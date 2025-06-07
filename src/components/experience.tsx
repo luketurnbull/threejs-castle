@@ -1,5 +1,6 @@
 import Scene from "./scene";
 import { OrbitControls, Sky, useGLTF } from "@react-three/drei";
+import "./grass-material";
 
 export default function Experience() {
   return (

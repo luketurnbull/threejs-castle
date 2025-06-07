@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useGLTF, useTexture } from "@react-three/drei";
 
-import "./grass-material/grassMaterial";
 import type { Model } from "../types/model";
 
 export function Tower() {
