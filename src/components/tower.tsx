@@ -205,6 +205,7 @@ function Grass() {
           transparent={true}
           side={THREE.DoubleSide}
           bladeHeight={4}
+          brightness={10.0}
         />
       </mesh>
       <mesh

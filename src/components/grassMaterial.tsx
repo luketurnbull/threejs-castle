@@ -5,7 +5,18 @@ import { extend } from "@react-three/fiber";
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      grassMaterial: any;
+      grassMaterial: React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
+        HTMLElement
+      > & {
+        map?: any;
+        alphaMap?: any;
+        toneMapped?: boolean;
+        transparent?: boolean;
+        side?: any;
+        bladeHeight?: number;
+        brightness?: number;
+      };
     }
   }
 }
@@ -18,6 +29,7 @@ const GrassMaterial = shaderMaterial(
     time: 0,
     tipColor: new THREE.Color(0.0, 0.6, 0.0).convertSRGBToLinear(),
     bottomColor: new THREE.Color(0.0, 0.1, 0.0).convertSRGBToLinear(),
+    brightness: 2.0,
   },
   `   precision mediump float;
       attribute vec3 offset;
@@ -105,6 +117,7 @@ const GrassMaterial = shaderMaterial(
       uniform sampler2D alphaMap;
       uniform vec3 tipColor;
       uniform vec3 bottomColor;
+      uniform float brightness;
       varying vec2 vUv;
       varying float frc;
       
@@ -119,7 +132,7 @@ const GrassMaterial = shaderMaterial(
         col = mix(vec4(tipColor, 1.0), col, frc);
         //Add a shadow towards root
         col = mix(vec4(bottomColor, 1.0), col, frc);
-        gl_FragColor = col;
+        gl_FragColor = col * brightness;
       }`,
   (self) => {
     if (self) {
