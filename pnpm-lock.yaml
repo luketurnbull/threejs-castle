@@ -69,6 +69,9 @@ importers:
       vite:
         specifier: ^6.3.5
         version: 6.3.5(jiti@2.4.2)(lightningcss@1.30.1)
+      vite-plugin-glsl:
+        specifier: ^1.4.2
+        version: 1.4.2(rollup@4.41.2)(vite@6.3.5(jiti@2.4.2)(lightningcss@1.30.1))
 
 packages:
 
@@ -450,6 +453,15 @@ packages:
 
   '@rolldown/pluginutils@1.0.0-beta.9':
     resolution: {integrity: sha512-e9MeMtVWo186sgvFFJOPGy7/d2j2mZhLJIdVW0C/xDluuOvymEATqz6zKsP0ZmXGzQtqlyjz5sC1sYQUoJG98w==}
+
+  '@rollup/pluginutils@5.1.4':
+    resolution: {integrity: sha512-USm05zrsFxYLPdWWq+K3STlWiT/3ELn3RcV5hJMghpeAIhxfsUIg6mt12CBJBInWMV4VneoV7SfGv8xIwo2qNQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
 
   '@rollup/rollup-android-arm-eabi@4.41.2':
     resolution: {integrity: sha512-YvIQXGGDzbOpkLuFcjGs+aiAi38D8FCyJanIdlcV2m9DWMJpHTSY8L9piO93VHBLRoe8O9C/FiycjnJ8+aP1tg==}
@@ -951,6 +963,9 @@ packages:
   estraverse@5.3.0:
     resolution: {integrity: sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA==}
     engines: {node: '>=4.0'}
+
+  estree-walker@2.0.2:
+    resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
 
   esutils@2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
@@ -1509,6 +1524,12 @@ packages:
     resolution: {integrity: sha512-6Z7Ma2aVEWisaL6TvBCy7P8rm2LQoPv6dJ7ecIaIixHcwfbJ0x7mWdbcwlIM5IGQxPZSFYeqRCqlOOeKoJYMkw==}
     engines: {node: '>= 4'}
 
+  vite-plugin-glsl@1.4.2:
+    resolution: {integrity: sha512-GQHx5tUPFna1zOrX9tbpSHLSVEv/wXZGPEey3Pk8ktHR/OJCEg82Vx2oE9d8mOeMhLfelrtpXg0TBD4riRs39Q==}
+    engines: {node: '>= 20.17.0', npm: '>= 10.8.3'}
+    peerDependencies:
+      vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
+
   vite@6.3.5:
     resolution: {integrity: sha512-cZn6NDFE7wdTpINgs++ZJ4N49W2vRp8LCKrn3Ob1kYNtOo21vfDoaV5GzBfLU4MovSAB8uNRm4jgzVQZ+mBzPQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -1957,6 +1978,14 @@ snapshots:
       - immer
 
   '@rolldown/pluginutils@1.0.0-beta.9': {}
+
+  '@rollup/pluginutils@5.1.4(rollup@4.41.2)':
+    dependencies:
+      '@types/estree': 1.0.8
+      estree-walker: 2.0.2
+      picomatch: 4.0.2
+    optionalDependencies:
+      rollup: 4.41.2
 
   '@rollup/rollup-android-arm-eabi@4.41.2':
     optional: true
@@ -2478,6 +2507,8 @@ snapshots:
 
   estraverse@5.3.0: {}
 
+  estree-walker@2.0.2: {}
+
   esutils@2.0.3: {}
 
   fast-deep-equal@3.1.3: {}
@@ -2955,6 +2986,13 @@ snapshots:
       react: 19.1.0
 
   utility-types@3.11.0: {}
+
+  vite-plugin-glsl@1.4.2(rollup@4.41.2)(vite@6.3.5(jiti@2.4.2)(lightningcss@1.30.1)):
+    dependencies:
+      '@rollup/pluginutils': 5.1.4(rollup@4.41.2)
+      vite: 6.3.5(jiti@2.4.2)(lightningcss@1.30.1)
+    transitivePeerDependencies:
+      - rollup
 
   vite@6.3.5(jiti@2.4.2)(lightningcss@1.30.1):
     dependencies:

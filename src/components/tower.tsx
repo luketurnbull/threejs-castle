@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { useEffect, useRef, type JSX } from "react";
 import { useGLTF, useTexture } from "@react-three/drei";
 import { type GLTF } from "three-stdlib";
-import "./grassMaterial";
+import "./grass-material/grassMaterial";
 import { useFrame } from "@react-three/fiber";
 
 type GLTFResult = GLTF & {
