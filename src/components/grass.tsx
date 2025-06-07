@@ -7,6 +7,8 @@ import rustleAudio from "../assets/rustlingGrass.mp3";
 
 const NUM_BLADES = 80000;
 const hillScale = new THREE.Vector3(119.355, 60.27, 119.355);
+const MIN_DISTANCE = 60; // Distance at which volume will be 1
+const MAX_DISTANCE = 300; // Distance at which volume will be 0
 
 function createBladeGeometry() {
   const geometry = new THREE.PlaneGeometry(0.12, 1, 1, 4);
@@ -17,6 +19,7 @@ function createBladeGeometry() {
 export default function Grass() {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
   const hillRef = useRef<THREE.Mesh>(null!);
+  const prevPointerRef = useRef<THREE.Vector2>(new THREE.Vector2());
 
   const [rustleSound] = useState<HTMLAudioElement>(
     () => new Audio(rustleAudio)
@@ -162,10 +165,25 @@ export default function Grass() {
       if (hits.length > 0) {
         const hitPoint = hits[0].point;
 
-        console.log(hitPoint);
+        // Check if cursor has moved
+        const hasMoved = !pointer.equals(prevPointerRef.current);
+        prevPointerRef.current.copy(pointer);
 
-        rustleSound.volume = Math.random();
-        rustleSound.play();
+        if (hasMoved) {
+          const distance = camera.position.distanceTo(hitPoint);
+
+          // Normalize distance to volume (1 at MIN_DISTANCE, 0 at MAX_DISTANCE)
+          const normalizedVolume = Math.max(
+            0,
+            Math.min(
+              1,
+              1 - (distance - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE)
+            )
+          );
+
+          rustleSound.volume = normalizedVolume;
+          rustleSound.play();
+        }
 
         materialRef.current.uniforms.playerPosition.value.copy(hitPoint);
       }
