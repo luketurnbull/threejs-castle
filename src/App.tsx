@@ -14,7 +14,7 @@ function App() {
         }}
       >
         <OrbitControls />
-        <ambientLight color="white" intensity={1} />
+        <ambientLight color="white" intensity={5} />
         <Tower />
       </Canvas>
     </div>
