@@ -1,5 +1,12 @@
 import Scene from "./scene";
-import { BakeShadows, OrbitControls, Sky, useGLTF } from "@react-three/drei";
+import {
+  BakeShadows,
+  OrbitControls,
+  Sky,
+  useGLTF,
+  AdaptiveDpr,
+  AdaptiveEvents,
+} from "@react-three/drei";
 import "./grass-material";
 
 export default function Experience() {
@@ -17,11 +24,16 @@ export default function Experience() {
         minPolarAngle={Math.PI * 0.2}
         maxPolarAngle={Math.PI * 0.5}
         enableZoom={false}
+        enableDamping={true}
+        dampingFactor={0.05}
       />
 
       <Scene />
 
       <BakeShadows />
+
+      <AdaptiveDpr pixelated />
+      <AdaptiveEvents />
     </>
   );
 }

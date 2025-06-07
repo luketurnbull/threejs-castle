@@ -11,6 +11,14 @@ function App() {
           near: 0.1,
           far: 1000,
         }}
+        dpr={[1, 2]}
+        performance={{ min: 0.5 }}
+        gl={{
+          antialias: true,
+          powerPreference: "high-performance",
+          stencil: false,
+          depth: true,
+        }}
       >
         <Experience />
       </Canvas>
