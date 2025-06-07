@@ -6,6 +6,7 @@ import {
   useGLTF,
   AdaptiveDpr,
   AdaptiveEvents,
+  Preload,
 } from "@react-three/drei";
 import "./grass-material";
 
@@ -31,7 +32,7 @@ export default function Experience() {
       <Scene />
 
       <BakeShadows />
-
+      <Preload all={true} />
       <AdaptiveDpr pixelated />
       <AdaptiveEvents />
     </>

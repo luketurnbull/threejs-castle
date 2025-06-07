@@ -151,12 +151,6 @@ export default function Grass() {
     };
   }, [hillGeom]);
 
-  const audio = async () => {
-    rustleSound.currentTime = 0;
-    rustleSound.volume = Math.random();
-    await rustleSound.play();
-  };
-
   useFrame((state) => {
     if (materialRef.current) {
       materialRef.current.uniforms.time.value = state.clock.elapsedTime * 0.25;
@@ -167,6 +161,11 @@ export default function Grass() {
 
       if (hits.length > 0) {
         const hitPoint = hits[0].point;
+
+        console.log(hitPoint);
+
+        rustleSound.volume = Math.random();
+        rustleSound.play();
 
         materialRef.current.uniforms.playerPosition.value.copy(hitPoint);
       }
