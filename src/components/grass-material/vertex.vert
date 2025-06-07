@@ -73,7 +73,7 @@ void main() {
    //Interpolate between the unbent direction and the direction of growth calculated on the CPU. 
    //Using the relative location of the vertex along the Y axis as the weight, we get a smooth bend
    direction = slerp(direction, orientation, frc);
-   vec3 vPosition = vec3(position.x, position.y + position.y * stretch, position.z);
+   vec3 vPosition = vec3(position.x, position.y * bladeHeight + position.y * stretch, position.z);
    vPosition = rotateVectorByQuaternion(vPosition, direction);
 
    //Apply wind
