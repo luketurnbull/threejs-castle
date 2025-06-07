@@ -1,8 +1,7 @@
 import * as THREE from "three";
-import { useEffect, useMemo, useRef, type JSX } from "react";
+import { useEffect, useRef, type JSX } from "react";
 import { useGLTF, useTexture } from "@react-three/drei";
-import { Geometry, type GLTF } from "three-stdlib";
-import { createNoise2D } from "simplex-noise";
+import { type GLTF } from "three-stdlib";
 import "./grassMaterial";
 import { useFrame } from "@react-three/fiber";
 
@@ -22,15 +21,7 @@ export function Tower(props: JSX.IntrinsicElements["group"]) {
 
   useEffect(() => {
     const geometry = nodes.towerMainShaft.geometry;
-
-    // Check which UV map has the correct layout
-    console.log("UV map 0 (uv):", geometry.attributes.uv.array.slice(0, 10));
-    console.log("UV map 1 (uv1):", geometry.attributes.uv1.array.slice(0, 10));
-
-    // Use the second UV map (likely your baking UV)
     geometry.attributes.uv = geometry.attributes.uv1;
-
-    // Force geometry to update
     geometry.attributes.uv.needsUpdate = true;
   }, [nodes]);
 
@@ -39,18 +30,8 @@ export function Tower(props: JSX.IntrinsicElements["group"]) {
 
   return (
     <group {...props} dispose={null}>
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.hill.geometry}
-        scale={[119.355, 60.27, 119.355]}
-      >
-        <meshStandardMaterial color={"green"} aoMap={shadowMap} />
-      </mesh>
       <Grass />
       <mesh
-        castShadow
-        receiveShadow
         geometry={nodes.towerMainShaft.geometry}
         position={[-1.617, 0, 0.229]}
         scale={10}
@@ -58,8 +39,6 @@ export function Tower(props: JSX.IntrinsicElements["group"]) {
         <meshStandardMaterial map={diffuse} />
       </mesh>
       <mesh
-        castShadow
-        receiveShadow
         geometry={nodes.windowInside.geometry}
         material={nodes.windowInside.material}
         position={[-11.648, 28.151, -0.501]}
@@ -70,75 +49,127 @@ export function Tower(props: JSX.IntrinsicElements["group"]) {
   );
 }
 
-useGLTF.preload("/tower-with-hill-3.glb");
+function createBladeGeometry() {
+  // Simple vertical plane for a grass blade
+  const geometry = new THREE.PlaneGeometry(0.12, 1, 1, 4);
+  geometry.translate(0, 0.5, 0); // Move base to y=0
+  return geometry;
+}
 
-const noise2D = createNoise2D();
+function samplePointOnGeometry(geometry: THREE.BufferGeometry) {
+  // Randomly pick a face, then a random point in that face
+  const position = geometry.attributes.position;
+  const index = geometry.index;
+  const faceCount = index ? index.count / 3 : position.count / 3;
+  const faceIndex = Math.floor(Math.random() * faceCount);
 
-function Grass({
-  options = { bW: 0.12, bH: 1, joints: 5 },
-  width = 100,
-  instances = 50000,
-  ...props
-}) {
-  const { bW, bH, joints } = options;
-  const materialRef = useRef(null!);
+  let a, b, c;
+
+  if (index) {
+    a = index.getX(faceIndex * 3);
+    b = index.getX(faceIndex * 3 + 1);
+    c = index.getX(faceIndex * 3 + 2);
+  } else {
+    a = faceIndex * 3;
+    b = faceIndex * 3 + 1;
+    c = faceIndex * 3 + 2;
+  }
+
+  const vA = new THREE.Vector3().fromBufferAttribute(position, a);
+  const vB = new THREE.Vector3().fromBufferAttribute(position, b);
+  const vC = new THREE.Vector3().fromBufferAttribute(position, c);
+
+  // Barycentric coordinates
+  const r1 = Math.random();
+  const r2 = Math.random();
+  const sqrtR1 = Math.sqrt(r1);
+  const u = 1 - sqrtR1;
+  const v = sqrtR1 * (1 - r2);
+  const w = sqrtR1 * r2;
+  const point = new THREE.Vector3()
+    .addScaledVector(vA, u)
+    .addScaledVector(vB, v)
+    .addScaledVector(vC, w);
+
+  // Normal
+  const nA = new THREE.Vector3().fromBufferAttribute(
+    geometry.attributes.normal,
+    a
+  );
+  const nB = new THREE.Vector3().fromBufferAttribute(
+    geometry.attributes.normal,
+    b
+  );
+  const nC = new THREE.Vector3().fromBufferAttribute(
+    geometry.attributes.normal,
+    c
+  );
+  const normal = new THREE.Vector3()
+    .addScaledVector(nA, u)
+    .addScaledVector(nB, v)
+    .addScaledVector(nC, w)
+    .normalize();
+  return { point, normal };
+}
+
+function Grass() {
+  const materialRef = useRef<THREE.ShaderMaterial>(null!);
+  const { nodes } = useGLTF("/tower-with-hill-3.glb") as unknown as GLTFResult;
+  const hillRef = useRef<THREE.Mesh>(null!);
 
   const texture = useTexture("./blade_diffuse.jpg");
   const alphaMap = useTexture("./blade_alpha.jpg");
 
-  const attributeData = useMemo(
-    () => getAttributeData(instances, width),
-    [instances, width]
-  );
+  // --- Grass Instancing Setup ---
+  const NUM_BLADES = 80000;
+  const baseGeom = createBladeGeometry();
+  const hillGeom = nodes.hill.geometry;
+  const hillScale = new THREE.Vector3(119.355, 60.27, 119.355);
 
-  const baseGeom = useMemo(
-    () => new THREE.PlaneGeometry(bW, bH, 1, joints).translate(0, bH / 2, 0),
-    [options]
-  );
+  // Prepare attribute arrays
+  const offsets = [];
+  const orientations = [];
+  const stretches = [];
+  const halfRootAngleSin = [];
+  const halfRootAngleCos = [];
 
-  const groundGeo = useMemo(() => {
-    const geo = new THREE.BufferGeometry();
-    const segments = 32;
-    const vertices = [];
-    const indices = [];
+  for (let i = 0; i < NUM_BLADES; i++) {
+    const { point, normal } = samplePointOnGeometry(hillGeom);
+    point.multiply(hillScale);
+    offsets.push(point.x, point.y, point.z);
 
-    // Create vertices
-    for (let i = 0; i <= segments; i++) {
-      for (let j = 0; j <= segments; j++) {
-        const x = (i / segments) * width - width / 2;
-        const z = (j / segments) * width - width / 2;
-        const y = getYPosition(x, z);
-        vertices.push(x, y, z);
-      }
+    // Orientation: align Y axis with normal
+    const up = new THREE.Vector3(0, 1, 0);
+    const quat = new THREE.Quaternion().setFromUnitVectors(up, normal);
+    orientations.push(quat.x, quat.y, quat.z, quat.w);
+
+    // Random stretch
+    const stretch = 0.7 + Math.random() * 0.6;
+    stretches.push(stretch);
+
+    // Random root angle for bending
+    const rootAngle = Math.random() * Math.PI * 2;
+    halfRootAngleSin.push(Math.sin(0.5 * rootAngle));
+    halfRootAngleCos.push(Math.cos(0.5 * rootAngle));
+  }
+
+  const grassAttributes = {
+    offsets,
+    orientations,
+    stretches,
+    halfRootAngleSin,
+    halfRootAngleCos,
+  };
+  // --- End Grass Instancing Setup ---
+
+  useFrame((state) => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.time.value = state.clock.elapsedTime / 4;
     }
-
-    // Create indices
-    for (let i = 0; i < segments; i++) {
-      for (let j = 0; j < segments; j++) {
-        const a = i * (segments + 1) + j;
-        const b = a + 1;
-        const c = a + (segments + 1);
-        const d = c + 1;
-
-        indices.push(a, b, c);
-        indices.push(b, d, c);
-      }
-    }
-
-    geo.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-    geo.setIndex(indices);
-    geo.computeVertexNormals();
-
-    return geo;
-  }, [width]);
-
-  useFrame(
-    (state) =>
-      (materialRef.current.uniforms.time.value = state.clock.elapsedTime / 4)
-  );
+  });
 
   return (
-    <group {...props}>
+    <group>
       <mesh>
         <instancedBufferGeometry
           index={baseGeom.index}
@@ -147,23 +178,23 @@ function Grass({
         >
           <instancedBufferAttribute
             attach={"attributes-offset"}
-            args={[new Float32Array(attributeData.offsets), 3]}
+            args={[new Float32Array(grassAttributes.offsets), 3]}
           />
           <instancedBufferAttribute
             attach={"attributes-orientation"}
-            args={[new Float32Array(attributeData.orientations), 4]}
+            args={[new Float32Array(grassAttributes.orientations), 4]}
           />
           <instancedBufferAttribute
             attach={"attributes-stretch"}
-            args={[new Float32Array(attributeData.stretches), 1]}
+            args={[new Float32Array(grassAttributes.stretches), 1]}
           />
           <instancedBufferAttribute
             attach={"attributes-halfRootAngleSin"}
-            args={[new Float32Array(attributeData.halfRootAngleSin), 1]}
+            args={[new Float32Array(grassAttributes.halfRootAngleSin), 1]}
           />
           <instancedBufferAttribute
             attach={"attributes-halfRootAngleCos"}
-            args={[new Float32Array(attributeData.halfRootAngleCos), 1]}
+            args={[new Float32Array(grassAttributes.halfRootAngleCos), 1]}
           />
         </instancedBufferGeometry>
         <grassMaterial
@@ -171,109 +202,21 @@ function Grass({
           map={texture}
           alphaMap={alphaMap}
           toneMapped={false}
+          transparent={true}
+          side={THREE.DoubleSide}
+          bladeHeight={4}
         />
       </mesh>
-      <mesh position={[0, 0, 0]} geometry={groundGeo}>
+      <mesh
+        ref={hillRef}
+        geometry={nodes.hill.geometry}
+        scale={[119.355, 60.27, 119.355]}
+        visible={true}
+      >
         <meshStandardMaterial color="#000f00" />
       </mesh>
     </group>
   );
 }
 
-function getAttributeData(instances, width) {
-  const offsets = [];
-  const orientations = [];
-  const stretches = [];
-  const halfRootAngleSin = [];
-  const halfRootAngleCos = [];
-
-  let quaternion_0 = new THREE.Vector4();
-  const quaternion_1 = new THREE.Vector4();
-
-  //The min and max angle for the growth direction (in radians)
-  const min = -0.25;
-  const max = 0.25;
-
-  //For each instance of the grass blade
-  for (let i = 0; i < instances; i++) {
-    //Offset of the roots
-    const offsetX = Math.random() * width - width / 2;
-    const offsetZ = Math.random() * width - width / 2;
-    const offsetY = getYPosition(offsetX, offsetZ);
-    offsets.push(offsetX, offsetY, offsetZ);
-
-    //Define random growth directions
-    //Rotate around Y
-    let angle = Math.PI - Math.random() * (2 * Math.PI);
-    halfRootAngleSin.push(Math.sin(0.5 * angle));
-    halfRootAngleCos.push(Math.cos(0.5 * angle));
-
-    let RotationAxis = new THREE.Vector3(0, 1, 0);
-    let x = RotationAxis.x * Math.sin(angle / 2.0);
-    let y = RotationAxis.y * Math.sin(angle / 2.0);
-    let z = RotationAxis.z * Math.sin(angle / 2.0);
-    let w = Math.cos(angle / 2.0);
-    quaternion_0.set(x, y, z, w).normalize();
-
-    //Rotate around X
-    angle = Math.random() * (max - min) + min;
-    RotationAxis = new THREE.Vector3(1, 0, 0);
-    x = RotationAxis.x * Math.sin(angle / 2.0);
-    y = RotationAxis.y * Math.sin(angle / 2.0);
-    z = RotationAxis.z * Math.sin(angle / 2.0);
-    w = Math.cos(angle / 2.0);
-    quaternion_1.set(x, y, z, w).normalize();
-
-    //Combine rotations to a single quaternion
-    quaternion_0 = multiplyQuaternions(quaternion_0, quaternion_1);
-
-    //Rotate around Z
-    angle = Math.random() * (max - min) + min;
-    RotationAxis = new THREE.Vector3(0, 0, 1);
-    x = RotationAxis.x * Math.sin(angle / 2.0);
-    y = RotationAxis.y * Math.sin(angle / 2.0);
-    z = RotationAxis.z * Math.sin(angle / 2.0);
-    w = Math.cos(angle / 2.0);
-    quaternion_1.set(x, y, z, w).normalize();
-
-    //Combine rotations to a single quaternion
-    quaternion_0 = multiplyQuaternions(quaternion_0, quaternion_1);
-
-    orientations.push(
-      quaternion_0.x,
-      quaternion_0.y,
-      quaternion_0.z,
-      quaternion_0.w
-    );
-
-    //Define variety in height
-    if (i < instances / 3) {
-      stretches.push(Math.random() * 1.8);
-    } else {
-      stretches.push(Math.random());
-    }
-  }
-
-  return {
-    offsets,
-    orientations,
-    stretches,
-    halfRootAngleCos,
-    halfRootAngleSin,
-  };
-}
-
-function multiplyQuaternions(q1, q2) {
-  const x = q1.x * q2.w + q1.y * q2.z - q1.z * q2.y + q1.w * q2.x;
-  const y = -q1.x * q2.z + q1.y * q2.w + q1.z * q2.x + q1.w * q2.y;
-  const z = q1.x * q2.y - q1.y * q2.x + q1.z * q2.w + q1.w * q2.z;
-  const w = -q1.x * q2.x - q1.y * q2.y - q1.z * q2.z + q1.w * q2.w;
-  return new THREE.Vector4(x, y, z, w);
-}
-
-function getYPosition(x, z) {
-  let y = 2 * noise2D(x / 50, z / 50);
-  y += 4 * noise2D(x / 100, z / 100);
-  y += 0.2 * noise2D(x / 10, z / 10);
-  return y;
-}
+useGLTF.preload("/tower-with-hill-3.glb");

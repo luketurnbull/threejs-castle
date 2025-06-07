@@ -15,11 +15,11 @@ function App() {
       >
         <Sky azimuth={1} inclination={0.6} distance={1000} />
         <OrbitControls
-          minPolarAngle={Math.PI / 2.5}
-          maxPolarAngle={Math.PI / 2.5}
-          enableZoom={false}
+        // minPolarAngle={Math.PI / 2.5}
+        // maxPolarAngle={Math.PI / 2.5}
+        // enableZoom={false}
         />
-        <ambientLight color="white" intensity={5} />
+        <ambientLight color="white" intensity={15} />
         <Tower />
       </Canvas>
     </div>
