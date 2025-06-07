@@ -272,7 +272,7 @@ function Grass() {
         scale={[119.355, 60.27, 119.355]}
         visible={true}
       >
-        <meshStandardMaterial color="#000f00" />
+        <meshStandardMaterial color="#270f0a" />
       </mesh>
     </group>
   );
