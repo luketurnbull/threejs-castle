@@ -86,24 +86,24 @@ void main() {
    vPosition = rotateVectorByQuaternion(vPosition, normalize(vec4(sin(halfAngle), 0.0, -sin(halfAngle), cos(halfAngle))));
 
    //Apply player interaction
-   if (distToPlayer < 40.0) {
-     float influence = 1.0 - smoothstep(0.0, 40.0, distToPlayer);
+   if (distToPlayer < 60.0) {
+     float influence = 1.0 - smoothstep(0.0, 60.0, distToPlayer);
      
      // Calculate direction from player to grass blade
      vec3 dirToPlayer = normalize(vec3(playerPosition.x - worldPos.x, 0.0, playerPosition.z - worldPos.z));
      
      // Create a radial wave effect
      float radialNoise = snoise(vec2(
-       distToPlayer * 0.1 + time * 0.5,
-       atan(dirToPlayer.z, dirToPlayer.x) * 2.0
+       distToPlayer * 0.05 + time * 0.3,
+       atan(dirToPlayer.z, dirToPlayer.x) * 1.5
      ));
      
      // Stronger push in the center, radiating outward
-     float centerPush = 1.0 - smoothstep(0.0, 8.0, distToPlayer);
+     float centerPush = 1.0 - smoothstep(0.0, 12.0, distToPlayer);
      float radialPush = influence * (1.2 + radialNoise * 0.6);
      
      // Combine center push with radial movement
-     vec3 pushDir = dirToPlayer * (centerPush * 1.2 + radialPush * 0.3);
+     vec3 pushDir = dirToPlayer * (centerPush * 1.2 + radialPush * 0.4);
      pushDir.y = -centerPush * 0.8;
      
      vPosition += pushDir;
