@@ -19,7 +19,7 @@ function App() {
           maxPolarAngle={Math.PI / 2.5}
           enableZoom={false}
         />
-        <ambientLight color="white" intensity={5} />
+        <ambientLight color="white" intensity={4} />
         <Tower />
       </Canvas>
     </div>

@@ -2,25 +2,6 @@ import * as THREE from "three";
 import { shaderMaterial } from "@react-three/drei";
 import { extend } from "@react-three/fiber";
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      grassMaterial: React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement>,
-        HTMLElement
-      > & {
-        map?: any;
-        alphaMap?: any;
-        toneMapped?: boolean;
-        transparent?: boolean;
-        side?: any;
-        bladeHeight?: number;
-        brightness?: number;
-      };
-    }
-  }
-}
-
 const GrassMaterial = shaderMaterial(
   {
     bladeHeight: 1,
@@ -30,6 +11,7 @@ const GrassMaterial = shaderMaterial(
     tipColor: new THREE.Color(0.0, 0.6, 0.0).convertSRGBToLinear(),
     bottomColor: new THREE.Color(0.0, 0.1, 0.0).convertSRGBToLinear(),
     brightness: 2.0,
+    aoMap: null,
   },
   `   precision mediump float;
       attribute vec3 offset;
@@ -37,10 +19,12 @@ const GrassMaterial = shaderMaterial(
       attribute float halfRootAngleSin;
       attribute float halfRootAngleCos;
       attribute float stretch;
+      attribute vec2 hillUv;
       uniform float time;
       uniform float bladeHeight;
       varying vec2 vUv;
       varying float frc;
+      varying vec2 vHillUv;
       
       //WEBGL-NOISE FROM https://github.com/stegu/webgl-noise
       //Description : Array and textureless GLSL 2D simplex noise function. Author : Ian McEwan, Ashima Arts. Maintainer : stegu Lastmod : 20110822 (ijm) License : Copyright (C) 2011 Ashima Arts. All rights reserved. Distributed under the MIT License. See LICENSE file. https://github.com/ashima/webgl-noise https://github.com/stegu/webgl-noise      
@@ -108,6 +92,7 @@ const GrassMaterial = shaderMaterial(
         vPosition = rotateVectorByQuaternion(vPosition, normalize(vec4(sin(halfAngle), 0.0, -sin(halfAngle), cos(halfAngle))));
         //UV for texture
         vUv = uv;
+        vHillUv = hillUv;
         //Calculate final position of the vertex from the world offset and the above shenanigans 
         gl_Position = projectionMatrix * modelViewMatrix * vec4(offset + vPosition, 1.0 );
       }`,
@@ -115,24 +100,24 @@ const GrassMaterial = shaderMaterial(
       precision mediump float;
       uniform sampler2D map;
       uniform sampler2D alphaMap;
+      uniform sampler2D aoMap;
       uniform vec3 tipColor;
       uniform vec3 bottomColor;
       uniform float brightness;
       varying vec2 vUv;
       varying float frc;
-      
+      varying vec2 vHillUv;
+
       void main() {
-        //Get transparency information from alpha map
         float alpha = texture2D(alphaMap, vUv).r;
-        //If transparent, don't draw
         if(alpha < 0.15) discard;
-        //Get colour data from texture
+
         vec4 col = vec4(texture2D(map, vUv));
-        //Add more green towards root
         col = mix(vec4(tipColor, 1.0), col, frc);
-        //Add a shadow towards root
         col = mix(vec4(bottomColor, 1.0), col, frc);
-        gl_FragColor = col * brightness;
+
+        float ao = texture2D(aoMap, vHillUv).r;
+        gl_FragColor = col * brightness * ao;
       }`,
   (self) => {
     if (self) {

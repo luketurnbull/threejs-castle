@@ -119,48 +119,101 @@ function Grass() {
 
   const texture = useTexture("./blade_diffuse.jpg");
   const alphaMap = useTexture("./blade_alpha.jpg");
+  const aoMap = useTexture("./hillShadow.png");
 
-  // --- Grass Instancing Setup ---
   const NUM_BLADES = 80000;
   const baseGeom = createBladeGeometry();
   const hillGeom = nodes.hill.geometry;
   const hillScale = new THREE.Vector3(119.355, 60.27, 119.355);
 
-  // Prepare attribute arrays
   const offsets = [];
   const orientations = [];
   const stretches = [];
   const halfRootAngleSin = [];
   const halfRootAngleCos = [];
+  const hillUVs = [];
 
   for (let i = 0; i < NUM_BLADES; i++) {
-    const { point, normal } = samplePointOnGeometry(hillGeom);
+    // Sample point, normal, and barycentric info
+    const position = hillGeom.attributes.position;
+    const index = hillGeom.index;
+    const faceCount = index ? index.count / 3 : position.count / 3;
+    const faceIndex = Math.floor(Math.random() * faceCount);
+    let a, b, c;
+    if (index) {
+      a = index.getX(faceIndex * 3);
+      b = index.getX(faceIndex * 3 + 1);
+      c = index.getX(faceIndex * 3 + 2);
+    } else {
+      a = faceIndex * 3;
+      b = faceIndex * 3 + 1;
+      c = faceIndex * 3 + 2;
+    }
+    const vA = new THREE.Vector3().fromBufferAttribute(position, a);
+    const vB = new THREE.Vector3().fromBufferAttribute(position, b);
+    const vC = new THREE.Vector3().fromBufferAttribute(position, c);
+    // Barycentric coordinates
+    const r1 = Math.random();
+    const r2 = Math.random();
+    const sqrtR1 = Math.sqrt(r1);
+    const u = 1 - sqrtR1;
+    const v = sqrtR1 * (1 - r2);
+    const w = sqrtR1 * r2;
+    const point = new THREE.Vector3()
+      .addScaledVector(vA, u)
+      .addScaledVector(vB, v)
+      .addScaledVector(vC, w);
+    // Normal
+    const nA = new THREE.Vector3().fromBufferAttribute(
+      hillGeom.attributes.normal,
+      a
+    );
+    const nB = new THREE.Vector3().fromBufferAttribute(
+      hillGeom.attributes.normal,
+      b
+    );
+    const nC = new THREE.Vector3().fromBufferAttribute(
+      hillGeom.attributes.normal,
+      c
+    );
+    const normal = new THREE.Vector3()
+      .addScaledVector(nA, u)
+      .addScaledVector(nB, v)
+      .addScaledVector(nC, w)
+      .normalize();
+    // Interpolated UV
+    const uvAttr = hillGeom.attributes.uv;
+    const uvA = new THREE.Vector2().fromBufferAttribute(uvAttr, a);
+    const uvB = new THREE.Vector2().fromBufferAttribute(uvAttr, b);
+    const uvC = new THREE.Vector2().fromBufferAttribute(uvAttr, c);
+    const uv = new THREE.Vector2()
+      .addScaledVector(uvA, u)
+      .addScaledVector(uvB, v)
+      .addScaledVector(uvC, w);
+    hillUVs.push(uv.x, uv.y);
+    // Apply scale
     point.multiply(hillScale);
     offsets.push(point.x, point.y, point.z);
-
     // Orientation: align Y axis with normal
     const up = new THREE.Vector3(0, 1, 0);
     const quat = new THREE.Quaternion().setFromUnitVectors(up, normal);
     orientations.push(quat.x, quat.y, quat.z, quat.w);
-
     // Random stretch
     const stretch = 0.7 + Math.random() * 0.6;
     stretches.push(stretch);
-
     // Random root angle for bending
     const rootAngle = Math.random() * Math.PI * 2;
     halfRootAngleSin.push(Math.sin(0.5 * rootAngle));
     halfRootAngleCos.push(Math.cos(0.5 * rootAngle));
   }
-
   const grassAttributes = {
     offsets,
     orientations,
     stretches,
     halfRootAngleSin,
     halfRootAngleCos,
+    hillUVs,
   };
-  // --- End Grass Instancing Setup ---
 
   useFrame((state) => {
     if (materialRef.current) {
@@ -196,6 +249,10 @@ function Grass() {
             attach={"attributes-halfRootAngleCos"}
             args={[new Float32Array(grassAttributes.halfRootAngleCos), 1]}
           />
+          <instancedBufferAttribute
+            attach={"attributes-hillUv"}
+            args={[new Float32Array(grassAttributes.hillUVs), 2]}
+          />
         </instancedBufferGeometry>
         <grassMaterial
           ref={materialRef}
@@ -205,7 +262,8 @@ function Grass() {
           transparent={true}
           side={THREE.DoubleSide}
           bladeHeight={4}
-          brightness={10.0}
+          brightness={5.0}
+          aoMap={aoMap}
         />
       </mesh>
       <mesh
