@@ -8,6 +8,7 @@ attribute float stretch;
 attribute vec2 hillUv;
 uniform float time;
 uniform float bladeHeight;
+uniform vec3 playerPosition;
 varying vec2 vUv;
 varying float frc;
 varying vec2 vHillUv;
@@ -76,14 +77,42 @@ void main() {
    vec3 vPosition = vec3(position.x, position.y * bladeHeight + position.y * stretch, position.z);
    vPosition = rotateVectorByQuaternion(vPosition, direction);
 
+   //Calculate world position for player interaction
+   vec3 worldPos = offset + vPosition;
+   float distToPlayer = length(vec2(playerPosition.x - worldPos.x, playerPosition.z - worldPos.z));
+   
    //Apply wind
    float halfAngle = noise * 0.15;
    vPosition = rotateVectorByQuaternion(vPosition, normalize(vec4(sin(halfAngle), 0.0, -sin(halfAngle), cos(halfAngle))));
+
+   //Apply player interaction
+   if (distToPlayer < 40.0) {
+     float influence = 1.0 - smoothstep(0.0, 40.0, distToPlayer);
+     
+     // Calculate direction from player to grass blade
+     vec3 dirToPlayer = normalize(vec3(playerPosition.x - worldPos.x, 0.0, playerPosition.z - worldPos.z));
+     
+     // Create a radial wave effect
+     float radialNoise = snoise(vec2(
+       distToPlayer * 0.1 + time * 0.5,
+       atan(dirToPlayer.z, dirToPlayer.x) * 2.0
+     ));
+     
+     // Stronger push in the center, radiating outward
+     float centerPush = 1.0 - smoothstep(0.0, 8.0, distToPlayer);
+     float radialPush = influence * (1.2 + radialNoise * 0.6);
+     
+     // Combine center push with radial movement
+     vec3 pushDir = dirToPlayer * (centerPush * 1.2 + radialPush * 0.3);
+     pushDir.y = -centerPush * 0.8;
+     
+     vPosition += pushDir;
+   }
 
    //UV for texture
    vUv = uv;
    vHillUv = hillUv;
    
-   //Calculate final position of the vertex from the world offset and the above shenanigans 
-   gl_Position = projectionMatrix * modelViewMatrix * vec4(offset + vPosition, 1.0 );
+   //Calculate final position
+   gl_Position = projectionMatrix * modelViewMatrix * vec4(offset + vPosition, 1.0);
 }

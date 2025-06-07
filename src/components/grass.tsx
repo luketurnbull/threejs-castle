@@ -1,7 +1,8 @@
 import { useGLTF, useTexture } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
+import type { Model } from "../types/model";
 
 function createBladeGeometry() {
   // Simple vertical plane for a grass blade
@@ -13,6 +14,7 @@ function createBladeGeometry() {
 export default function Grass() {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
   const { nodes } = useGLTF("/tower-with-hill-3.glb", true) as unknown as Model;
+  const { camera, raycaster, pointer } = useThree();
 
   const hillRef = useRef<THREE.Mesh>(null!);
 
@@ -142,6 +144,20 @@ export default function Grass() {
   useFrame((state) => {
     if (materialRef.current) {
       materialRef.current.uniforms.time.value = state.clock.elapsedTime * 0.25;
+
+      // Update player position based on mouse position
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObject(hillRef.current);
+
+      if (hits.length > 0) {
+        const hitPoint = hits[0].point;
+        // Keep the player position at a fixed height
+        hitPoint.y = 0.5;
+        materialRef.current.uniforms.playerPosition.value.copy(hitPoint);
+      } else {
+        // Move player position far away when not hovering
+        materialRef.current.uniforms.playerPosition.value.set(1000, 0.5, 1000);
+      }
     }
   });
 
