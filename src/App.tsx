@@ -1,6 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { Tower } from "./components/tower";
-import { OrbitControls, Sky } from "@react-three/drei";
+import Experience from "./components/experience";
 
 function App() {
   return (
@@ -13,14 +12,7 @@ function App() {
           far: 1000,
         }}
       >
-        <Sky azimuth={1} inclination={0.6} distance={1000} />
-        <OrbitControls
-          minPolarAngle={Math.PI / 2.5}
-          maxPolarAngle={Math.PI / 2.5}
-          enableZoom={false}
-        />
-        <ambientLight color="white" intensity={4} />
-        <Tower />
+        <Experience />
       </Canvas>
     </div>
   );
