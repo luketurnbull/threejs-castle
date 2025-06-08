@@ -3,12 +3,14 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Model } from "../types/model";
-import rustleAudio from "../assets/rustlingGrass.mp3";
+import rustleAudio from "../assets/leavesRustling2.mp3";
 
 const NUM_BLADES = 80000;
 const hillScale = new THREE.Vector3(119.355, 60.27, 119.355);
-const MIN_DISTANCE = 0; // Distance at which volume will be 1
-const MAX_DISTANCE = 260; // Distance at which volume will be 0
+const MIN_DISTANCE = 60; // Distance at which volume will be 1
+const MAX_DISTANCE = 200; // Distance at which volume will be 0
+const FADE_SPEED = 0.05; // Speed of volume fade in/out
+const STOP_DELAY = 200; // Delay before stopping sound (ms)
 
 function createBladeGeometry() {
   const geometry = new THREE.PlaneGeometry(0.12, 1, 1, 4);
@@ -20,10 +22,14 @@ export default function Grass() {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
   const hillRef = useRef<THREE.Mesh>(null!);
   const prevPointerRef = useRef<THREE.Vector2>(new THREE.Vector2());
+  const targetVolumeRef = useRef<number>(0);
+  const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [rustleSound] = useState<HTMLAudioElement>(
-    () => new Audio(rustleAudio)
-  );
+  const [rustleSound] = useState<HTMLAudioElement>(() => {
+    const audio = new Audio(rustleAudio);
+    audio.loop = true;
+    return audio;
+  });
 
   const { nodes } = useGLTF("/tower-with-hill-3.glb", true) as unknown as Model;
   const hillGeom = nodes.hill.geometry;
@@ -181,11 +187,51 @@ export default function Grass() {
             )
           );
 
-          rustleSound.volume = normalizedVolume;
-          rustleSound.play();
+          // Clear any existing stop timeout
+          if (stopTimeoutRef.current) {
+            clearTimeout(stopTimeoutRef.current);
+            stopTimeoutRef.current = null;
+          }
+
+          // When movement resumes, restart the audio
+          if (rustleSound.paused) {
+            rustleSound.currentTime = 0;
+            rustleSound.volume = normalizedVolume; // Set initial volume immediately
+            rustleSound.play();
+          } else {
+            // Only use fade for subsequent volume changes
+            targetVolumeRef.current = normalizedVolume;
+          }
+
+          materialRef.current.uniforms.playerPosition.value.copy(hitPoint);
+        } else {
+          // Set up timeout to stop sound if no movement
+          if (!stopTimeoutRef.current) {
+            stopTimeoutRef.current = setTimeout(() => {
+              targetVolumeRef.current = 0;
+            }, STOP_DELAY);
+          }
         }
 
-        materialRef.current.uniforms.playerPosition.value.copy(hitPoint);
+        // Smoothly adjust volume towards target
+        const currentVolume = rustleSound.volume;
+        const volumeDiff = targetVolumeRef.current - currentVolume;
+        rustleSound.volume = currentVolume + volumeDiff * FADE_SPEED;
+
+        // Stop sound if volume is very low
+        if (rustleSound.volume < 0.01 && !hasMoved) {
+          rustleSound.pause();
+          rustleSound.volume = 0;
+        }
+      } else {
+        // When not hovering over hill, immediately stop the sound
+        if (stopTimeoutRef.current) {
+          clearTimeout(stopTimeoutRef.current);
+          stopTimeoutRef.current = null;
+        }
+        targetVolumeRef.current = 0;
+        rustleSound.pause();
+        rustleSound.volume = 0;
       }
     }
   });
