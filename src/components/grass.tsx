@@ -7,6 +7,8 @@ import rustleAudio from "../assets/leavesRustling2.mp3";
 
 const NUM_BLADES = 80000;
 const hillScale = new THREE.Vector3(119.355, 60.27, 119.355);
+
+// Audio settings
 const MIN_DISTANCE = 60; // Distance at which volume will be 1
 const MAX_DISTANCE = 200; // Distance at which volume will be 0
 const FADE_SPEED = 0.05; // Speed of volume fade in/out
@@ -166,6 +168,7 @@ export default function Grass() {
 
       // Update player position based on mouse position
       raycaster.setFromCamera(pointer, camera);
+
       const hits = raycaster.intersectObject(hillRef.current);
 
       if (hits.length > 0) {
@@ -229,6 +232,7 @@ export default function Grass() {
           clearTimeout(stopTimeoutRef.current);
           stopTimeoutRef.current = null;
         }
+
         targetVolumeRef.current = 0;
         rustleSound.pause();
         rustleSound.volume = 0;
