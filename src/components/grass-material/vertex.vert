@@ -6,9 +6,11 @@ attribute float halfRootAngleSin;
 attribute float halfRootAngleCos;
 attribute float stretch;
 attribute vec2 hillUv;
+
 uniform float time;
 uniform float bladeHeight;
 uniform vec3 playerPosition;
+
 varying vec2 vUv;
 varying float frc;
 varying vec2 vHillUv;
@@ -86,11 +88,11 @@ void main() {
    vPosition = rotateVectorByQuaternion(vPosition, normalize(vec4(sin(halfAngle), 0.0, -sin(halfAngle), cos(halfAngle))));
 
    //Apply player interaction
-   if (distToPlayer < 60.0) {
-     float influence = 1.0 - smoothstep(0.0, 60.0, distToPlayer);
+   if (distToPlayer < 20.0) {
+     float influence = 1.0 - smoothstep(0.0, 20.0, distToPlayer);
      
-     // Calculate direction from player to grass blade
-     vec3 dirToPlayer = normalize(vec3(playerPosition.x - worldPos.x, 0.0, playerPosition.z - worldPos.z));
+     // Calculate direction from grass blade to player (reversed for bending away)
+     vec3 dirToPlayer = normalize(vec3(worldPos.x - playerPosition.x, 0.0, worldPos.z - playerPosition.z));
      
      // Create a radial wave effect
      float radialNoise = snoise(vec2(
@@ -102,9 +104,9 @@ void main() {
      float centerPush = 1.0 - smoothstep(0.0, 12.0, distToPlayer);
      float radialPush = influence * (1.2 + radialNoise * 0.6);
      
-     // Combine center push with radial movement
-     vec3 pushDir = dirToPlayer * (centerPush * 1.2 + radialPush * 0.4);
-     pushDir.y = -centerPush * 0.8;
+     // Combine center push with radial movement, increased for stronger bending
+     vec3 pushDir = dirToPlayer * (centerPush * 2.0 + radialPush * 0.8);
+     pushDir.y = -centerPush * 0.4; // Reduced vertical movement
      
      vPosition += pushDir;
    }
