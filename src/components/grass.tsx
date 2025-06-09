@@ -293,7 +293,7 @@ export default function Grass() {
         position={[4.324, 3.324, -0.949]}
         visible={true}
       >
-        <meshStandardMaterial color={"#000000"} />
+        <meshStandardMaterial color={"#060f05"} />
       </mesh>
     </group>
   );
