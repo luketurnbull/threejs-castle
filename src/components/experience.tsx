@@ -13,7 +13,7 @@ import "./grass-material";
 export default function Experience() {
   return (
     <>
-      <ambientLight color="white" intensity={4} />
+      <ambientLight color="white" intensity={10} />
       <Sky
         azimuth={0.1}
         inclination={0.6}

@@ -15,7 +15,7 @@ const FADE_SPEED = 0.05; // Speed of volume fade in/out
 const STOP_DELAY = 200; // Delay before stopping sound (ms)
 
 function createBladeGeometry() {
-  const geometry = new THREE.PlaneGeometry(0.12, 1, 1, 4);
+  const geometry = new THREE.PlaneGeometry(0.2, 1, 1, 4);
   geometry.translate(0, 0.5, 0);
   return geometry;
 }
@@ -281,8 +281,8 @@ export default function Grass() {
           toneMapped={false}
           transparent={true}
           side={THREE.DoubleSide}
-          bladeHeight={4}
-          brightness={5.0}
+          bladeHeight={6}
+          brightness={30.0}
           aoMap={bakedTexture}
         />
       </mesh>
@@ -293,7 +293,7 @@ export default function Grass() {
         position={[4.324, 3.324, -0.949]}
         visible={true}
       >
-        <meshStandardMaterial map={bakedTexture} />
+        <meshStandardMaterial color={"#000000"} />
       </mesh>
     </group>
   );
