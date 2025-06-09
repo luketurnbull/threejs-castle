@@ -6,7 +6,7 @@ import type { Model } from "../types/model";
 import rustleAudio from "../assets/leavesRustling2.mp3";
 
 const NUM_BLADES = 80000;
-const hillScale = new THREE.Vector3(119.355, 60.27, 119.355);
+const HILL_SCALE = new THREE.Vector3(119.355, 60.27, 119.355);
 
 // Audio settings
 const MIN_DISTANCE = 60; // Distance at which volume will be 1
@@ -33,12 +33,13 @@ export default function Grass() {
     return audio;
   });
 
-  const { nodes } = useGLTF("/tower-with-hill-3.glb", true) as unknown as Model;
+  const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
   const hillGeom = nodes.hill.geometry;
 
   const texture = useTexture("./blade_diffuse.jpg");
   const alphaMap = useTexture("./blade_alpha.jpg");
-  const aoMap = useTexture("./hillShadow.png");
+  const bakedTexture = useTexture("./hill_baked.png");
+  bakedTexture.flipY = false;
 
   const baseGeom = useMemo(() => createBladeGeometry(), []);
 
@@ -134,7 +135,7 @@ export default function Grass() {
       hillUVs.push(uv.x, uv.y);
 
       // Apply scale
-      point.multiply(hillScale);
+      point.multiply(HILL_SCALE);
       offsets.push(point.x, point.y, point.z);
 
       // Orientation: align Y axis with normal
@@ -282,16 +283,17 @@ export default function Grass() {
           side={THREE.DoubleSide}
           bladeHeight={4}
           brightness={5.0}
-          aoMap={aoMap}
+          aoMap={bakedTexture}
         />
       </mesh>
       <mesh
         ref={hillRef}
         geometry={nodes.hill.geometry}
-        scale={[119.355, 60.27, 119.355]}
+        scale={HILL_SCALE}
+        position={[4.324, 3.324, -0.949]}
         visible={true}
       >
-        <meshStandardMaterial color="#270f0a" />
+        <meshStandardMaterial map={bakedTexture} />
       </mesh>
     </group>
   );

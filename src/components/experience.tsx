@@ -39,4 +39,4 @@ export default function Experience() {
   );
 }
 
-useGLTF.preload("/tower-with-hill-3.glb", true);
+useGLTF.preload("/scene.glb", true);
