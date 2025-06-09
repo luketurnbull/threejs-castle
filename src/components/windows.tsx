@@ -2,7 +2,7 @@ import { useGLTF } from "@react-three/drei";
 import type { Model } from "@/types/model";
 import * as THREE from "three";
 import { useMemo } from "react";
-import { windowMaterial } from "./window-material";
+import { windowMaterial, WindowMaterial } from "./window-material";
 
 type WindowPosition = {
   position: [number, number, number];
@@ -42,5 +42,10 @@ export default function Windows() {
     return mesh;
   }, [nodes.windowInside.geometry]);
 
-  return <primitive object={instancedMesh} />;
+  return (
+    <>
+      <primitive object={instancedMesh} />
+      <WindowMaterial />
+    </>
+  );
 }
