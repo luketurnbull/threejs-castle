@@ -1,6 +1,5 @@
 import { Canvas } from "@react-three/fiber";
 import Experience from "./components/experience";
-import { Preload } from "@react-three/drei";
 
 function App() {
   return (

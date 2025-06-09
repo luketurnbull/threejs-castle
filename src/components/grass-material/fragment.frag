@@ -18,6 +18,9 @@ void main() {
    col = mix(vec4(tipColor, 1.0), col, frc);
    col = mix(vec4(bottomColor, 1.0), col, frc);
 
-   float ao = texture2D(aoMap, vHillUv).r;
+   // Use the luminance of the baked texture for shadows
+   vec4 aoColor = texture2D(aoMap, vHillUv);
+   float ao = dot(aoColor.rgb, vec3(0.299, 0.587, 0.114)); // Convert to grayscale using luminance weights
+   
    gl_FragColor = col * brightness * ao;
 }

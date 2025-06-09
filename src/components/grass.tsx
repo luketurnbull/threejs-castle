@@ -5,17 +5,18 @@ import * as THREE from "three";
 import type { Model } from "../types/model";
 import rustleAudio from "../assets/leavesRustling2.mp3";
 
-const NUM_BLADES = 80000;
-const hillScale = new THREE.Vector3(119.355, 60.27, 119.355);
+const NUM_BLADES = 40000;
+const HILL_SCALE = new THREE.Vector3(119.355, 60.27, 119.355);
+const HILL_POSITION = new THREE.Vector3(4.324, 3.324, -0.949);
 
 // Audio settings
-const MIN_DISTANCE = 60; // Distance at which volume will be 1
-const MAX_DISTANCE = 200; // Distance at which volume will be 0
+const MIN_DISTANCE = 50; // Distance at which volume will be 1
+const MAX_DISTANCE = 250; // Distance at which volume will be 0
 const FADE_SPEED = 0.05; // Speed of volume fade in/out
 const STOP_DELAY = 200; // Delay before stopping sound (ms)
 
 function createBladeGeometry() {
-  const geometry = new THREE.PlaneGeometry(0.12, 1, 1, 4);
+  const geometry = new THREE.PlaneGeometry(0.2, 1, 1, 4);
   geometry.translate(0, 0.5, 0);
   return geometry;
 }
@@ -33,12 +34,13 @@ export default function Grass() {
     return audio;
   });
 
-  const { nodes } = useGLTF("/tower-with-hill-3.glb", true) as unknown as Model;
+  const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
   const hillGeom = nodes.hill.geometry;
 
   const texture = useTexture("./blade_diffuse.jpg");
   const alphaMap = useTexture("./blade_alpha.jpg");
-  const aoMap = useTexture("./hillShadow.png");
+  const bakedTexture = useTexture("./hill_baked.png");
+  bakedTexture.flipY = false;
 
   const baseGeom = useMemo(() => createBladeGeometry(), []);
 
@@ -133,8 +135,9 @@ export default function Grass() {
 
       hillUVs.push(uv.x, uv.y);
 
-      // Apply scale
-      point.multiply(hillScale);
+      // Apply scale and position
+      point.multiply(HILL_SCALE);
+      point.add(HILL_POSITION);
       offsets.push(point.x, point.y, point.z);
 
       // Orientation: align Y axis with normal
@@ -143,7 +146,7 @@ export default function Grass() {
       orientations.push(quat.x, quat.y, quat.z, quat.w);
 
       // Random stretch
-      const stretch = 0.7 + Math.random() * 0.6;
+      const stretch = 0.5 + Math.random() * 4.0;
       stretches.push(stretch);
 
       // Random root angle for bending
@@ -280,18 +283,19 @@ export default function Grass() {
           toneMapped={false}
           transparent={true}
           side={THREE.DoubleSide}
-          bladeHeight={4}
-          brightness={5.0}
-          aoMap={aoMap}
+          bladeHeight={1}
+          brightness={20.0}
+          aoMap={bakedTexture}
         />
       </mesh>
       <mesh
         ref={hillRef}
         geometry={nodes.hill.geometry}
-        scale={[119.355, 60.27, 119.355]}
+        scale={HILL_SCALE}
+        position={HILL_POSITION}
         visible={true}
       >
-        <meshStandardMaterial color="#270f0a" />
+        <meshStandardMaterial aoMap={bakedTexture} color={"#3d2300"} />
       </mesh>
     </group>
   );

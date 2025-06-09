@@ -13,7 +13,7 @@ import "./grass-material";
 export default function Experience() {
   return (
     <>
-      <ambientLight color="white" intensity={4} />
+      <ambientLight color="white" intensity={20} />
       <Sky
         azimuth={0.1}
         inclination={0.6}
@@ -39,4 +39,4 @@ export default function Experience() {
   );
 }
 
-useGLTF.preload("/tower-with-hill-3.glb", true);
+useGLTF.preload("/scene.glb", true);
