@@ -7,6 +7,7 @@ import rustleAudio from "../assets/leavesRustling2.mp3";
 
 const NUM_BLADES = 80000;
 const HILL_SCALE = new THREE.Vector3(119.355, 60.27, 119.355);
+const HILL_POSITION = new THREE.Vector3(4.324, 3.324, -0.949);
 
 // Audio settings
 const MIN_DISTANCE = 60; // Distance at which volume will be 1
@@ -134,8 +135,9 @@ export default function Grass() {
 
       hillUVs.push(uv.x, uv.y);
 
-      // Apply scale
+      // Apply scale and position
       point.multiply(HILL_SCALE);
+      point.add(HILL_POSITION);
       offsets.push(point.x, point.y, point.z);
 
       // Orientation: align Y axis with normal
@@ -281,8 +283,8 @@ export default function Grass() {
           toneMapped={false}
           transparent={true}
           side={THREE.DoubleSide}
-          bladeHeight={6}
-          brightness={60.0}
+          bladeHeight={4}
+          brightness={30.0}
           aoMap={bakedTexture}
         />
       </mesh>
@@ -290,10 +292,10 @@ export default function Grass() {
         ref={hillRef}
         geometry={nodes.hill.geometry}
         scale={HILL_SCALE}
-        position={[4.324, 3.324, -0.949]}
+        position={HILL_POSITION}
         visible={true}
       >
-        <meshStandardMaterial color={"#060f05"} />
+        <meshStandardMaterial color={"#001100"} />
       </mesh>
     </group>
   );
