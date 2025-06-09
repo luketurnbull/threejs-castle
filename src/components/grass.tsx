@@ -295,7 +295,7 @@ export default function Grass() {
         position={HILL_POSITION}
         visible={true}
       >
-        <meshStandardMaterial aoMap={bakedTexture} color={"#004900"} />
+        <meshStandardMaterial aoMap={bakedTexture} color={"#3d2300"} />
       </mesh>
     </group>
   );
