@@ -22,3 +22,7 @@ Castle Project for ThreeJS Journey Challenge 18
 - [ ] Bake lighting for night time (moon light and more emission from castle windows?)
 - [ ] Dim down the ambient light in the scene
 - [ ] Show a moon in the Sky some how?
+
+## Flag
+
+- [ ] Add waving flag to the top of the castle
