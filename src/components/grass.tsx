@@ -283,8 +283,8 @@ export default function Grass() {
           toneMapped={false}
           transparent={true}
           side={THREE.DoubleSide}
-          bladeHeight={3}
-          brightness={20.0}
+          bladeHeight={2}
+          brightness={25.0}
           aoMap={bakedTexture}
         />
       </mesh>
