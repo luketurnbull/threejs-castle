@@ -6,7 +6,7 @@ Castle Project for ThreeJS Journey Challenge 18
 
 ## Grass
 
-- [ ] Make grass strands different heights
+- [x] Make grass strands different heights
 
 ## Windows
 
@@ -16,3 +16,9 @@ Castle Project for ThreeJS Journey Challenge 18
 ## Tree
 
 - [ ] Come up with a concept for a tree
+
+## Night mode
+
+- [ ] Bake lighting for night time (moon light and more emission from castle windows?)
+- [ ] Dim down the ambient light in the scene
+- [ ] Show a moon in the Sky some how?

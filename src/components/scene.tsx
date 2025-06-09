@@ -1,14 +1,9 @@
 import type { JSX } from "react";
-import { Tower } from "./tower";
+import Tower from "./tower";
 import Grass from "./grass";
 import { useGLTF } from "@react-three/drei";
 import type { Model } from "@/types/model";
-import {
-  MeshStandardMaterial,
-  DoubleSide,
-  InstancedMesh,
-  Object3D,
-} from "three";
+import { DoubleSide, InstancedMesh, Object3D, ShaderMaterial } from "three";
 import { useMemo } from "react";
 
 type WindowPosition = {
@@ -34,14 +29,24 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
 
   // Create instanced mesh
   const instancedMesh = useMemo(() => {
-    const windowMaterial = new MeshStandardMaterial({
-      color: "#000000",
+    const shaderMaterial = new ShaderMaterial({
+      vertexShader: `
+        void main() {
+          vec4 worldPosition = instanceMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * viewMatrix * worldPosition;
+        }
+      `,
+      fragmentShader: `
+        void main() {
+          gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+      `,
       side: DoubleSide,
     });
 
     const mesh = new InstancedMesh(
       nodes.windowInside.geometry,
-      windowMaterial,
+      shaderMaterial,
       windowPositions.length
     );
 

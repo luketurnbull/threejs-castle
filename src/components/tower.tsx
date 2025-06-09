@@ -3,7 +3,7 @@ import { useGLTF, useTexture } from "@react-three/drei";
 
 import type { Model } from "../types/model";
 
-export function Tower() {
+export default function Tower() {
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
 
   const diffuse = useTexture("./tower_diffuse.png");
