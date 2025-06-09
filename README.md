@@ -17,6 +17,10 @@ Castle Project for ThreeJS Journey Challenge 18
 
 - [ ] Come up with a concept for a tree
 
+## Rocks
+
+- [ ] Add a bunch of rocks to the scene in Blender and rebake everything
+
 ## Night mode
 
 - [ ] Bake lighting for night time (moon light and more emission from castle windows?)
