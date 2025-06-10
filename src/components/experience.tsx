@@ -19,6 +19,8 @@ export default function Experience() {
         sunPosition={[38, 2, -100]}
         rayleigh={4}
         turbidity={10}
+        mieCoefficient={0.004}
+        mieDirectionalG={0.8}
       />
 
       <OrbitControls
