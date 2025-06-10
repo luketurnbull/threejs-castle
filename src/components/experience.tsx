@@ -7,6 +7,7 @@ import {
   AdaptiveDpr,
   AdaptiveEvents,
   Preload,
+  Cloud,
 } from "@react-three/drei";
 import "./grass-material";
 
@@ -23,6 +24,13 @@ export default function Experience() {
         mieDirectionalG={0.8}
       />
 
+      <Cloud
+        position={[0, 110, -50]}
+        scale={[20, 20, 20]}
+        opacity={0.8}
+        speed={0.2}
+      />
+
       <OrbitControls
         minPolarAngle={Math.PI * 0.4}
         maxPolarAngle={Math.PI * 0.5}
@@ -30,6 +38,7 @@ export default function Experience() {
         makeDefault={true}
         enableDamping={true}
         dampingFactor={0.05}
+        enablePan={false}
       />
 
       <Scene />
