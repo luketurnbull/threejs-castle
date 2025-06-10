@@ -4,6 +4,10 @@ Castle Project for ThreeJS Journey Challenge 18
 
 # TODO/ Ideas list
 
+## Castle
+
+- [ ] Way less emissions coming from windows in Blender, looks too orange
+
 ## Debug UI
 
 - [ ] Add Leva UI to debug things
