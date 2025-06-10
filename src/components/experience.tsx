@@ -15,7 +15,7 @@ export default function Experience() {
     <>
       <ambientLight color="white" intensity={20} />
       <Sky
-        distance={1000}
+        distance={500}
         sunPosition={[38, 2, -100]}
         rayleigh={4}
         turbidity={10}
@@ -24,7 +24,7 @@ export default function Experience() {
       />
 
       <OrbitControls
-        minPolarAngle={Math.PI * 0.25}
+        minPolarAngle={Math.PI * 0.3}
         maxPolarAngle={Math.PI * 0.48}
         enableZoom={false}
         makeDefault={true}

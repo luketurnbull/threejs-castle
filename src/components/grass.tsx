@@ -5,7 +5,7 @@ import * as THREE from "three";
 import type { Model } from "../types/model";
 import rustleAudio from "../assets/leavesRustling2.mp3";
 
-const NUM_BLADES = 40000;
+const NUM_BLADES = 60000;
 const HILL_SCALE = new THREE.Vector3(119.355, 60.27, 119.355);
 const HILL_POSITION = new THREE.Vector3(4.324, 3.324, -0.949);
 
@@ -146,7 +146,7 @@ export default function Grass() {
       orientations.push(quat.x, quat.y, quat.z, quat.w);
 
       // Random stretch
-      const stretch = 0.5 + Math.random() * 4.0;
+      const stretch = Math.random() * 2.0;
       stretches.push(stretch);
 
       // Random root angle for bending
@@ -283,8 +283,8 @@ export default function Grass() {
           toneMapped={false}
           transparent={true}
           side={THREE.DoubleSide}
-          bladeHeight={1}
-          brightness={20.0}
+          bladeHeight={2}
+          brightness={25.0}
           aoMap={bakedTexture}
         />
       </mesh>
