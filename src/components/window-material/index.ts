@@ -7,7 +7,6 @@ import { useRef } from "react";
 const material = new THREE.ShaderMaterial({
   vertexShader: vertex,
   fragmentShader: fragment,
-  side: THREE.DoubleSide,
   uniforms: {
     uTime: { value: 0 },
   },
