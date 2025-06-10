@@ -14,6 +14,7 @@ function App() {
         onStart={() => {
           setStarted(true);
           backgroundAudio.loop = true;
+          backgroundAudio.volume = 0.8;
           backgroundAudio.play();
         }}
       />

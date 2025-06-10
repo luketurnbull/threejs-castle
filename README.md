@@ -6,7 +6,9 @@ Castle Project for ThreeJS Journey Challenge 18
 
 ## Loading screen and background sounds
 
-- [ ] Think of loading screen concept
+- [x] Add basic loading screen and background sound
+- [ ] Think of loading screen concept that fits with concept/ colours themes, svg pictures?
+- [ ] Add way to toggle audio off
 
 ## Castle
 
