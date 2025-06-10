@@ -1,7 +1,25 @@
 import { Canvas } from "@react-three/fiber";
 import Experience from "./components/experience";
+import LoadingScreen from "./components/loading-screen";
+import { useState } from "react";
+import backgroundSounds from "./assets/background.mp3";
 
 function App() {
+  const [started, setStarted] = useState(false);
+  const [backgroundAudio] = useState(() => new Audio(backgroundSounds));
+
+  if (!started) {
+    return (
+      <LoadingScreen
+        onStart={() => {
+          setStarted(true);
+          backgroundAudio.loop = true;
+          backgroundAudio.play();
+        }}
+      />
+    );
+  }
+
   return (
     <div className="h-screen w-screen">
       <Canvas
