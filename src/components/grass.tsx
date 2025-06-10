@@ -10,7 +10,7 @@ const HILL_SCALE = new THREE.Vector3(119.355, 60.27, 119.355);
 const HILL_POSITION = new THREE.Vector3(4.324, 3.324, -0.949);
 
 // Audio settings
-const MIN_DISTANCE = 40; // Distance at which volume will be 1
+const MIN_DISTANCE = 60; // Distance at which volume will be 1
 const MAX_DISTANCE = 230; // Distance at which volume will be 0
 const FADE_SPEED = 0.05; // Speed of volume fade in/out
 const STOP_DELAY = 200; // Delay before stopping sound (ms)

@@ -4,13 +4,13 @@ Castle Project for ThreeJS Journey Challenge 18
 
 # TODO/ Ideas list
 
+## Loading screen and background sounds
+
+- [ ] Think of loading screen concept
+
 ## Castle
 
 - [ ] Way less emissions coming from windows in Blender, looks too orange
-
-## Debug UI
-
-- [ ] Add Leva UI to debug things
 
 ## Grass
 
@@ -22,22 +22,23 @@ Castle Project for ThreeJS Journey Challenge 18
 
 - [x] Make windows all an instance mesh so we're using the same mesh and material
 - [x] Make sure window normals are facing the correct way in Blender so we don't have to use THREE.DoubleSide
-- [ ] Add cool shader to the mesh, that looks like a flickering light
-
-## Tree
-
-- [ ] Come up with a concept for a tree
+- [x] Add cool shader to the mesh, that looks like a flickering light
 
 ## Rocks
 
 - [ ] Add a bunch of rocks to the scene in Blender and rebake everything
 
-## Night mode
+## Tree
 
-- [ ] Bake lighting for night time (moon light and more emission from castle windows?)
-- [ ] Dim down the ambient light in the scene
-- [ ] Show a moon in the Sky some how?
+- [ ] Come up with a concept for a tree
 
 ## Flag
 
 - [ ] Add waving flag to the top of the castle
+
+## Night mode
+
+- [ ] Bake lighting for night time (moon light and more emission from castle windows?)
+- [ ] Dim down the ambient light in the scene
+- [ ] Change the Sun settings
+- [ ] Show a moon in the Sky some how?
