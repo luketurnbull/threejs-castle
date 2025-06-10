@@ -9,6 +9,7 @@ Castle Project for ThreeJS Journey Challenge 18
 - [x] Add basic loading screen and background sound
 - [ ] Think of loading screen concept that fits with concept/ colours themes, svg pictures?
 - [ ] Add way to toggle audio off
+- [ ] Make sure audio loops properly
 
 ## Castle
 
@@ -44,3 +45,9 @@ Castle Project for ThreeJS Journey Challenge 18
 - [ ] Dim down the ambient light in the scene
 - [ ] Change the Sun settings
 - [ ] Show a moon in the Sky some how?
+
+## Refinements
+
+- [ ] Refine experience for mobile
+- [ ] Potentially do adaptive performance? Less grass blades and no clouds if the users computer can't handle it?
+- [ ] Play with some Post Processor effects?
