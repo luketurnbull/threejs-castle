@@ -31,6 +31,13 @@ export default function Experience() {
         speed={0.2}
       />
 
+      <Cloud
+        position={[150, 60, 150]}
+        scale={[20, 20, 20]}
+        opacity={0.8}
+        speed={0.2}
+      />
+
       <OrbitControls
         minPolarAngle={Math.PI * 0.4}
         maxPolarAngle={Math.PI * 0.5}
