@@ -15,8 +15,8 @@ export default function Experience() {
     <>
       <ambientLight color="white" intensity={20} />
       <Sky
-        distance={500}
-        sunPosition={[38, 2, -100]}
+        distance={600000}
+        sunPosition={[4, 0.25, -12]}
         rayleigh={4}
         turbidity={10}
         mieCoefficient={0.004}
