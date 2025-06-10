@@ -8,39 +8,45 @@ function App() {
   const [started, setStarted] = useState(false);
   const [backgroundAudio] = useState(() => new Audio(backgroundSounds));
 
-  if (!started) {
-    return (
-      <LoadingScreen
-        onStart={() => {
-          setStarted(true);
-          backgroundAudio.loop = true;
-          backgroundAudio.volume = 0.6;
-          backgroundAudio.play();
-        }}
-      />
-    );
-  }
-
   return (
-    <div className="h-screen w-screen">
-      <Canvas
-        camera={{
-          position: [-150, 5, 15],
-          fov: 45,
-          near: 0.1,
-          far: 1000,
-        }}
-        dpr={[1, 2]}
-        performance={{ min: 0.5 }}
-        gl={{
-          antialias: true,
-          powerPreference: "high-performance",
-          stencil: false,
-          depth: true,
-        }}
+    <div className="h-screen w-screen relative">
+      {/* Canvas is always mounted but hidden until started */}
+      <div
+        className={`absolute inset-0 transition-opacity duration-500 ${
+          started ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
       >
-        <Experience />
-      </Canvas>
+        <Canvas
+          camera={{
+            position: [-150, 5, 15],
+            fov: 45,
+            near: 0.1,
+            far: 1000,
+          }}
+          dpr={[1, 2]}
+          performance={{ min: 0.5 }}
+          gl={{
+            antialias: true,
+            powerPreference: "high-performance",
+            stencil: false,
+            depth: true,
+          }}
+        >
+          <Experience />
+        </Canvas>
+      </div>
+
+      {/* Loading screen is shown until started */}
+      {!started && (
+        <LoadingScreen
+          onStart={() => {
+            setStarted(true);
+            backgroundAudio.loop = true;
+            backgroundAudio.volume = 0.6;
+            backgroundAudio.play();
+          }}
+        />
+      )}
     </div>
   );
 }
