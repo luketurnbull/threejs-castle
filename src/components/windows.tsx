@@ -31,6 +31,19 @@ export default function Windows() {
 
     const tempObject = new THREE.Object3D();
 
+    // Create time offsets for each window
+    const timeOffsets = new Float32Array(windowPositions.length);
+    for (let i = 0; i < windowPositions.length; i++) {
+      // Random offset between 0 and 2π to spread out the flickering
+      timeOffsets[i] = Math.random() * Math.PI * 2;
+    }
+
+    // Add the time offset attribute
+    mesh.geometry.setAttribute(
+      "timeOffset",
+      new THREE.InstancedBufferAttribute(timeOffsets, 1)
+    );
+
     windowPositions.forEach(({ position, rotation }, i) => {
       tempObject.position.set(position[0], position[1], position[2]);
       tempObject.rotation.set(rotation[0], rotation[1], rotation[2]);
