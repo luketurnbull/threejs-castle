@@ -15,16 +15,17 @@ export default function Experience() {
     <>
       <ambientLight color="white" intensity={20} />
       <Sky
-        azimuth={0.1}
-        inclination={0.6}
         distance={1000}
-        sunPosition={[-50, 20, -100]}
+        sunPosition={[38, 2, -100]}
+        rayleigh={4}
+        turbidity={10}
       />
 
       <OrbitControls
         minPolarAngle={Math.PI * 0.2}
         maxPolarAngle={Math.PI * 0.5}
         // enableZoom={false}
+        makeDefault={true}
         enableDamping={true}
         dampingFactor={0.05}
       />
