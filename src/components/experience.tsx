@@ -24,9 +24,9 @@ export default function Experience() {
       />
 
       <OrbitControls
-        minPolarAngle={Math.PI * 0.2}
-        maxPolarAngle={Math.PI * 0.5}
-        // enableZoom={false}
+        minPolarAngle={Math.PI * 0.25}
+        maxPolarAngle={Math.PI * 0.48}
+        enableZoom={false}
         makeDefault={true}
         enableDamping={true}
         dampingFactor={0.05}

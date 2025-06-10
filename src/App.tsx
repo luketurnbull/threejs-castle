@@ -6,7 +6,7 @@ function App() {
     <div className="h-screen w-screen">
       <Canvas
         camera={{
-          position: [-157, 5, 17],
+          position: [-150, 5, 15],
           fov: 45,
           near: 0.1,
           far: 1000,
