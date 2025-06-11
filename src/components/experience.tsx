@@ -8,6 +8,7 @@ import {
   AdaptiveEvents,
   Preload,
   Cloud,
+  Bvh,
 } from "@react-three/drei";
 import "./grass-material";
 
@@ -51,6 +52,7 @@ export default function Experience() {
       <Scene />
 
       <BakeShadows />
+      <Bvh firstHitOnly={true} />
       <Preload all={true} />
       <AdaptiveDpr pixelated />
       <AdaptiveEvents />
