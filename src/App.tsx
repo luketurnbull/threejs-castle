@@ -10,7 +10,6 @@ function App() {
 
   return (
     <div className="h-screen w-screen relative">
-      {/* Canvas is always mounted but hidden until started */}
       <div
         className={`absolute inset-0 transition-opacity duration-500 ${
           started ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -36,7 +35,6 @@ function App() {
         </Canvas>
       </div>
 
-      {/* Loading screen is shown until started */}
       {!started && (
         <LoadingScreen
           onStart={() => {

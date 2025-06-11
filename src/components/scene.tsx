@@ -2,6 +2,7 @@ import type { JSX } from "react";
 import Tower from "./tower";
 import Grass from "./grass";
 import Windows from "./windows";
+import Rocks from "./rocks";
 
 export default function Scene(props: JSX.IntrinsicElements["group"]) {
   return (
@@ -9,6 +10,7 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
       <Tower />
       <Grass />
       <Windows />
+      <Rocks />
     </group>
   );
 }

@@ -14,7 +14,7 @@ import "./grass-material";
 export default function Experience() {
   return (
     <>
-      <ambientLight color="white" intensity={20} />
+      <ambientLight color="white" intensity={10} />
       <Sky
         distance={600000}
         sunPosition={[4, 0.25, -12]}

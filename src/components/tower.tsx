@@ -29,19 +29,17 @@ export default function Tower() {
   }, [nodes]);
 
   return (
-    <>
-      <mesh
-        geometry={nodes.tower.geometry}
-        position={[-1.617, 0.627, 0.229]}
-        scale={10}
-      >
-        <meshStandardMaterial
-          map={diffuse}
-          roughnessMap={roughness}
-          normalMap={normal}
-        />
-      </mesh>
-    </>
+    <mesh
+      geometry={nodes.tower.geometry}
+      position={[-1.617, 0.627, 0.229]}
+      scale={10}
+    >
+      <meshStandardMaterial
+        map={diffuse}
+        roughnessMap={roughness}
+        normalMap={normal}
+      />
+    </mesh>
   );
 }
 

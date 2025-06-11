@@ -13,7 +13,9 @@ Castle Project for ThreeJS Journey Challenge 18
 
 ## Castle
 
-- [ ] Way less emissions coming from windows in Blender, looks too orange
+- [x] Way less emissions coming from windows in Blender, looks too orange
+- [ ] Less area light, otherwise looking great!
+- [ ] Door that lowers when you click on it
 
 ## Grass
 
@@ -29,7 +31,7 @@ Castle Project for ThreeJS Journey Challenge 18
 
 ## Rocks
 
-- [ ] Add a bunch of rocks to the scene in Blender and rebake everything
+- [x] Add a bunch of rocks to the scene in Blender and rebake everything
 
 ## Tree
 
