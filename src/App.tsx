@@ -17,7 +17,7 @@ function App() {
       >
         <Canvas
           camera={{
-            position: [-150, 5, 15],
+            position: [-150, 20, 15],
             fov: 45,
             near: 0.1,
             far: 1000,
@@ -40,7 +40,7 @@ function App() {
           onStart={() => {
             setStarted(true);
             backgroundAudio.loop = true;
-            backgroundAudio.volume = 0.6;
+            backgroundAudio.volume = 0.5;
             backgroundAudio.play();
           }}
         />
