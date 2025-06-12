@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useGLTF, useProgress, useTexture } from "@react-three/drei";
 import { gsap } from "gsap";
 import { TEXTURES } from "@/constants/assets";
@@ -37,8 +37,11 @@ export default function LoadingScreen({
         {loadingScreenReady && (
           <AssetLoader
             onReady={() => {
-              setIsReady(true);
               onReady();
+
+              setTimeout(() => {
+                setIsReady(true);
+              }, 500);
             }}
           />
         )}
@@ -48,7 +51,7 @@ export default function LoadingScreen({
             <button
               onClick={onStart}
               ref={startButtonRef}
-              className="px-6 py-2 text-md text-black bg-[#859531] font-semi-bold border-2 rounded-md cursor-pointer transition-colors duration-300 hover:bg-[#9ea733] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+              className="px-6 py-2 text-md text-black bg-[#9ea733] hover:bg-[#859531] font-semi-bold border-2 rounded-md cursor-pointer transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
             >
               Start
             </button>
@@ -60,25 +63,36 @@ export default function LoadingScreen({
 }
 
 function AssetLoader({ onReady }: { onReady: () => void }) {
-  const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  const { progress } = useProgress();
+  // Preload model
   useGLTF.preload("/scene.glb", true);
 
+  // Preload tower textures
   useTexture.preload(TEXTURES.TOWER_DIFFUSE);
   useTexture.preload(TEXTURES.TOWER_NORMAL);
   useTexture.preload(TEXTURES.TOWER_ROUGHNESS);
 
+  // Preload hill and grass blade textures
   useTexture.preload(TEXTURES.BLADE_DIFFUSE);
   useTexture.preload(TEXTURES.BLADE_ALPHA);
   useTexture.preload(TEXTURES.HILL_BAKED);
 
+  // Preload rock textures
   useTexture.preload(TEXTURES.ROCK_DIFFUSE);
   useTexture.preload(TEXTURES.ROCK_NORMAL);
 
+  const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const { progress: assetsProgress } = useProgress();
+  const [progress, setProgress] = useState(0);
+
   useEffect(() => {
-    if (progress === 100) {
+    console.log(assetsProgress);
+    setProgress(Math.round(Math.max(assetsProgress - 10, 0)));
+  }, [assetsProgress]);
+
+  useEffect(() => {
+    if (progress === 90) {
       setTimeout(() => {
+        setProgress(100);
         onReady();
       }, 500);
     }
@@ -93,7 +107,7 @@ function AssetLoader({ onReady }: { onReady: () => void }) {
             scale: 1,
             duration: 0.5,
             ease: "back.out(1.7)",
-            delay: index * 0.05,
+            delay: index * 0.01,
           });
         } else {
           gsap.set(brickRef, { opacity: 0, scale: 0 });
@@ -105,7 +119,7 @@ function AssetLoader({ onReady }: { onReady: () => void }) {
   return (
     <div className="h-1/3 w-4/5 max-w-[300px]">
       <div className="text-center mt-2.5 text-black text-2xl font-bold">
-        {Math.round(progress)}%
+        {progress}%
       </div>
       <div className="grid grid-cols-10 gap-1 mb-4">
         {Array.from({ length: 10 }).map((_, index) => (
