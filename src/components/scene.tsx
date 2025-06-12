@@ -4,10 +4,11 @@ import Grass from "./grass";
 import Windows from "./windows";
 import Rocks from "./rocks";
 import { Cloud, Sky } from "@react-three/drei";
+import WavingFlag from "./waving-flag/waving-flag";
 
 export default function Scene(props: JSX.IntrinsicElements["group"]) {
   return (
-    <>
+    <group {...props} dispose={null}>
       <Sky
         distance={600000}
         sunPosition={[4, 0.25, -12]}
@@ -30,13 +31,11 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
         opacity={0.8}
         speed={0.2}
       />
-
-      <group {...props} dispose={null}>
-        <Tower />
-        <Grass />
-        <Windows />
-        <Rocks />
-      </group>
-    </>
+      <Tower />
+      <Grass />
+      <Windows />
+      <Rocks />
+      <WavingFlag />
+    </group>
   );
 }
