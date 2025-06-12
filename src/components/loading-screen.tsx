@@ -103,7 +103,7 @@ function AssetLoader({ onReady }: { onReady: () => void }) {
   }, [progress, onReady]);
 
   return (
-    <div className="h-1/3 w-4/5 max-w-[300px] mb-5">
+    <div className="h-1/3 w-4/5 max-w-[300px]">
       <div className="text-center mt-2.5 text-black text-2xl font-bold">
         {Math.round(progress)}%
       </div>
