@@ -117,19 +117,21 @@ function AssetLoader({ onReady }: { onReady: () => void }) {
   }, [progress, onReady]);
 
   return (
-    <div className="h-1/3 w-4/5 max-w-[300px]">
+    <div className="h-1/3 w-4/5 max-w-[300px] flex flex-col gap-4">
       <div className="text-center mt-2.5 text-black text-2xl font-bold">
         {progress}%
       </div>
-      <div className="grid grid-cols-10 gap-1 mb-4">
+      <div className="grid grid-cols-10 gap-1">
         {Array.from({ length: 10 }).map((_, index) => (
           <div
             key={index}
             ref={(el) => {
               brickRefs.current[index] = el;
             }}
-            className="w-full h-12 rounded-md opacity-0 transform scale-0 bg-[url('/brick-tile.webp')] bg-contain bg-center bg-no-repeat"
-          ></div>
+            className="w-full h-12 opacity-0 transform scale-0"
+          >
+            <img src="/brick-tile.webp" />
+          </div>
         ))}
       </div>
     </div>
