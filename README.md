@@ -7,9 +7,10 @@ Castle Project for ThreeJS Journey Challenge 18
 ## Loading screen and background sounds
 
 - [x] Add basic loading screen and background sound
-- [ ] Think of loading screen concept that fits with concept/ colours themes, svg pictures?
+- [x] Think of loading screen concept that fits with concept/ colours themes, svg pictures?
 - [ ] Add way to toggle audio off
 - [ ] Make sure audio loops properly
+- [ ] Add shadcn/ui so we can quickly add buttons
 
 ## Castle
 
@@ -21,7 +22,7 @@ Castle Project for ThreeJS Journey Challenge 18
 
 - [x] Make grass strands different heights
 - [ ] Fade grass sound out when users mouse leaves the hill
-- [ ] Make hover over grass effect better
+- [ ] Make hover over grass effect better, currently the grass warps too much
 
 ## Windows
 
@@ -33,13 +34,17 @@ Castle Project for ThreeJS Journey Challenge 18
 
 - [x] Add a bunch of rocks to the scene in Blender and rebake everything
 
+## Flag
+
+- [ ] Add waving flag to the top of the castle
+
 ## Tree
 
 - [ ] Come up with a concept for a tree
 
-## Flag
+## Fire
 
-- [ ] Add waving flag to the top of the castle
+- [ ] Make a camp fire, in the day mode it can have smoke, in night mode it can be an actual flame
 
 ## Night mode
 

@@ -18,7 +18,7 @@ export default function LoadingScreen({
       gsap.fromTo(
         startButtonRef.current,
         { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }
+        { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }
       );
     }
   }, [isReady]);
@@ -40,7 +40,7 @@ export default function LoadingScreen({
 
               setTimeout(() => {
                 setIsReady(true);
-              }, 500);
+              }, 550);
             }}
           />
         )}

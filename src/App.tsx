@@ -11,7 +11,6 @@ function App() {
 
   return (
     <div className="h-screen w-screen relative overflow-hidden">
-      {/* 3D Scene Container */}
       <div
         className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
           started ? "opacity-100 scale-100" : "opacity-0"
@@ -39,7 +38,6 @@ function App() {
         )}
       </div>
 
-      {/* Loading Screen Container */}
       <div
         className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
           started
