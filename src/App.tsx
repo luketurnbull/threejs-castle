@@ -6,6 +6,7 @@ import backgroundSounds from "./assets/background.mp3";
 
 function App() {
   const [started, setStarted] = useState(false);
+  const [ready, setReady] = useState(false);
   const [backgroundAudio] = useState(() => new Audio(backgroundSounds));
 
   return (
@@ -15,24 +16,26 @@ function App() {
           started ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
-        <Canvas
-          camera={{
-            position: [-150, 20, 15],
-            fov: 45,
-            near: 0.1,
-            far: 1000,
-          }}
-          dpr={[1, 2]}
-          performance={{ min: 0.5 }}
-          gl={{
-            antialias: true,
-            powerPreference: "high-performance",
-            stencil: false,
-            depth: true,
-          }}
-        >
-          <Experience />
-        </Canvas>
+        {ready && (
+          <Canvas
+            camera={{
+              position: [-150, 20, 15],
+              fov: 45,
+              near: 0.1,
+              far: 1000,
+            }}
+            dpr={[1, 2]}
+            performance={{ min: 0.5 }}
+            gl={{
+              antialias: true,
+              powerPreference: "high-performance",
+              stencil: false,
+              depth: true,
+            }}
+          >
+            <Experience />
+          </Canvas>
+        )}
       </div>
 
       {!started && (
@@ -42,6 +45,9 @@ function App() {
             backgroundAudio.loop = true;
             backgroundAudio.volume = 0.5;
             backgroundAudio.play();
+          }}
+          onReady={() => {
+            setReady(true);
           }}
         />
       )}

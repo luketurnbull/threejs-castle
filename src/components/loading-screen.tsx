@@ -1,38 +1,76 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useProgress } from "@react-three/drei";
+import { gsap } from "gsap";
 
-export default function LoadingScreen({ onStart }: { onStart: () => void }) {
+export default function LoadingScreen({
+  onStart,
+  onReady,
+}: {
+  onStart: () => void;
+  onReady: () => void;
+}) {
   const { progress } = useProgress();
   const [isReady, setIsReady] = useState(false);
+  const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     if (progress === 100) {
-      setIsReady(true);
+      setTimeout(() => {
+        setIsReady(true);
+        onReady();
+      }, 500);
     }
+
+    const bricksToShow = Math.min(Math.floor(progress / 10), 10);
+
+    brickRefs.current.forEach((brickRef, index) => {
+      if (brickRef) {
+        if (index < bricksToShow) {
+          gsap.to(brickRef, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.5,
+            ease: "back.out(1.7)",
+            delay: index * 0.05,
+          });
+        } else {
+          gsap.set(brickRef, { opacity: 0, scale: 0 });
+        }
+      }
+    });
   }, [progress]);
 
   return (
-    <div className="absolute inset-0 w-full h-full bg-black/80 flex flex-col items-center justify-center text-white font-sans z-50">
-      <div className="w-4/5 max-w-[400px] mb-5">
-        <div className="w-full h-5 bg-gray-700 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-green-500 transition-all duration-300 ease-in-out"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <div className="text-center mt-2.5">
-          Loading assets... {Math.round(progress)}%
+    <div className="w-screen h-screen absolute bg-[#ffe79e] flex items-center justify-center">
+      <div className="flex flex-col gap-2 justify-center items-center max-w-[800px] p-6">
+        <img src="/castle-on-a-hill.png" className="max-h-1/3" />
+        <div className="h-1/3 w-4/5 max-w-[300px] mb-5">
+          <div className="text-center mt-2.5 text-black">
+            {Math.round(progress)}%
+          </div>
+          <div className="grid grid-cols-10 gap-1 mb-4">
+            {Array.from({ length: 10 }).map((_, index) => (
+              <div
+                key={index}
+                ref={(el) => {
+                  brickRefs.current[index] = el;
+                }}
+                className="w-full h-12 rounded-md opacity-0 transform scale-0 bg-[url('/brick-tile.png')] bg-contain bg-center bg-no-repeat"
+              ></div>
+            ))}
+          </div>
+          <div className="flex w-full justify-center h-14">
+            {isReady && (
+              <button
+                onClick={onStart}
+                className="px-6 py-3 text-md text-black bg-[#859531] font-semi-bold border-2 rounded-md cursor-pointer transition-colors duration-300 hover:bg-[#9ea733] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+              >
+                Start
+              </button>
+            )}
+          </div>
         </div>
       </div>
-
-      {isReady && (
-        <button
-          onClick={onStart}
-          className="px-6 py-3 text-lg bg-green-500 text-white border-none rounded-md cursor-pointer transition-colors duration-300 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-        >
-          Start Experience
-        </button>
-      )}
     </div>
   );
 }
