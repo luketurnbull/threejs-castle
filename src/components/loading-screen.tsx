@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useGLTF, useProgress, useTexture } from "@react-three/drei";
 import { gsap } from "gsap";
 import { TEXTURES } from "@/constants/assets";
