@@ -4,6 +4,7 @@ import { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
 import type { Model } from "../types/model";
 import rustleAudio from "../assets/leavesRustling2.mp3";
+import { TEXTURES } from "../constants/assets";
 
 // Preload the audio
 const preloadedAudio = new Audio(rustleAudio);
@@ -18,12 +19,6 @@ const MIN_DISTANCE = 60; // Distance at which volume will be 1
 const MAX_DISTANCE = 230; // Distance at which volume will be 0
 const FADE_SPEED = 0.05; // Speed of volume fade in/out
 const STOP_DELAY = 200; // Delay before stopping sound (ms)
-
-const textures = {
-  BLADE_DIFFUSE: "./blade_diffuse.jpg",
-  BLADE_ALPHA: "./blade_alpha.jpg",
-  HILL_BAKED: "./hill_baked.png",
-};
 
 function createBladeGeometry() {
   const geometry = new THREE.PlaneGeometry(0.2, 1, 1, 4);
@@ -55,9 +50,9 @@ export default function Grass() {
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
   const hillGeom = nodes.hill.geometry;
 
-  const texture = useTexture(textures.BLADE_DIFFUSE);
-  const alphaMap = useTexture(textures.BLADE_ALPHA);
-  const bakedTexture = useTexture(textures.HILL_BAKED);
+  const texture = useTexture(TEXTURES.BLADE_DIFFUSE);
+  const alphaMap = useTexture(TEXTURES.BLADE_ALPHA);
+  const bakedTexture = useTexture(TEXTURES.HILL_BAKED);
   bakedTexture.flipY = false;
 
   const baseGeom = useMemo(() => createBladeGeometry(), []);
@@ -318,7 +313,3 @@ export default function Grass() {
     </group>
   );
 }
-
-useTexture.preload(textures.BLADE_DIFFUSE);
-useTexture.preload(textures.BLADE_ALPHA);
-useTexture.preload(textures.HILL_BAKED);

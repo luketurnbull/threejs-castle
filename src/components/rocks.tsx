@@ -2,19 +2,15 @@ import { useEffect } from "react";
 import { useGLTF, useTexture } from "@react-three/drei";
 
 import type { Model } from "../types/model";
-
-const textures = {
-  ROCK_DIFFUSE: "./rocks_diffuse.png",
-  ROCK_NORMAL: "./rocks_normal.png",
-};
+import { TEXTURES } from "../constants/assets";
 
 export default function Rocks() {
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
 
-  const diffuse = useTexture(textures.ROCK_DIFFUSE);
+  const diffuse = useTexture(TEXTURES.ROCK_DIFFUSE);
   diffuse.flipY = false;
 
-  const normal = useTexture(textures.ROCK_NORMAL);
+  const normal = useTexture(TEXTURES.ROCK_NORMAL);
   normal.flipY = false;
 
   useEffect(() => {
@@ -37,6 +33,3 @@ export default function Rocks() {
     </mesh>
   );
 }
-
-useTexture.preload(textures.ROCK_DIFFUSE);
-useTexture.preload(textures.ROCK_NORMAL);

@@ -2,23 +2,18 @@ import { useEffect } from "react";
 import { useGLTF, useTexture } from "@react-three/drei";
 
 import type { Model } from "../types/model";
-
-const textures = {
-  TOWER_DIFFUSE: "./tower_diffuse.png",
-  TOWER_NORMAL: "./tower_normal.png",
-  TOWER_ROUGHNESS: "./tower_roughness.png",
-};
+import { TEXTURES } from "../constants/assets";
 
 export default function Tower() {
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
 
-  const diffuse = useTexture(textures.TOWER_DIFFUSE);
+  const diffuse = useTexture(TEXTURES.TOWER_DIFFUSE);
   diffuse.flipY = false;
 
-  const normal = useTexture(textures.TOWER_NORMAL);
+  const normal = useTexture(TEXTURES.TOWER_NORMAL);
   normal.flipY = false;
 
-  const roughness = useTexture(textures.TOWER_ROUGHNESS);
+  const roughness = useTexture(TEXTURES.TOWER_ROUGHNESS);
   roughness.flipY = false;
 
   useEffect(() => {
@@ -42,7 +37,3 @@ export default function Tower() {
     </mesh>
   );
 }
-
-useTexture.preload(textures.TOWER_DIFFUSE);
-useTexture.preload(textures.TOWER_NORMAL);
-useTexture.preload(textures.TOWER_ROUGHNESS);

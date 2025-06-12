@@ -3,10 +3,8 @@ import {
   BakeShadows,
   OrbitControls,
   Sky,
-  useGLTF,
   AdaptiveDpr,
   AdaptiveEvents,
-  Preload,
   Cloud,
   Bvh,
   Stats,
@@ -54,12 +52,9 @@ export default function Experience() {
 
       <BakeShadows />
       <Bvh firstHitOnly={true} />
-      <Preload all={true} />
       <AdaptiveDpr pixelated />
       <AdaptiveEvents />
       <Stats />
     </>
   );
 }
-
-useGLTF.preload("/scene.glb", true);
