@@ -54,7 +54,7 @@ export default function LoadingScreen({
   return (
     <div className="w-screen h-screen absolute bg-[#ffe79e] flex items-center justify-center">
       <div className="flex flex-col gap-2 justify-center items-center max-w-[800px] p-6">
-        <img src="/castle-on-a-hill.png" className="max-h-1/3" />
+        <img src="/flash-page-image.webp" className="max-h-1/3" />
         <div className="h-1/3 w-4/5 max-w-[300px] mb-5">
           <div className="text-center mt-2.5 text-black">
             {Math.round(progress)}%
@@ -66,7 +66,7 @@ export default function LoadingScreen({
                 ref={(el) => {
                   brickRefs.current[index] = el;
                 }}
-                className="w-full h-12 rounded-md opacity-0 transform scale-0 bg-[url('/brick-tile.png')] bg-contain bg-center bg-no-repeat"
+                className="w-full h-12 rounded-md opacity-0 transform scale-0 bg-[url('/brick-tile.webp')] bg-contain bg-center bg-no-repeat"
               ></div>
             ))}
           </div>
