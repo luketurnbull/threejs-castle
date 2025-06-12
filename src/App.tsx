@@ -10,10 +10,11 @@ function App() {
   const [backgroundAudio] = useState(() => new Audio(backgroundSounds));
 
   return (
-    <div className="h-screen w-screen relative">
+    <div className="h-screen w-screen relative overflow-hidden">
+      {/* 3D Scene Container */}
       <div
-        className={`absolute inset-0 transition-opacity duration-500 ${
-          started ? "opacity-100" : "opacity-0 pointer-events-none"
+        className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+          started ? "opacity-100 scale-100" : "opacity-0"
         }`}
       >
         {ready && (
@@ -38,7 +39,14 @@ function App() {
         )}
       </div>
 
-      {!started && (
+      {/* Loading Screen Container */}
+      <div
+        className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+          started
+            ? "opacity-0 translate-y-full pointer-events-none"
+            : "opacity-100 translate-y-0"
+        }`}
+      >
         <LoadingScreen
           onStart={() => {
             setStarted(true);
@@ -50,7 +58,7 @@ function App() {
             setReady(true);
           }}
         />
-      )}
+      </div>
     </div>
   );
 }
