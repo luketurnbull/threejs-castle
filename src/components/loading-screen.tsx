@@ -43,12 +43,12 @@ export default function LoadingScreen({
           />
         )}
 
-        <div className="flex w-full justify-center h-14">
+        <div className="flex w-full justify-center h-12">
           {isReady && (
             <button
               onClick={onStart}
               ref={startButtonRef}
-              className="px-6 py-3 text-md text-black bg-[#859531] font-semi-bold border-2 rounded-md cursor-pointer transition-colors duration-300 hover:bg-[#9ea733] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+              className="px-6 py-2 text-md text-black bg-[#859531] font-semi-bold border-2 rounded-md cursor-pointer transition-colors duration-300 hover:bg-[#9ea733] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
             >
               Start
             </button>
