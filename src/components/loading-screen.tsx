@@ -12,6 +12,7 @@ export default function LoadingScreen({
   const { progress } = useProgress();
   const [isReady, setIsReady] = useState(false);
   const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const startButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (progress === 100) {
@@ -38,7 +39,17 @@ export default function LoadingScreen({
         }
       }
     });
-  }, [progress]);
+  }, [progress, onReady]);
+
+  useEffect(() => {
+    if (isReady && startButtonRef.current) {
+      gsap.fromTo(
+        startButtonRef.current,
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }
+      );
+    }
+  }, [isReady]);
 
   return (
     <div className="w-screen h-screen absolute bg-[#ffe79e] flex items-center justify-center">
@@ -63,6 +74,7 @@ export default function LoadingScreen({
             {isReady && (
               <button
                 onClick={onStart}
+                ref={startButtonRef}
                 className="px-6 py-3 text-md text-black bg-[#859531] font-semi-bold border-2 rounded-md cursor-pointer transition-colors duration-300 hover:bg-[#9ea733] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
               >
                 Start
