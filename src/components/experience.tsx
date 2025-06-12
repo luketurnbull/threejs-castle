@@ -2,10 +2,8 @@ import Scene from "./scene";
 import {
   BakeShadows,
   OrbitControls,
-  Sky,
   AdaptiveDpr,
   AdaptiveEvents,
-  Cloud,
   Bvh,
   Stats,
 } from "@react-three/drei";
