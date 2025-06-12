@@ -26,7 +26,6 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    console.log(assetsProgress);
     setProgress(Math.round(Math.max(assetsProgress - 10, 0)));
   }, [assetsProgress]);
 
