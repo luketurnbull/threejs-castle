@@ -56,7 +56,7 @@ export default function LoadingScreen({
       <div className="flex flex-col gap-2 justify-center items-center max-w-[800px] p-6">
         <img src="/flash-page-image.webp" className="max-h-1/3" />
         <div className="h-1/3 w-4/5 max-w-[300px] mb-5">
-          <div className="text-center mt-2.5 text-black">
+          <div className="text-center mt-2.5 text-black text-2xl font-bold">
             {Math.round(progress)}%
           </div>
           <div className="grid grid-cols-10 gap-1 mb-4">
