@@ -31,6 +31,7 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
         opacity={0.8}
         speed={0.2}
       />
+
       <Tower />
       <Grass />
       <Windows />
