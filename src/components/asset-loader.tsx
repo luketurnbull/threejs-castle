@@ -21,6 +21,9 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
   useTexture.preload(TEXTURES.ROCK_DIFFUSE);
   useTexture.preload(TEXTURES.ROCK_NORMAL);
 
+  // Preload flag textures
+  useTexture.preload(TEXTURES.FLAG_ALPHA);
+
   const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { progress: assetsProgress } = useProgress();
   const [progress, setProgress] = useState(0);
