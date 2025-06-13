@@ -11,17 +11,21 @@ import {
 } from "@react-three/drei";
 import "./grass-material";
 import "./flag-material";
+import { useState } from "react";
+import * as THREE from "three";
 
 export default function Experience() {
+  const [sunPosition] = useState(() => new THREE.Vector3(4, 0.25, -12));
+
   return (
     <>
       <ambientLight color="white" intensity={10} />
 
-      <Scene />
+      <Scene sunPosition={sunPosition} />
 
       <Sky
         distance={600000}
-        sunPosition={[4, 0.25, -12]}
+        sunPosition={[sunPosition.x, sunPosition.y, sunPosition.z]}
         rayleigh={4}
         turbidity={10}
         mieCoefficient={0.004}
@@ -29,27 +33,27 @@ export default function Experience() {
       />
 
       <Cloud
-        position={[0, 110, -50]}
+        position={[0, 120, -50]}
         scale={[20, 20, 20]}
         opacity={0.8}
         speed={0.2}
       />
 
       <Cloud
-        position={[150, 60, 150]}
-        scale={[20, 20, 20]}
+        position={[200, 60, 200]}
+        scale={[40, 40, 40]}
         opacity={0.8}
         speed={0.2}
       />
 
       <OrbitControls
-        minPolarAngle={Math.PI * 0.4}
+        minPolarAngle={Math.PI * 0.35}
         maxPolarAngle={Math.PI * 0.5}
         enableZoom={false}
         makeDefault={true}
+        enablePan={false}
         enableDamping={true}
         dampingFactor={0.05}
-        enablePan={false}
       />
 
       <BakeShadows />

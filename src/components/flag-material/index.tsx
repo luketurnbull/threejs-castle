@@ -7,11 +7,13 @@ import { shaderMaterial } from "@react-three/drei";
 type FlagMaterialProps = {
   uAlphaMap: THREE.Texture | null;
   uTime: number;
+  uSunPosition: THREE.Vector3;
 };
 
 const defaultFlagUniforms: FlagMaterialProps = {
   uAlphaMap: null,
   uTime: 0,
+  uSunPosition: new THREE.Vector3(4, 0.25, -12),
 };
 
 const FlagMaterial = shaderMaterial(
@@ -22,6 +24,7 @@ const FlagMaterial = shaderMaterial(
     if (self) {
       self.side = THREE.DoubleSide;
       self.transparent = true;
+      self.depthWrite = true;
     }
   }
 );

@@ -4,13 +4,18 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
 
-export default function Flag() {
+type FlagProps = {
+  sunPosition: THREE.Vector3;
+};
+
+export default function Flag({ sunPosition }: FlagProps) {
   const flagMaterial = useRef<THREE.ShaderMaterial>(null!);
   const alphaMap = useTexture(TEXTURES.FLAG_ALPHA);
 
   useFrame((state) => {
     if (flagMaterial.current) {
       flagMaterial.current.uniforms.uTime.value = state.clock.elapsedTime;
+      flagMaterial.current.uniforms.uSunPosition.value = sunPosition;
     }
   });
 
@@ -22,7 +27,11 @@ export default function Flag() {
       </mesh>
       <mesh rotation-y={Math.PI * 1.5} position={[0, 3.2, 4.3]}>
         <planeGeometry args={[9, 6, 32, 32]} />
-        <flagMaterial ref={flagMaterial} uAlphaMap={alphaMap} />
+        <flagMaterial
+          ref={flagMaterial}
+          uAlphaMap={alphaMap}
+          uSunPosition={sunPosition}
+        />
       </mesh>
     </group>
   );
