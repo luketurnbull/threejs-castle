@@ -8,12 +8,16 @@ type FlagMaterialProps = {
   uAlphaMap: THREE.Texture | null;
   uTime: number;
   uSunPosition: THREE.Vector3;
+  uMousePosition: THREE.Vector3;
+  uIsHovered: number;
 };
 
 const defaultFlagUniforms: FlagMaterialProps = {
   uAlphaMap: null,
   uTime: 0,
   uSunPosition: new THREE.Vector3(4, 0.25, -12),
+  uMousePosition: new THREE.Vector3(),
+  uIsHovered: 0.0,
 };
 
 const FlagMaterial = shaderMaterial(
