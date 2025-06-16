@@ -16,6 +16,7 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
   useTexture.preload(TEXTURES.BLADE_DIFFUSE);
   useTexture.preload(TEXTURES.BLADE_ALPHA);
   useTexture.preload(TEXTURES.HILL_BAKED);
+  useTexture.preload(TEXTURES.HILL_PATCHES);
 
   // Preload rock textures
   useTexture.preload(TEXTURES.ROCK_DIFFUSE);

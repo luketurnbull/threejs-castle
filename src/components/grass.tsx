@@ -337,7 +337,7 @@ export default function Grass() {
           toneMapped={false}
           transparent={true}
           side={THREE.DoubleSide}
-          bladeHeight={2}
+          bladeHeight={2.5}
           brightness={50.0}
           aoMap={bakedTexture}
         />
