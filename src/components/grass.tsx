@@ -10,7 +10,7 @@ import { TEXTURES } from "../constants/assets";
 const preloadedAudio = new Audio(rustleAudio);
 preloadedAudio.load();
 
-const NUM_BLADES = 60000;
+const NUM_BLADES = 100000;
 const HILL_SCALE = new THREE.Vector3(119.355, 60.27, 119.355);
 const HILL_POSITION = new THREE.Vector3(4.324, 3.324, -0.949);
 
@@ -297,7 +297,7 @@ export default function Grass() {
           transparent={true}
           side={THREE.DoubleSide}
           bladeHeight={2}
-          brightness={25.0}
+          brightness={50.0}
           aoMap={bakedTexture}
         />
       </mesh>
@@ -308,7 +308,7 @@ export default function Grass() {
         position={HILL_POSITION}
         visible={true}
       >
-        <meshStandardMaterial aoMap={bakedTexture} color={"#3d2300"} />
+        <meshStandardMaterial map={bakedTexture} color={"#aaaaaa"} />
       </mesh>
     </group>
   );
