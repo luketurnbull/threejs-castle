@@ -73,7 +73,7 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
             }}
             className="w-full h-12 opacity-0 transform scale-0"
           >
-            <img src="/brick-tile.webp" />
+            <img src="/loading/brick-tile.webp" />
           </div>
         ))}
       </div>

@@ -27,7 +27,7 @@ export default function LoadingScreen({
     <div className="w-screen h-screen absolute bg-[#ffe79e] flex items-center justify-center">
       <div className="flex flex-col gap-2 justify-center items-center max-w-[500px] p-6">
         <img
-          src="/flash-page-image.webp"
+          src="/loading/flash-page-image.webp"
           className="max-h-1/3"
           onLoad={() => {
             setIsLoadingScreenReady(true);
