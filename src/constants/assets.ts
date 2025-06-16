@@ -10,6 +10,7 @@ export const TEXTURES = {
 
   // Hill textures
   HILL_BAKED: "./hill/hill_baked.png",
+  HILL_PATCHES: "./hill/hill_patches.png",
 
   // Rock textures
   ROCK_DIFFUSE: "./rocks/rocks_diffuse.png",

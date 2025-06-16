@@ -1,10 +1,11 @@
 import { useGLTF, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import type { Model } from "../types/model";
 import rustleAudio from "../assets/leavesRustling2.mp3";
 import { TEXTURES } from "../constants/assets";
+import { getTexturePixelData } from "../utils/textureUtils";
 
 // Preload the audio
 const preloadedAudio = new Audio(rustleAudio);
@@ -53,7 +54,18 @@ export default function Grass() {
   const texture = useTexture(TEXTURES.BLADE_DIFFUSE);
   const alphaMap = useTexture(TEXTURES.BLADE_ALPHA);
   const bakedTexture = useTexture(TEXTURES.HILL_BAKED);
+  const hillPatchesTexture = useTexture(TEXTURES.HILL_PATCHES);
   bakedTexture.flipY = false;
+  hillPatchesTexture.flipY = false;
+
+  const [patchesPixelData, setPatchesPixelData] =
+    useState<Uint8ClampedArray | null>(null);
+
+  useEffect(() => {
+    if (hillPatchesTexture.image) {
+      setPatchesPixelData(getTexturePixelData(hillPatchesTexture));
+    }
+  }, [hillPatchesTexture]);
 
   const baseGeom = useMemo(() => createBladeGeometry(), []);
 
@@ -66,6 +78,17 @@ export default function Grass() {
     const halfRootAngleSin = [];
     const halfRootAngleCos = [];
     const hillUVs = [];
+
+    if (!patchesPixelData) {
+      return {
+        offsets: [],
+        orientations: [],
+        stretches: [],
+        halfRootAngleSin: [],
+        halfRootAngleCos: [],
+        hillUVs: [],
+      };
+    }
 
     for (let i = 0; i < NUM_BLADES; i++) {
       // Sample point, normal, and barycentric info
@@ -146,6 +169,24 @@ export default function Grass() {
         .addScaledVector(uvB, v)
         .addScaledVector(uvC, w);
 
+      // Sample patch density from texture pixel data
+      if (patchesPixelData) {
+        const imgWidth = hillPatchesTexture.image.width;
+        const imgHeight = hillPatchesTexture.image.height;
+        const x = Math.min(imgWidth - 1, Math.floor(uv.x * imgWidth));
+        const y = Math.min(imgHeight - 1, Math.floor(uv.y * imgHeight)); // Use uv.y directly, consistent with hill_baked texture behavior
+
+        // Get the red channel value (assuming grayscale for density)
+        const index = (y * imgWidth + x) * 4; // * 4 for RGBA
+        const patchDensity = 1.0 - patchesPixelData[index] / 255.0; // Normalize to 0-1 and invert
+
+        // Only add blade if density is above a threshold
+        // and randomly based on density for partial areas
+        if (patchDensity < 0.1 || Math.random() > patchDensity) {
+          continue; // Skip this blade
+        }
+      }
+
       hillUVs.push(uv.x, uv.y);
 
       // Apply scale and position
@@ -176,7 +217,7 @@ export default function Grass() {
       halfRootAngleCos,
       hillUVs,
     };
-  }, [hillGeom]);
+  }, [hillGeom, patchesPixelData]);
 
   useFrame((state) => {
     if (materialRef.current && rustleSoundRef.current) {
