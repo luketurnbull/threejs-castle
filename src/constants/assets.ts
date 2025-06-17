@@ -1,8 +1,6 @@
 export const TEXTURES = {
   // Tower textures
   TOWER_DIFFUSE: "./tower/tower_diffuse.png",
-  TOWER_NORMAL: "./tower/tower_normal.png",
-  TOWER_ROUGHNESS: "./tower/tower_roughness.png",
 
   // Grass blade textures
   BLADE_DIFFUSE: "./hill/blade_diffuse.jpg",
@@ -13,9 +11,11 @@ export const TEXTURES = {
   HILL_PATCHES: "./hill/hill_patches.png",
 
   // Rock textures
-  ROCK_DIFFUSE: "./rocks/rocks_diffuse.png",
-  ROCK_NORMAL: "./rocks/rocks_normal.png",
+  ROCK_DIFFUSE: "./objects/objects.png",
 
   // Flag textures
   FLAG_ALPHA: "./flag_alpha.jpg",
+
+  // Door textures
+  DOOR_DIFFUSE: "./door_diffuse.png",
 };

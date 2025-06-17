@@ -9,8 +9,6 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
 
   // Preload tower textures
   useTexture.preload(TEXTURES.TOWER_DIFFUSE);
-  useTexture.preload(TEXTURES.TOWER_NORMAL);
-  useTexture.preload(TEXTURES.TOWER_ROUGHNESS);
 
   // Preload hill and grass blade textures
   useTexture.preload(TEXTURES.BLADE_DIFFUSE);
@@ -20,10 +18,12 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
 
   // Preload rock textures
   useTexture.preload(TEXTURES.ROCK_DIFFUSE);
-  useTexture.preload(TEXTURES.ROCK_NORMAL);
 
   // Preload flag textures
   useTexture.preload(TEXTURES.FLAG_ALPHA);
+
+  // Preload door textures
+  useTexture.preload(TEXTURES.DOOR_DIFFUSE);
 
   const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { progress: assetsProgress } = useProgress();

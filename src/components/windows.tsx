@@ -15,7 +15,7 @@ const windowPositions: WindowPosition[] = [
   { position: [6.292, 26.054, 6.59], rotation: [-3.128, 0.528, 3.136] },
   { position: [8.098, 12.109, -2.783], rotation: [-3.128, -0.492, -3.134] },
   { position: [3.646, 26.821, -8.355], rotation: [-3.114, -1.129, -3.116] },
-  { position: [-8.463, 20.556, 7.702], rotation: [-0.022, 1.014, 0.02] },
+  { position: [-8.512, 20.556, 7.78], rotation: [-0.022, 1.014, 0.02] },
 ];
 
 export default function Windows() {

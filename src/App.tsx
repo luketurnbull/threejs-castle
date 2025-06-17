@@ -19,7 +19,7 @@ function App() {
         {ready && (
           <Canvas
             camera={{
-              position: [-150, 20, 15],
+              position: [146, 10, 39],
               fov: 45,
               near: 0.1,
               far: 1000,

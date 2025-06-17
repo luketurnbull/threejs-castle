@@ -10,11 +10,8 @@ export default function Rocks() {
   const diffuse = useTexture(TEXTURES.ROCK_DIFFUSE);
   diffuse.flipY = false;
 
-  const normal = useTexture(TEXTURES.ROCK_NORMAL);
-  normal.flipY = false;
-
   useEffect(() => {
-    const geometry = nodes.tower.geometry;
+    const geometry = nodes.objects.geometry;
 
     geometry.attributes.uv = geometry.attributes.uv1;
     geometry.attributes.uv.needsUpdate = true;
@@ -24,12 +21,12 @@ export default function Rocks() {
     <mesh
       castShadow
       receiveShadow
-      geometry={nodes.rocks.geometry}
-      material={nodes.rocks.material}
-      position={[-39.969, -12.221, -27.737]}
-      scale={[5.155, 4.241, 5.155]}
+      geometry={nodes.objects.geometry}
+      material={nodes.objects.material}
+      position={[7.225, 2.852, 16.36]}
+      scale={[1, 1.542, 1]}
     >
-      <meshStandardMaterial map={diffuse} normalMap={normal} />
+      <meshStandardMaterial map={diffuse} />
     </mesh>
   );
 }

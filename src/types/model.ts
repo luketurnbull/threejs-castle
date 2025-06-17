@@ -4,8 +4,9 @@ import * as THREE from "three";
 export type Model = GLTF & {
   nodes: {
     hill: THREE.Mesh;
-    rocks: THREE.Mesh;
+    objects: THREE.Mesh;
     tower: THREE.Mesh;
+    door: THREE.Mesh;
     windowInside: THREE.Mesh;
   };
 };

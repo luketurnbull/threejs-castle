@@ -52,11 +52,7 @@ export default function Flag({ sunPosition }: FlagProps) {
   });
 
   return (
-    <group position={[0, 40, 0]}>
-      <mesh scale={0.05}>
-        <cylinderGeometry args={[5, 5, 250, 32]} />
-        <meshBasicMaterial color={"black"} />
-      </mesh>
+    <group position={[-2, 42, 0.1]}>
       <mesh ref={flagRef} rotation-y={Math.PI * 1.5} position={[0, 3.2, 4.3]}>
         <planeGeometry args={[9, 6, 32, 32]} />
         <flagMaterial
