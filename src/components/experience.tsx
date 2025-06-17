@@ -19,7 +19,7 @@ export default function Experience() {
 
   return (
     <>
-      <ambientLight color="white" intensity={10} />
+      <ambientLight color="white" intensity={15} />
 
       <Scene sunPosition={sunPosition} />
 
