@@ -25,6 +25,9 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
   // Preload door textures
   useTexture.preload(TEXTURES.DOOR_DIFFUSE);
 
+  // Preload Others
+  useTexture.preload(TEXTURES.PERLIN_NOISE);
+
   const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { progress: assetsProgress } = useProgress();
   const [progress, setProgress] = useState(0);

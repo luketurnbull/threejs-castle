@@ -338,7 +338,7 @@ export default function Grass() {
           transparent={true}
           side={THREE.DoubleSide}
           bladeHeight={1}
-          brightness={25.0}
+          brightness={40.0}
           aoMap={bakedTexture}
         />
       </mesh>
@@ -349,7 +349,7 @@ export default function Grass() {
         position={HILL_POSITION}
         visible={true}
       >
-        <meshStandardMaterial map={bakedTexture} color={"#999999"} />
+        <meshStandardMaterial map={bakedTexture} color={"#666666"} />
       </mesh>
     </group>
   );

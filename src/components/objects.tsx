@@ -4,7 +4,7 @@ import { useGLTF, useTexture } from "@react-three/drei";
 import type { Model } from "../types/model";
 import { TEXTURES } from "../constants/assets";
 
-export default function Rocks() {
+export default function Objects() {
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
 
   const diffuse = useTexture(TEXTURES.ROCK_DIFFUSE);

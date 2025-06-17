@@ -18,4 +18,7 @@ export const TEXTURES = {
 
   // Door textures
   DOOR_DIFFUSE: "./door_diffuse.png",
+
+  // Others
+  PERLIN_NOISE: "./perlin.png",
 };

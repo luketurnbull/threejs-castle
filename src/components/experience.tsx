@@ -11,6 +11,7 @@ import {
 } from "@react-three/drei";
 import "./grass-material";
 import "./flag-material";
+import "./smoke-material";
 import { useState } from "react";
 import * as THREE from "three";
 
@@ -19,7 +20,7 @@ export default function Experience() {
 
   return (
     <>
-      <ambientLight color="white" intensity={15} />
+      <ambientLight color="white" intensity={18} />
 
       <Scene sunPosition={sunPosition} />
 
