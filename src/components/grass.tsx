@@ -11,7 +11,7 @@ import { getTexturePixelData } from "../utils/textureUtils";
 const preloadedAudio = new Audio(rustleAudio);
 preloadedAudio.load();
 
-const NUM_BLADES = 100000;
+const NUM_BLADES = 200000;
 const HILL_SCALE = new THREE.Vector3(119.355, 60.27, 119.355);
 const HILL_POSITION = new THREE.Vector3(4.324, 3.324, -0.949);
 
@@ -217,7 +217,7 @@ export default function Grass() {
       halfRootAngleCos,
       hillUVs,
     };
-  }, [hillGeom, patchesPixelData]);
+  }, [hillGeom, patchesPixelData, hillPatchesTexture]);
 
   useFrame((state) => {
     if (materialRef.current && rustleSoundRef.current) {
@@ -337,8 +337,8 @@ export default function Grass() {
           toneMapped={false}
           transparent={true}
           side={THREE.DoubleSide}
-          bladeHeight={2.5}
-          brightness={50.0}
+          bladeHeight={1}
+          brightness={25.0}
           aoMap={bakedTexture}
         />
       </mesh>
@@ -349,7 +349,7 @@ export default function Grass() {
         position={HILL_POSITION}
         visible={true}
       >
-        <meshStandardMaterial map={bakedTexture} color={"#aaaaaa"} />
+        <meshStandardMaterial map={bakedTexture} color={"#999999"} />
       </mesh>
     </group>
   );
