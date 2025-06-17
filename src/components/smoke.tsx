@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 export default function Smoke() {
   const smokeMaterial = useRef<THREE.ShaderMaterial>(null!);
-  const perlinTexture = useTexture(TEXTURES.FLAG_ALPHA);
+  const perlinTexture = useTexture(TEXTURES.PERLIN_NOISE);
   perlinTexture.wrapS = THREE.RepeatWrapping;
   perlinTexture.wrapT = THREE.RepeatWrapping;
 
@@ -15,9 +15,13 @@ export default function Smoke() {
   });
 
   return (
-    <mesh position={[50, 20, 50]} scale={[5, 25, 5]}>
+    <mesh position={[75, -5, 8]} scale={[8, 25, 8]}>
       <planeGeometry args={[1, 1, 16, 64]} />
-      <smokeMaterial ref={smokeMaterial} uPerlinTexture={perlinTexture} />
+      <smokeMaterial
+        ref={smokeMaterial}
+        uPerlinTexture={perlinTexture}
+        uTime={0}
+      />
     </mesh>
   );
 }

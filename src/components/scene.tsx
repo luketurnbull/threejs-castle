@@ -5,6 +5,7 @@ import Windows from "./windows";
 import Flag from "./flag";
 import * as THREE from "three";
 import Objects from "./objects";
+import Smoke from "./smoke";
 // import Smoke from "./smoke";
 
 type SceneProps = JSX.IntrinsicElements["group"] & {
@@ -18,7 +19,7 @@ export default function Scene({ sunPosition, ...props }: SceneProps) {
       <Tower />
       <Windows />
       <Objects />
-      {/* <Smoke /> */}
+      <Smoke />
       <Grass />
     </group>
   );
