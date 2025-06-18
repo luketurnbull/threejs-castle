@@ -15,22 +15,12 @@ import "./smoke-material";
 import { useAppStore } from "../store";
 
 export default function Experience() {
-  const sunPosition = useAppStore((state) => state.sunPosition);
-
   return (
     <>
       <ambientLight color="white" intensity={18} />
+      <SkySettings />
 
       <Scene />
-
-      <Sky
-        distance={600000}
-        sunPosition={[sunPosition.x, sunPosition.y, sunPosition.z]}
-        rayleigh={4}
-        turbidity={10}
-        mieCoefficient={0.004}
-        mieDirectionalG={0.8}
-      />
 
       <Cloud
         position={[0, 120, -50]}
@@ -62,5 +52,20 @@ export default function Experience() {
       <AdaptiveEvents />
       <Stats />
     </>
+  );
+}
+
+function SkySettings() {
+  const sunPosition = useAppStore((state) => state.sunPosition);
+
+  return (
+    <Sky
+      distance={600000}
+      sunPosition={[sunPosition.x, sunPosition.y, sunPosition.z]}
+      rayleigh={4}
+      turbidity={10}
+      mieCoefficient={0.004}
+      mieDirectionalG={0.8}
+    />
   );
 }

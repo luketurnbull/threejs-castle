@@ -29,7 +29,8 @@ interface AppState {
   stopBackgroundAudio: () => void;
 
   // Mode
-  toggleMode: () => void;
+  setDay: () => void;
+  setNight: () => void;
 
   // Sun position
   setSunPosition: (position: THREE.Vector3) => void;
@@ -75,13 +76,18 @@ export const useAppStore = create<AppState>((set, get) => ({
     backgroundAudio.pause();
   },
 
-  toggleMode: () => {
-    const { mode } = get();
-    if (mode === "day") {
-      set({ mode: "night" });
-    } else {
-      set({ mode: "day" });
-    }
+  setDay: () => {
+    set({
+      mode: "day",
+      sunPosition: new THREE.Vector3(4, 0.25, -12),
+    });
+  },
+
+  setNight: () => {
+    set({
+      mode: "night",
+      sunPosition: new THREE.Vector3(0, -50, 0),
+    });
   },
 
   setSunPosition: (position: THREE.Vector3) => {
