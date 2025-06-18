@@ -8,15 +8,17 @@ Castle Project for ThreeJS Journey Challenge 18
 
 - [x] Add basic loading screen and background sound
 - [x] Think of loading screen concept that fits with concept/ colours themes, svg pictures?
-- [ ] Add way to toggle audio off
+- [x] Add way to toggle audio off
+- [x] Add shadcn/ui so we can quickly add buttons
+- [ ] Style buttons better
+- [ ] Animate sound next to audio button to show it's on?
 - [ ] Make sure audio loops properly
-- [ ] Add shadcn/ui so we can quickly add buttons
 
 ## Castle
 
 - [x] Way less emissions coming from windows in Blender, looks too orange
 - [x] Less area light, otherwise looking great!
-- [ ] Create door
+- [x] Create door
 - [ ] Add chains to door
 - [ ] Door that lowers when you click on it
 
