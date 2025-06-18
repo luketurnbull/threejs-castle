@@ -2,6 +2,7 @@ import { create } from "zustand";
 import backgroundSounds from "../assets/background.mp3";
 
 export type AppStatus = "loading" | "ready" | "started";
+export type Mode = "day" | "night";
 
 interface AppState {
   // App status
@@ -11,12 +12,21 @@ interface AppState {
   audioEnabled: boolean;
   backgroundAudio: HTMLAudioElement | null;
 
+  // Mode
+  mode: Mode;
+
   // Actions
+  // Status
   setStatus: (status: AppStatus) => void;
+
+  // Audio
   toggleAudio: () => void;
   startBackgroundAudio: () => void;
   stopBackgroundAudio: () => void;
   initializeAudio: () => void;
+
+  // Mode
+  toggleMode: () => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -24,6 +34,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   status: "loading",
   audioEnabled: true,
   backgroundAudio: null,
+  mode: "day",
 
   // Actions
   setStatus: (status: AppStatus) => {
@@ -64,5 +75,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   initializeAudio: () => {
     const audio = new Audio(backgroundSounds);
     set({ backgroundAudio: audio });
+  },
+
+  toggleMode: () => {
+    const { mode } = get();
+    if (mode === "day") {
+      set({ mode: "night" });
+    } else {
+      set({ mode: "day" });
+    }
   },
 }));

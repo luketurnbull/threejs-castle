@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import Experience from "./experience";
 import { Button } from "./ui/button";
-import { VolumeOff, Volume2 } from "lucide-react";
+import { VolumeOff, Volume2, Sun, Moon } from "lucide-react";
 import { useAppStore } from "../store";
 
 export default function Castle() {
@@ -33,11 +33,16 @@ export default function Castle() {
 function ControlPanel() {
   const audioEnabled = useAppStore((state) => state.audioEnabled);
   const toggleAudio = useAppStore((state) => state.toggleAudio);
+  const mode = useAppStore((state) => state.mode);
+  const toggleMode = useAppStore((state) => state.toggleMode);
 
   return (
-    <div className="fixed top-6 right-6 z-50">
+    <div className="fixed top-6 right-6 z-50 flex flex-col gap-y-2">
       <Button size="icon" onClick={toggleAudio}>
         {audioEnabled ? <Volume2 /> : <VolumeOff />}
+      </Button>
+      <Button size="icon" onClick={toggleMode}>
+        {mode === "day" ? <Sun /> : <Moon />}
       </Button>
     </div>
   );
