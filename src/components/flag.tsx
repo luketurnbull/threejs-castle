@@ -3,12 +3,10 @@ import { useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import * as THREE from "three";
-import { useAppStore } from "../store";
 
 const HOVER_TRANSITION_SPEED = 2.0; // Speed of hover transition
 
 export default function Flag() {
-  const sunPosition = useAppStore((state) => state.sunPosition);
   const flagMaterial = useRef<THREE.ShaderMaterial>(null!);
   const alphaMap = useTexture(TEXTURES.FLAG_ALPHA);
   const [mousePosition, setMousePosition] = useState(new THREE.Vector3());
@@ -21,7 +19,6 @@ export default function Flag() {
     if (flagMaterial.current && flagRef.current) {
       // Update time uniform
       flagMaterial.current.uniforms.uTime.value = state.clock.elapsedTime;
-      flagMaterial.current.uniforms.uSunPosition.value = sunPosition;
 
       // Update mouse position in world space
       raycaster.setFromCamera(pointer, camera);
@@ -56,7 +53,7 @@ export default function Flag() {
         <flagMaterial
           ref={flagMaterial}
           uAlphaMap={alphaMap}
-          uSunPosition={sunPosition}
+          uSunPosition={new THREE.Vector3(4, 0.25, -12)}
           uMousePosition={mousePosition}
           uIsHovered={hoverTransition}
         />

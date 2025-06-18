@@ -13,28 +13,18 @@ import "./grass-material";
 import "./flag-material";
 import "./smoke-material";
 import { useAppStore } from "../store";
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import * as THREE from "three";
 
 export default function Experience() {
   return (
     <>
-      <ambientLight color="white" intensity={18} />
       <SkySettings />
+      <LightSettings />
+      <CloudSettings />
 
       <Scene />
-
-      <Cloud
-        position={[0, 120, -50]}
-        scale={[20, 20, 20]}
-        opacity={0.8}
-        speed={0.2}
-      />
-
-      <Cloud
-        position={[200, 60, 200]}
-        scale={[40, 40, 40]}
-        opacity={0.8}
-        speed={0.2}
-      />
 
       <OrbitControls
         minPolarAngle={Math.PI * 0.4}
@@ -48,7 +38,7 @@ export default function Experience() {
 
       <BakeShadows />
       <Bvh firstHitOnly={true} />
-      <AdaptiveDpr pixelated />
+      <AdaptiveDpr pixelated={true} />
       <AdaptiveEvents />
       <Stats />
     </>
@@ -56,16 +46,49 @@ export default function Experience() {
 }
 
 function SkySettings() {
-  const sunPosition = useAppStore((state) => state.sunPosition);
+  const mode = useAppStore((state) => state.mode);
+  const [yPos, setYPos] = useState(0.25);
+
+  useEffect(() => {
+    if (mode === "night") {
+      setYPos(-50);
+    } else {
+      setYPos(0.25);
+    }
+  }, [mode]);
 
   return (
     <Sky
       distance={600000}
-      sunPosition={[sunPosition.x, sunPosition.y, sunPosition.z]}
+      sunPosition={[4, yPos, -12]}
       rayleigh={4}
       turbidity={10}
       mieCoefficient={0.004}
       mieDirectionalG={0.8}
     />
+  );
+}
+
+function LightSettings() {
+  return <ambientLight color="white" intensity={18} />;
+}
+
+function CloudSettings() {
+  return (
+    <>
+      <Cloud
+        position={[0, 120, -50]}
+        scale={[20, 20, 20]}
+        opacity={0.8}
+        speed={0.2}
+      />
+
+      <Cloud
+        position={[200, 60, 200]}
+        scale={[40, 40, 40]}
+        opacity={0.8}
+        speed={0.2}
+      />
+    </>
   );
 }

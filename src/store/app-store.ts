@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import backgroundSounds from "../assets/background.mp3";
-import * as THREE from "three";
 
 export type AppStatus = "loading" | "ready" | "started";
 export type Mode = "day" | "night";
@@ -16,9 +15,6 @@ interface AppState {
   // Mode
   mode: Mode;
 
-  // Sun position
-  sunPosition: THREE.Vector3;
-
   // Actions
   // Status
   setStatus: (status: AppStatus) => void;
@@ -31,9 +27,6 @@ interface AppState {
   // Mode
   setDay: () => void;
   setNight: () => void;
-
-  // Sun position
-  setSunPosition: (position: THREE.Vector3) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -42,7 +35,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   audioEnabled: true,
   backgroundAudio: new Audio(backgroundSounds),
   mode: "day",
-  sunPosition: new THREE.Vector3(4, 0.25, -12),
 
   // Actions
   setStatus: (status: AppStatus) => {
@@ -77,20 +69,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   setDay: () => {
-    set({
-      mode: "day",
-      sunPosition: new THREE.Vector3(4, 0.25, -12),
-    });
+    set({ mode: "day" });
   },
 
   setNight: () => {
-    set({
-      mode: "night",
-      sunPosition: new THREE.Vector3(0, -50, 0),
-    });
-  },
-
-  setSunPosition: (position: THREE.Vector3) => {
-    set({ sunPosition: position });
+    set({ mode: "night" });
   },
 }));
