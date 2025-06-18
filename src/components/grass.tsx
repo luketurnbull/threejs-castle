@@ -125,28 +125,6 @@ export default function Grass() {
         .addScaledVector(vB, v)
         .addScaledVector(vC, w);
 
-      // Normal
-      const nA = new THREE.Vector3().fromBufferAttribute(
-        hillGeom.attributes.normal,
-        a
-      );
-
-      const nB = new THREE.Vector3().fromBufferAttribute(
-        hillGeom.attributes.normal,
-        b
-      );
-
-      const nC = new THREE.Vector3().fromBufferAttribute(
-        hillGeom.attributes.normal,
-        c
-      );
-
-      const normal = new THREE.Vector3()
-        .addScaledVector(nA, u)
-        .addScaledVector(nB, v)
-        .addScaledVector(nC, w)
-        .normalize();
-
       // Interpolated UV
       const uvAttr = hillGeom.attributes.uv;
       const uvA = new THREE.Vector2().fromBufferAttribute(
@@ -194,10 +172,13 @@ export default function Grass() {
       point.add(HILL_POSITION);
       offsets.push(point.x, point.y, point.z);
 
-      // Orientation: align Y axis with normal
-      const up = new THREE.Vector3(0, 1, 0);
-      const quat = new THREE.Quaternion().setFromUnitVectors(up, normal);
-      orientations.push(quat.x, quat.y, quat.z, quat.w);
+      // Orientation: make all grass blades face straight up on Y axis with slight random rotation
+      const randomAngle = (Math.random() - 0.5) * 0.3; // Random angle between -0.15 and 0.15 radians (~±8.6 degrees)
+      const randomQuat = new THREE.Quaternion().setFromAxisAngle(
+        new THREE.Vector3(0, 1, 0),
+        randomAngle
+      );
+      orientations.push(randomQuat.x, randomQuat.y, randomQuat.z, randomQuat.w);
 
       // Random stretch
       const stretch = Math.random() * 2.0;
