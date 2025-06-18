@@ -12,17 +12,16 @@ import {
 import "./grass-material";
 import "./flag-material";
 import "./smoke-material";
-import { useState } from "react";
-import * as THREE from "three";
+import { useAppStore } from "../store";
 
 export default function Experience() {
-  const [sunPosition] = useState(() => new THREE.Vector3(4, 0.25, -12));
+  const sunPosition = useAppStore((state) => state.sunPosition);
 
   return (
     <>
       <ambientLight color="white" intensity={18} />
 
-      <Scene sunPosition={sunPosition} />
+      <Scene />
 
       <Sky
         distance={600000}

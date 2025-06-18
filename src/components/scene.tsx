@@ -3,19 +3,14 @@ import Tower from "./tower";
 import Grass from "./grass";
 import Windows from "./windows";
 import Flag from "./flag";
-import * as THREE from "three";
 import Objects from "./objects";
 import Smoke from "./smoke";
 // import Smoke from "./smoke";
 
-type SceneProps = JSX.IntrinsicElements["group"] & {
-  sunPosition: THREE.Vector3;
-};
-
-export default function Scene({ sunPosition, ...props }: SceneProps) {
+export default function Scene(props: JSX.IntrinsicElements["group"]) {
   return (
     <group {...props} dispose={null}>
-      <Flag sunPosition={sunPosition} />
+      <Flag />
       <Tower />
       <Windows />
       <Objects />
