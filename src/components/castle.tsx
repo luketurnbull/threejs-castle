@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import Experience from "./experience";
 import { Button } from "./ui/button";
-import { VolumeOff, Volume2, Sun, Moon } from "lucide-react";
+import { VolumeOff, Volume2 } from "lucide-react";
 import { useAppStore } from "../store";
 import { ModeToggle } from "./ui/mode-toggle";
 

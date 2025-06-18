@@ -13,9 +13,7 @@ import "./grass-material";
 import "./flag-material";
 import "./smoke-material";
 import { useAppStore } from "../store";
-import { useEffect, useRef, useState } from "react";
-import { gsap } from "gsap";
-import * as THREE from "three";
+import { useEffect, useState } from "react";
 
 export default function Experience() {
   return (
