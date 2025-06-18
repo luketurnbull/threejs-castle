@@ -11,7 +11,7 @@ import { getTexturePixelData } from "../utils/textureUtils";
 const preloadedAudio = new Audio(rustleAudio);
 preloadedAudio.load();
 
-const NUM_BLADES = 200000;
+const NUM_BLADES = 120000;
 const HILL_SCALE = new THREE.Vector3(119.355, 60.27, 119.355);
 const HILL_POSITION = new THREE.Vector3(4.324, 3.324, -0.949);
 
