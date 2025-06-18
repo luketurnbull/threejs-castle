@@ -10,7 +10,7 @@ interface AppState {
 
   // Audio state
   audioEnabled: boolean;
-  backgroundAudio: HTMLAudioElement | null;
+  backgroundAudio: HTMLAudioElement;
 
   // Mode
   mode: Mode;
@@ -23,7 +23,6 @@ interface AppState {
   toggleAudio: () => void;
   startBackgroundAudio: () => void;
   stopBackgroundAudio: () => void;
-  initializeAudio: () => void;
 
   // Mode
   toggleMode: () => void;
@@ -33,7 +32,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Initial state
   status: "loading",
   audioEnabled: true,
-  backgroundAudio: null,
+  backgroundAudio: new Audio(backgroundSounds),
   mode: "day",
 
   // Actions
@@ -47,18 +46,16 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     set({ audioEnabled: newAudioEnabled });
 
-    if (backgroundAudio) {
-      if (newAudioEnabled) {
-        backgroundAudio.play().catch(console.error);
-      } else {
-        backgroundAudio.pause();
-      }
+    if (newAudioEnabled) {
+      backgroundAudio.play().catch(console.error);
+    } else {
+      backgroundAudio.pause();
     }
   },
 
   startBackgroundAudio: () => {
     const { backgroundAudio, audioEnabled } = get();
-    if (backgroundAudio && audioEnabled) {
+    if (audioEnabled) {
       backgroundAudio.loop = true;
       backgroundAudio.volume = 0.5;
       backgroundAudio.play().catch(console.error);
@@ -67,14 +64,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   stopBackgroundAudio: () => {
     const { backgroundAudio } = get();
-    if (backgroundAudio) {
-      backgroundAudio.pause();
-    }
-  },
-
-  initializeAudio: () => {
-    const audio = new Audio(backgroundSounds);
-    set({ backgroundAudio: audio });
+    backgroundAudio.pause();
   },
 
   toggleMode: () => {

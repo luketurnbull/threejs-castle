@@ -1,17 +1,10 @@
 import LoadingScreen from "./components/loading-screen";
-import { useEffect } from "react";
 import Castle from "./components/castle";
 import { useAppStore } from "./store";
 
 function App() {
-  // Only subscribe to status and initializeAudio, not the entire store
+  // Only subscribe to status since audio is now initialized on store creation
   const status = useAppStore((state) => state.status);
-  const initializeAudio = useAppStore((state) => state.initializeAudio);
-
-  // Initialize audio when component mounts
-  useEffect(() => {
-    initializeAudio();
-  }, [initializeAudio]);
 
   return (
     <div className="h-screen w-screen relative overflow-hidden">
