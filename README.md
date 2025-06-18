@@ -15,7 +15,9 @@ Castle Project for ThreeJS Journey Challenge 18
 ## Castle
 
 - [x] Way less emissions coming from windows in Blender, looks too orange
-- [ ] Less area light, otherwise looking great!
+- [x] Less area light, otherwise looking great!
+- [ ] Create door
+- [ ] Add chains to door
 - [ ] Door that lowers when you click on it
 
 ## Grass
@@ -36,15 +38,13 @@ Castle Project for ThreeJS Journey Challenge 18
 
 ## Flag
 
-- [ ] Add waving flag to the top of the castle
-
-## Tree
-
-- [ ] Come up with a concept for a tree
+- [x] Add waving flag to the top of the castle
 
 ## Fire
 
-- [ ] Make a camp fire, in the day mode it can have smoke, in night mode it can be an actual flame
+- [x] Make a camp fire
+- [x] Smoke shader during day
+- [ ] Fire shader during night
 
 ## Night mode
 
@@ -58,3 +58,7 @@ Castle Project for ThreeJS Journey Challenge 18
 - [ ] Refine experience for mobile
 - [ ] Potentially do adaptive performance? Less grass blades and no clouds if the users computer can't handle it?
 - [ ] Play with some Post Processor effects?
+
+## Tree
+
+- [ ] Come up with a concept for a tree
