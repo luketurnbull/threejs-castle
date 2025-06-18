@@ -31,7 +31,8 @@ export default function Castle() {
 }
 
 function ControlPanel() {
-  const { audioEnabled, toggleAudio } = useAppStore();
+  const audioEnabled = useAppStore((state) => state.audioEnabled);
+  const toggleAudio = useAppStore((state) => state.toggleAudio);
 
   return (
     <div className="fixed top-6 right-6 z-50">

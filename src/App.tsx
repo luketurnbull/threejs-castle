@@ -4,7 +4,9 @@ import Castle from "./components/castle";
 import { useAppStore } from "./store";
 
 function App() {
-  const { status, initializeAudio } = useAppStore();
+  // Only subscribe to status and initializeAudio, not the entire store
+  const status = useAppStore((state) => state.status);
+  const initializeAudio = useAppStore((state) => state.initializeAudio);
 
   // Initialize audio when component mounts
   useEffect(() => {

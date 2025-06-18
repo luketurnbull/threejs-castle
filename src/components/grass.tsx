@@ -6,6 +6,7 @@ import type { Model } from "../types/model";
 import rustleAudio from "../assets/leavesRustling2.mp3";
 import { TEXTURES } from "../constants/assets";
 import { getTexturePixelData } from "../utils/textureUtils";
+import { useAppStore } from "@/store";
 
 // Preload the audio
 const preloadedAudio = new Audio(rustleAudio);
@@ -47,6 +48,8 @@ export default function Grass() {
       }
     };
   }, []);
+
+  const audioEnabled = useAppStore((state) => state.audioEnabled);
 
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
   const hillGeom = nodes.hill.geometry;
@@ -204,7 +207,7 @@ export default function Grass() {
     if (materialRef.current && rustleSoundRef.current) {
       materialRef.current.uniforms.time.value = state.clock.elapsedTime * 0.25;
 
-      // Update player position based on mouse position
+      // Update player position based on mouse position (always for visual effects)
       raycaster.setFromCamera(pointer, camera);
 
       const hits = raycaster.intersectObject(hillRef.current);
@@ -216,64 +219,82 @@ export default function Grass() {
         const hasMoved = !pointer.equals(prevPointerRef.current);
         prevPointerRef.current.copy(pointer);
 
-        if (hasMoved) {
-          const distance = camera.position.distanceTo(hitPoint);
+        // Always update the player position for visual rustling effects
+        materialRef.current.uniforms.playerPosition.value.copy(hitPoint);
 
-          // Normalize distance to volume (1 at MIN_DISTANCE, 0 at MAX_DISTANCE)
-          const normalizedVolume = Math.max(
-            0,
-            Math.min(
-              1,
-              1 - (distance - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE)
-            )
-          );
+        // Only handle audio if audio is enabled
+        if (audioEnabled) {
+          if (hasMoved) {
+            const distance = camera.position.distanceTo(hitPoint);
 
+            // Normalize distance to volume (1 at MIN_DISTANCE, 0 at MAX_DISTANCE)
+            const normalizedVolume = Math.max(
+              0,
+              Math.min(
+                1,
+                1 - (distance - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE)
+              )
+            );
+
+            // Clear any existing stop timeout
+            if (stopTimeoutRef.current) {
+              clearTimeout(stopTimeoutRef.current);
+              stopTimeoutRef.current = null;
+            }
+
+            // When movement resumes, restart the audio
+            if (rustleSoundRef.current.paused) {
+              rustleSoundRef.current.currentTime = 0;
+              rustleSoundRef.current.volume = normalizedVolume; // Set initial volume immediately
+              rustleSoundRef.current.play();
+            } else {
+              // Only use fade for subsequent volume changes
+              targetVolumeRef.current = normalizedVolume;
+            }
+          } else {
+            // Set up timeout to stop sound if no movement
+            if (!stopTimeoutRef.current) {
+              stopTimeoutRef.current = setTimeout(() => {
+                targetVolumeRef.current = 0;
+              }, STOP_DELAY);
+            }
+          }
+
+          // Smoothly adjust volume towards target
+          const currentVolume = rustleSoundRef.current.volume;
+          const volumeDiff = targetVolumeRef.current - currentVolume;
+          rustleSoundRef.current.volume =
+            currentVolume + volumeDiff * FADE_SPEED;
+
+          // Stop sound if volume is very low
+          if (rustleSoundRef.current.volume < 0.01 && !hasMoved) {
+            rustleSoundRef.current.pause();
+            rustleSoundRef.current.volume = 0;
+          }
+        } else {
+          // Stop audio immediately if disabled
+          if (!rustleSoundRef.current.paused) {
+            rustleSoundRef.current.pause();
+            rustleSoundRef.current.volume = 0;
+          }
           // Clear any existing stop timeout
           if (stopTimeoutRef.current) {
             clearTimeout(stopTimeoutRef.current);
             stopTimeoutRef.current = null;
           }
-
-          // When movement resumes, restart the audio
-          if (rustleSoundRef.current.paused) {
-            rustleSoundRef.current.currentTime = 0;
-            rustleSoundRef.current.volume = normalizedVolume; // Set initial volume immediately
-            rustleSoundRef.current.play();
-          } else {
-            // Only use fade for subsequent volume changes
-            targetVolumeRef.current = normalizedVolume;
-          }
-
-          materialRef.current.uniforms.playerPosition.value.copy(hitPoint);
-        } else {
-          // Set up timeout to stop sound if no movement
-          if (!stopTimeoutRef.current) {
-            stopTimeoutRef.current = setTimeout(() => {
-              targetVolumeRef.current = 0;
-            }, STOP_DELAY);
-          }
         }
+      } else {
+        // When not hovering over hill, immediately stop the sound (only if audio enabled)
+        if (audioEnabled) {
+          if (stopTimeoutRef.current) {
+            clearTimeout(stopTimeoutRef.current);
+            stopTimeoutRef.current = null;
+          }
 
-        // Smoothly adjust volume towards target
-        const currentVolume = rustleSoundRef.current.volume;
-        const volumeDiff = targetVolumeRef.current - currentVolume;
-        rustleSoundRef.current.volume = currentVolume + volumeDiff * FADE_SPEED;
-
-        // Stop sound if volume is very low
-        if (rustleSoundRef.current.volume < 0.01 && !hasMoved) {
+          targetVolumeRef.current = 0;
           rustleSoundRef.current.pause();
           rustleSoundRef.current.volume = 0;
         }
-      } else {
-        // When not hovering over hill, immediately stop the sound
-        if (stopTimeoutRef.current) {
-          clearTimeout(stopTimeoutRef.current);
-          stopTimeoutRef.current = null;
-        }
-
-        targetVolumeRef.current = 0;
-        rustleSoundRef.current.pause();
-        rustleSoundRef.current.volume = 0;
       }
     }
   });

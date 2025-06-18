@@ -5,7 +5,10 @@ import { Button } from "./ui/button";
 import { useAppStore } from "../store";
 
 export default function LoadingScreen() {
-  const { setStatus, startBackgroundAudio } = useAppStore();
+  const setStatus = useAppStore((state) => state.setStatus);
+  const startBackgroundAudio = useAppStore(
+    (state) => state.startBackgroundAudio
+  );
   const [showStartButton, setShowStartButton] = useState(false);
   const [loadingScreenReady, setIsLoadingScreenReady] = useState(false);
   const startButtonRef = useRef<HTMLButtonElement>(null!);
@@ -27,7 +30,6 @@ export default function LoadingScreen() {
 
   const handleReady = () => {
     setStatus("ready");
-
     setTimeout(() => {
       setShowStartButton(true);
     }, 550);
