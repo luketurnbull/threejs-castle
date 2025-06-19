@@ -13,7 +13,7 @@ import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 const preloadedAudio = new Audio(rustleAudio);
 preloadedAudio.load();
 
-const NUM_BLADES = 120000;
+const NUM_BLADES = 150000;
 const HILL_SCALE = new THREE.Vector3(119.355, 60.27, 119.355);
 const HILL_POSITION = new THREE.Vector3(4.324, 3.324, -0.949);
 
@@ -380,6 +380,7 @@ export default function Grass() {
           ref={hillMaterialRef}
           uDayDiffuse={bakedTexture}
           uNightDiffuse={bakeNightTexture}
+          color={"#666666"}
         />
       </mesh>
     </group>

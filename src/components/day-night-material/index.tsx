@@ -8,12 +8,14 @@ type DayNightMaterialProps = {
   uDayDiffuse: THREE.Texture | null;
   uNightDiffuse: THREE.Texture | null;
   uTransitionFactor: number;
+  color: THREE.Color;
 };
 
 const defaultDayNightUniforms: DayNightMaterialProps = {
   uDayDiffuse: null,
   uNightDiffuse: null,
   uTransitionFactor: 0,
+  color: new THREE.Color(1, 1, 1),
 };
 
 export const DayNightMaterial = shaderMaterial(

@@ -15,7 +15,7 @@ varying vec2 vHillUv;
 void main() {
    float alpha = texture2D(alphaMap, vUv).r;
    if(alpha < 0.15) discard;
-
+   
    vec4 col = vec4(texture2D(map, vUv));
    col = mix(vec4(tipColor, 1.0), col, frc);
    col = mix(vec4(bottomColor, 1.0), col, frc);
@@ -27,5 +27,6 @@ void main() {
    float aoNightL = dot(aoNight.rgb, vec3(0.299, 0.587, 0.114));
    float ao = mix(aoDayL, aoNightL, smoothstep(0.0, 1.0, uTransitionFactor));
    
-   gl_FragColor = col * brightness * ao;
+   gl_FragColor.rgb = (col * brightness * ao).rgb;
+   gl_FragColor.a = alpha;
 }
