@@ -7,6 +7,7 @@ import rustleAudio from "../assets/leavesRustling2.mp3";
 import { TEXTURES } from "../constants/assets";
 import { getTexturePixelData } from "../utils/textureUtils";
 import { useAppStore } from "@/store";
+import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 
 // Preload the audio
 const preloadedAudio = new Audio(rustleAudio);
@@ -30,6 +31,7 @@ function createBladeGeometry() {
 
 export default function Grass() {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
+  const hillMaterialRef = useRef<THREE.ShaderMaterial>(null!);
   const hillRef = useRef<THREE.Mesh>(null!);
   const prevPointerRef = useRef<THREE.Vector2>(new THREE.Vector2());
   const targetVolumeRef = useRef<number>(0);
@@ -56,10 +58,17 @@ export default function Grass() {
 
   const texture = useTexture(TEXTURES.BLADE_DIFFUSE);
   const alphaMap = useTexture(TEXTURES.BLADE_ALPHA);
+
   const bakedTexture = useTexture(TEXTURES.HILL_BAKED);
-  const hillPatchesTexture = useTexture(TEXTURES.HILL_PATCHES);
   bakedTexture.flipY = false;
+
+  const bakeNightTexture = useTexture(TEXTURES.HILL_BAKED_NIGHT);
+  bakeNightTexture.flipY = false;
+
+  const hillPatchesTexture = useTexture(TEXTURES.HILL_PATCHES);
   hillPatchesTexture.flipY = false;
+
+  const mode = useAppStore((state) => state.mode);
 
   const [patchesPixelData, setPatchesPixelData] =
     useState<Uint8ClampedArray | null>(null);
@@ -203,7 +212,17 @@ export default function Grass() {
     };
   }, [hillGeom, patchesPixelData, hillPatchesTexture]);
 
-  useFrame((state) => {
+  const targetTransition = mode === "day" ? 0 : 1;
+
+  useFrame((state, delta) => {
+    const speed = delta / NIGHT_TIME_TRANSITION_DURATION;
+
+    if (hillMaterialRef.current) {
+      const current = hillMaterialRef.current.uTransitionFactor;
+      const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
+      hillMaterialRef.current.uTransitionFactor = newValue;
+    }
+
     if (materialRef.current && rustleSoundRef.current) {
       materialRef.current.uniforms.time.value = state.clock.elapsedTime * 0.25;
 
@@ -340,7 +359,7 @@ export default function Grass() {
           transparent={true}
           side={THREE.DoubleSide}
           bladeHeight={1}
-          brightness={40.0}
+          brightness={10.0}
           aoMap={bakedTexture}
         />
       </mesh>
@@ -351,7 +370,11 @@ export default function Grass() {
         position={HILL_POSITION}
         visible={true}
       >
-        <meshStandardMaterial map={bakedTexture} color={"#666666"} />
+        <dayNightMaterial
+          ref={hillMaterialRef}
+          uDayDiffuse={bakedTexture}
+          uNightDiffuse={bakeNightTexture}
+        />
       </mesh>
     </group>
   );

@@ -10,6 +10,7 @@ import {
 import "./grass-material";
 import "./flag-material";
 import "./smoke-material";
+import "./day-night-material";
 import SkySettings from "./sky-settings";
 import LightSettings from "./light-settings";
 import CloudSettings from "./cloud-settings";

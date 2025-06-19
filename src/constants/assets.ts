@@ -8,10 +8,12 @@ export const TEXTURES = {
 
   // Hill textures
   HILL_BAKED: "./hill/hill_baked.png",
+  HILL_BAKED_NIGHT: "./hill/hill_baked_night.png",
   HILL_PATCHES: "./hill/hill_patches.png",
 
   // Rock textures
-  ROCK_DIFFUSE: "./objects/objects.png",
+  OBJECTS_DIFFUSE: "./objects/objects.png",
+  OBJECTS_DIFFUSE_NIGHT: "./objects/objects_night.png",
 
   // Flag textures
   FLAG_ALPHA: "./flag_alpha.jpg",
