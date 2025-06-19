@@ -1,6 +1,13 @@
+import { useAppStore } from "@/store";
 import { Cloud } from "@react-three/drei";
 
 export default function CloudSettings() {
+  const mode = useAppStore((state) => state.mode);
+
+  if (mode === "night") {
+    return <></>;
+  }
+
   return (
     <>
       <Cloud

@@ -1,17 +1,12 @@
 import { useAppStore } from "@/store";
 import { Sky, Stars } from "@react-three/drei";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 export default function SkySettings() {
   const mode = useAppStore((state) => state.mode);
-  const [yPos, setYPos] = useState(0.25);
 
-  useEffect(() => {
-    if (mode === "night") {
-      setYPos(-50);
-    } else {
-      setYPos(0.25);
-    }
+  const yPos = useMemo(() => {
+    return mode === "day" ? 0.25 : -50;
   }, [mode]);
 
   return (
