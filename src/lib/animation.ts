@@ -1,0 +1,1 @@
+export const NIGHT_TIME_TRANSITION_DURATION = 1.5;
