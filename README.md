@@ -62,6 +62,7 @@ Castle Project for ThreeJS Journey Challenge 18
 - [ ] Refine experience for mobile
 - [ ] Potentially do adaptive performance? Less grass blades and no clouds if the users computer can't handle it?
 - [ ] Play with some Post Processor effects?
+- [ ] Use GSAP MorphSVG to morph the moon and sun SVGs in the mode toggle
 
 ## Tree
 

@@ -5,7 +5,6 @@ import Windows from "./windows";
 import Flag from "./flag";
 import Objects from "./objects";
 import Smoke from "./smoke";
-// import Smoke from "./smoke";
 
 export default function Scene(props: JSX.IntrinsicElements["group"]) {
   return (
