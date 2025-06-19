@@ -1,6 +1,7 @@
 export const TEXTURES = {
   // Tower textures
   TOWER_DIFFUSE: "./tower/tower_diffuse.png",
+  TOWER_DIFFUSE_NIGHT: "./tower/tower_diffuse_night.png",
 
   // Grass blade textures
   BLADE_DIFFUSE: "./hill/blade_diffuse.jpg",

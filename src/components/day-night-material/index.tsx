@@ -16,7 +16,7 @@ const defaultDayNightUniforms: DayNightMaterialProps = {
   uTransitionFactor: 0,
 };
 
-const DayNightMaterial = shaderMaterial(
+export const DayNightMaterial = shaderMaterial(
   defaultDayNightUniforms,
   vertex,
   fragment

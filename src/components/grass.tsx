@@ -359,7 +359,7 @@ export default function Grass() {
           transparent={true}
           side={THREE.DoubleSide}
           bladeHeight={1}
-          brightness={10.0}
+          brightness={5.0}
           aoMap={bakedTexture}
         />
       </mesh>

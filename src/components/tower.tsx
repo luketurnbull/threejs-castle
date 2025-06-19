@@ -1,14 +1,38 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useGLTF, useTexture } from "@react-three/drei";
+import * as THREE from "three";
 
 import type { Model } from "../types/model";
 import { TEXTURES } from "../constants/assets";
+import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
+import { useFrame } from "@react-three/fiber";
+import { useAppStore } from "@/store";
+import { DayNightMaterial } from "./day-night-material";
 
 export default function Tower() {
+  const towerMaterialRef = useRef<typeof DayNightMaterial>(null!);
+
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
 
   const diffuse = useTexture(TEXTURES.TOWER_DIFFUSE);
   diffuse.flipY = false;
+
+  const diffuseNight = useTexture(TEXTURES.TOWER_DIFFUSE_NIGHT);
+  diffuseNight.flipY = false;
+
+  const mode = useAppStore((state) => state.mode);
+
+  const targetTransition = mode === "day" ? 0 : 1;
+
+  useFrame((_, delta) => {
+    const speed = delta / NIGHT_TIME_TRANSITION_DURATION;
+
+    if (towerMaterialRef.current) {
+      const current = towerMaterialRef.current.uTransitionFactor;
+      const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
+      towerMaterialRef.current.uTransitionFactor = newValue;
+    }
+  });
 
   const doorDiffuse = useTexture(TEXTURES.DOOR_DIFFUSE);
   doorDiffuse.flipY = false;
@@ -32,7 +56,11 @@ export default function Tower() {
         rotation={[Math.PI / 2, 0, -0.737]}
         scale={4.22}
       >
-        <meshStandardMaterial map={diffuse} />
+        <dayNightMaterial
+          ref={towerMaterialRef}
+          uDayDiffuse={diffuse}
+          uNightDiffuse={diffuseNight}
+        />
       </mesh>
       <mesh
         name="door"

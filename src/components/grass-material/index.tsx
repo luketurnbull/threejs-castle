@@ -22,7 +22,7 @@ const defaultUniforms: GrassMaterialProps = {
   alphaMap: null,
   time: 0,
   tipColor: new THREE.Color(0.0, 0.6, 0.0).convertSRGBToLinear(),
-  bottomColor: new THREE.Color(0.0, 0.1, 0.0).convertSRGBToLinear(),
+  bottomColor: new THREE.Color(0.0, 0.0, 0.0).convertSRGBToLinear(),
   brightness: 2.0,
   aoMap: null,
   playerPosition: new THREE.Vector3(0, -1, 0),
