@@ -50,10 +50,12 @@ Castle Project for ThreeJS Journey Challenge 18
 
 ## Night mode
 
-- [ ] Bake lighting for night time (moon light and more emission from castle windows?)
-- [ ] Dim down the ambient light in the scene
-- [ ] Change the Sun settings
+- [x] Change the Sun settings
+- [x] Add stars
+- [x] Dim down the ambient light in the scene
 - [ ] Show a moon in the Sky some how?
+- [ ] Bake lighting for night time (moon light and more emission from castle windows?)
+- [ ] Add transition
 
 ## Refinements
 
