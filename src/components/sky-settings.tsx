@@ -1,12 +1,25 @@
 import { useAppStore } from "@/store";
 import { Sky, Stars } from "@react-three/drei";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
+import gsap from "gsap";
 
 export default function SkySettings() {
   const mode = useAppStore((state) => state.mode);
 
-  const yPos = useMemo(() => {
-    return mode === "day" ? 0.25 : -50;
+  const [yPos, setYPos] = useState(mode === "day" ? 0.25 : -0.75);
+
+  useEffect(() => {
+    gsap.to(
+      { value: yPos },
+      {
+        value: mode === "day" ? 0.25 : -0.75,
+        duration: 1.5,
+        ease: "power2.inOut",
+        onUpdate: function () {
+          setYPos(this.targets()[0].value);
+        },
+      }
+    );
   }, [mode]);
 
   return (
