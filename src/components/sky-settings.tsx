@@ -1,5 +1,5 @@
 import { useAppStore } from "@/store";
-import { Sky } from "@react-three/drei";
+import { Sky, Stars } from "@react-three/drei";
 import { useEffect, useState } from "react";
 
 export default function SkySettings() {
@@ -15,13 +15,17 @@ export default function SkySettings() {
   }, [mode]);
 
   return (
-    <Sky
-      distance={600000}
-      sunPosition={[4, yPos, -12]}
-      rayleigh={4}
-      turbidity={10}
-      mieCoefficient={0.004}
-      mieDirectionalG={0.8}
-    />
+    <>
+      <Sky
+        distance={600000}
+        sunPosition={[4, yPos, -12]}
+        rayleigh={4}
+        turbidity={10}
+        mieCoefficient={0.004}
+        mieDirectionalG={0.8}
+      />
+
+      {mode === "night" && <Stars />}
+    </>
   );
 }
