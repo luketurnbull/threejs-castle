@@ -1,10 +1,9 @@
 import LoadingScreen from "./components/loading-screen";
 import Castle from "./components/castle";
 import { useAppStore } from "./store";
-import { ModeToggle } from "./components/ui/mode-toggle";
+import ControlPanel from "./components/control-panel";
 
 function App() {
-  // Only subscribe to status since audio is now initialized on store creation
   const status = useAppStore((state) => state.status);
 
   return (
@@ -27,8 +26,7 @@ function App() {
         <LoadingScreen />
       </div>
 
-      {/* Mode toggle button - only show when app is started */}
-      {status === "started" && <ModeToggle />}
+      {status === "started" && <ControlPanel />}
     </div>
   );
 }
