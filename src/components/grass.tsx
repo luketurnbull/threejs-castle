@@ -218,12 +218,17 @@ export default function Grass() {
     const speed = delta / NIGHT_TIME_TRANSITION_DURATION;
 
     if (hillMaterialRef.current) {
-      const current = hillMaterialRef.current.uTransitionFactor;
+      const current = hillMaterialRef.current.uniforms.uTransitionFactor.value;
       const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
-      hillMaterialRef.current.uTransitionFactor = newValue;
+      hillMaterialRef.current.uniforms.uTransitionFactor.value = newValue;
     }
 
     if (materialRef.current && rustleSoundRef.current) {
+      // Animate transition for grass aoMap
+      const current = materialRef.current.uniforms.uTransitionFactor.value;
+      const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
+      materialRef.current.uniforms.uTransitionFactor.value = newValue;
+
       materialRef.current.uniforms.time.value = state.clock.elapsedTime * 0.25;
 
       // Update player position based on mouse position (always for visual effects)
@@ -361,6 +366,7 @@ export default function Grass() {
           bladeHeight={1}
           brightness={5.0}
           aoMap={bakedTexture}
+          aoMapNight={bakeNightTexture}
         />
       </mesh>
       <mesh

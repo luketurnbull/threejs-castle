@@ -8,12 +8,14 @@ type GrassMaterialProps = {
   map: THREE.Texture | null;
   alphaMap: THREE.Texture | null;
   aoMap: THREE.Texture | null;
+  aoMapNight: THREE.Texture | null;
   bladeHeight: number;
   time: number;
   tipColor: THREE.Color;
   bottomColor: THREE.Color;
   brightness: number;
   playerPosition: THREE.Vector3;
+  uTransitionFactor: number;
 };
 
 const defaultUniforms: GrassMaterialProps = {
@@ -25,7 +27,9 @@ const defaultUniforms: GrassMaterialProps = {
   bottomColor: new THREE.Color(0.0, 0.0, 0.0).convertSRGBToLinear(),
   brightness: 2.0,
   aoMap: null,
+  aoMapNight: null,
   playerPosition: new THREE.Vector3(0, -1, 0),
+  uTransitionFactor: 0,
 };
 
 const GrassMaterial = shaderMaterial(
