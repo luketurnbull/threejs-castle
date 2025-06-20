@@ -7,11 +7,13 @@ import { shaderMaterial } from "@react-three/drei";
 type SmokeMaterialProps = {
   uPerlinTexture: THREE.Texture | null;
   uTime: number;
+  uOpacity: number;
 };
 
 const defaultSmokeUniforms: SmokeMaterialProps = {
   uPerlinTexture: null,
   uTime: 0,
+  uOpacity: 1,
 };
 
 const SmokeMaterial = shaderMaterial(

@@ -1,9 +1,10 @@
 import { TEXTURES } from "@/constants/assets";
 import Smoke from "./smoke";
 import { useAppStore } from "@/store";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 
 type Particle = {
   position: THREE.Vector3;
@@ -20,30 +21,49 @@ type Props = {
   position?: [number, number, number];
   scale?: [number, number, number];
   texture: string;
+  opacity?: number;
 };
 
-export default function Fire() {
+function CrossFadeFire() {
   const mode = useAppStore((state) => state.mode);
+  const [fade, setFade] = useState(mode === "night" ? 1 : 0);
+  const [prevMode, setPrevMode] = useState(mode);
 
-  if (mode === "night") {
-    return (
+  // Animate fade value
+  useFrame((_, delta) => {
+    if (mode !== prevMode) {
+      setPrevMode(mode);
+    }
+    setFade((f) => {
+      const target = mode === "night" ? 1 : 0;
+      const speed = NIGHT_TIME_TRANSITION_DURATION;
+      if (Math.abs(f - target) < 0.01) return target;
+      return f + (Math.sign(target - f) * delta) / (1 / speed);
+    });
+  });
+
+  return (
+    <>
       <R3FParticleSystem
         position={[75, -5, 8]}
         scale={[8, 25, 8]}
         texture={TEXTURES.FIRE}
+        opacity={fade}
       />
-    );
-  }
-
-  return <Smoke />;
+      <Smoke opacity={1 - fade} />
+    </>
+  );
 }
+
+export default CrossFadeFire;
 
 export function R3FParticleSystem({
   count = 100,
   position = [0, 0, 0],
   scale = [1, 1, 1],
   texture,
-}: Props) {
+  opacity = 1,
+}: Props & { opacity?: number }) {
   const pointsRef = useRef<THREE.Points>(null);
 
   // Initialize particles using useRef instead of useMemo
@@ -114,6 +134,7 @@ export function R3FParticleSystem({
           alphaTest={0.01}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
+          opacity={opacity}
         />
       </points>
     </group>
