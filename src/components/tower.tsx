@@ -7,11 +7,10 @@ import { TEXTURES } from "../constants/assets";
 import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 import { useFrame } from "@react-three/fiber";
 import { useAppStore } from "@/store";
-import { DayNightMaterial } from "./day-night-material";
 
 export default function Tower() {
-  const towerMaterialRef = useRef<typeof DayNightMaterial>(null!);
-  const doorMaterialRef = useRef<typeof DayNightMaterial>(null!);
+  const towerMaterialRef = useRef<THREE.ShaderMaterial>(null!);
+  const doorMaterialRef = useRef<THREE.ShaderMaterial>(null!);
 
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
 
@@ -29,15 +28,15 @@ export default function Tower() {
     const speed = delta / NIGHT_TIME_TRANSITION_DURATION;
 
     if (towerMaterialRef.current) {
-      const current = towerMaterialRef.current.uTransitionFactor;
+      const current = towerMaterialRef.current.uniforms.uTransitionFactor.value;
       const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
-      towerMaterialRef.current.uTransitionFactor = newValue;
+      towerMaterialRef.current.uniforms.uTransitionFactor.value = newValue;
     }
 
     if (doorMaterialRef.current) {
-      const current = doorMaterialRef.current.uTransitionFactor;
+      const current = doorMaterialRef.current.uniforms.uTransitionFactor.value;
       const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
-      doorMaterialRef.current.uTransitionFactor = newValue;
+      doorMaterialRef.current.uniforms.uTransitionFactor.value = newValue;
     }
   });
 

@@ -8,7 +8,7 @@ import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 import { useAppStore } from "@/store";
 
 export default function Objects() {
-  const materialRef = useRef(null!);
+  const materialRef = useRef<THREE.ShaderMaterial>(null!);
 
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
 
@@ -32,9 +32,9 @@ export default function Objects() {
     const speed = delta / NIGHT_TIME_TRANSITION_DURATION;
 
     if (materialRef.current) {
-      const current = materialRef.current.uTransitionFactor;
+      const current = materialRef.current.uniforms.uTransitionFactor.value;
       const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
-      materialRef.current.uTransitionFactor = newValue;
+      materialRef.current.uniforms.uTransitionFactor.value = newValue;
     }
   });
 
