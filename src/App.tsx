@@ -6,6 +6,8 @@ import ControlPanel from "./components/control-panel";
 function App() {
   const status = useAppStore((state) => state.status);
 
+  console.log(status);
+
   return (
     <div className="h-screen w-screen relative overflow-hidden">
       <div

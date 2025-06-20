@@ -25,4 +25,5 @@ export const TEXTURES = {
 
   // Others
   PERLIN_NOISE: "./perlin.png",
+  FIRE: "./fire.png",
 };

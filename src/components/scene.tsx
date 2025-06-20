@@ -4,7 +4,7 @@ import Grass from "./grass";
 import Windows from "./windows";
 import Flag from "./flag";
 import Objects from "./objects";
-import Smoke from "./smoke";
+import Fire from "./fire";
 
 export default function Scene(props: JSX.IntrinsicElements["group"]) {
   return (
@@ -13,8 +13,8 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
       <Tower />
       <Windows />
       <Objects />
-      <Smoke />
       <Grass />
+      <Fire />
     </group>
   );
 }
