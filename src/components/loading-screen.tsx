@@ -6,6 +6,7 @@ import { useAppStore } from "../store";
 
 export default function LoadingScreen() {
   const setStatus = useAppStore((state) => state.setStatus);
+  const status = useAppStore((state) => state.status);
   const startBackgroundAudio = useAppStore(
     (state) => state.startBackgroundAudio
   );
@@ -45,7 +46,9 @@ export default function LoadingScreen() {
             setIsLoadingScreenReady(true);
           }}
         />
-        {loadingScreenReady && <AssetLoader onReady={handleReady} />}
+        {loadingScreenReady && status !== "started" && (
+          <AssetLoader onReady={handleReady} />
+        )}
 
         <div className="flex w-full justify-center h-12">
           {showStartButton && (

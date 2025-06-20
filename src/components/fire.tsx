@@ -45,28 +45,28 @@ export function R3FParticleSystem({
 }: Props) {
   const pointsRef = useRef<THREE.Points>(null);
 
-  // Initialize particles
-  const particles = useMemo<Particle[]>(() => {
-    const arr: Particle[] = [];
-
-    for (let i = 0; i < count; i++) {
-      arr.push({
-        position: new THREE.Vector3(
-          (Math.random() - 0.5) * 2,
-          (Math.random() - 0.5) * 2,
-          (Math.random() - 0.5) * 2
-        ),
-        velocity: new THREE.Vector3(0, Math.random() * 0.1 + 0.05, 0),
-        life: Math.random(),
-        maxLife: 1 + Math.random(),
-        size: Math.random() * 2 + 1,
-        color: new THREE.Color(1, 0.5 + Math.random() * 0.5, 0),
-        alpha: 1,
-      });
-    }
-
-    return arr;
-  }, [count]);
+  // Initialize particles using useRef instead of useMemo
+  const particles = useRef<Particle[]>(
+    (() => {
+      const arr: Particle[] = [];
+      for (let i = 0; i < count; i++) {
+        arr.push({
+          position: new THREE.Vector3(
+            (Math.random() - 0.5) * 2,
+            (Math.random() - 0.5) * 2,
+            (Math.random() - 0.5) * 2
+          ),
+          velocity: new THREE.Vector3(0, Math.random() * 0.1 + 0.05, 0),
+          life: Math.random(),
+          maxLife: 1 + Math.random(),
+          size: Math.random() * 2 + 1,
+          color: new THREE.Color(1, 0.5 + Math.random() * 0.5, 0),
+          alpha: 1,
+        });
+      }
+      return arr;
+    })()
+  );
 
   // Geometry attributes
   const positions = useMemo(() => new Float32Array(count * 3), [count]);
@@ -76,7 +76,7 @@ export function R3FParticleSystem({
   // Animate particles
   useFrame((_, delta) => {
     for (let i = 0; i < count; i++) {
-      const p = particles[i];
+      const p = particles.current[i];
       p.position.addScaledVector(p.velocity, delta);
       p.life += delta;
 
@@ -103,12 +103,7 @@ export function R3FParticleSystem({
     <group position={position} scale={scale}>
       <points ref={pointsRef}>
         <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            array={positions}
-            count={count}
-            itemSize={3}
-          />
+          <bufferAttribute attach="attributes-position" args={[positions, 3]} />
           {/* Add more attributes for size, alpha, color if you want */}
         </bufferGeometry>
         <pointsMaterial
