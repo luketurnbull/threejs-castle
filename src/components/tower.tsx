@@ -11,6 +11,7 @@ import { DayNightMaterial } from "./day-night-material";
 
 export default function Tower() {
   const towerMaterialRef = useRef<typeof DayNightMaterial>(null!);
+  const doorMaterialRef = useRef<typeof DayNightMaterial>(null!);
 
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
 
@@ -32,10 +33,19 @@ export default function Tower() {
       const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
       towerMaterialRef.current.uTransitionFactor = newValue;
     }
+
+    if (doorMaterialRef.current) {
+      const current = doorMaterialRef.current.uTransitionFactor;
+      const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
+      doorMaterialRef.current.uTransitionFactor = newValue;
+    }
   });
 
   const doorDiffuse = useTexture(TEXTURES.DOOR_DIFFUSE);
   doorDiffuse.flipY = false;
+
+  const doorDiffuseNight = useTexture(TEXTURES.DOOR_DIFFUSE_NIGHT);
+  doorDiffuseNight.flipY = false;
 
   useEffect(() => {
     const towerGeometry = nodes.tower.geometry;
@@ -69,7 +79,11 @@ export default function Tower() {
         rotation={[-3.086, -0.697, 1.606]}
         scale={[0.192, 3.847, 0.691]}
       >
-        <meshStandardMaterial map={doorDiffuse} />
+        <dayNightMaterial
+          ref={doorMaterialRef}
+          uDayDiffuse={doorDiffuse}
+          uNightDiffuse={doorDiffuseNight}
+        />
       </mesh>
     </>
   );

@@ -9,6 +9,7 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
 
   // Preload tower textures
   useTexture.preload(TEXTURES.TOWER_DIFFUSE);
+  useTexture.preload(TEXTURES.TOWER_DIFFUSE_NIGHT);
 
   // Preload hill and grass blade textures
   useTexture.preload(TEXTURES.BLADE_DIFFUSE);
@@ -25,6 +26,7 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
 
   // Preload door textures
   useTexture.preload(TEXTURES.DOOR_DIFFUSE);
+  useTexture.preload(TEXTURES.DOOR_DIFFUSE_NIGHT);
 
   // Preload Others
   useTexture.preload(TEXTURES.PERLIN_NOISE);
