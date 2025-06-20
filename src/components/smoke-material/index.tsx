@@ -7,11 +7,13 @@ import { shaderMaterial } from "@react-three/drei";
 type SmokeMaterialProps = {
   uPerlinTexture: THREE.Texture | null;
   uTime: number;
+  uMode: number; // 0 for day (smoke), 1 for night (fire)
 };
 
 const defaultSmokeUniforms: SmokeMaterialProps = {
   uPerlinTexture: null,
   uTime: 0,
+  uMode: 0,
 };
 
 const SmokeMaterial = shaderMaterial(
