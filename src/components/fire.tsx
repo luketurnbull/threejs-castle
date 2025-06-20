@@ -25,16 +25,17 @@ type Props = {
 export default function Fire() {
   const mode = useAppStore((state) => state.mode);
 
-  return (
-    <>
-      <Smoke />
+  if (mode === "night") {
+    return (
       <R3FParticleSystem
         position={[75, -5, 8]}
         scale={[8, 25, 8]}
         texture={TEXTURES.FIRE}
       />
-    </>
-  );
+    );
+  }
+
+  return <Smoke />;
 }
 
 export function R3FParticleSystem({
