@@ -10,9 +10,11 @@ import {
 import "./grass-material";
 import "./flag-material";
 import "./smoke-material";
+import "./day-night-material";
 import SkySettings from "./sky-settings";
 import LightSettings from "./light-settings";
 import CloudSettings from "./cloud-settings";
+// import { EffectComposer, Bloom } from "@react-three/postprocessing";
 
 export default function Experience() {
   return (
@@ -22,6 +24,14 @@ export default function Experience() {
       <CloudSettings />
 
       <Scene />
+
+      {/* <EffectComposer enableNormalPass={true} resolutionScale={0.5}>
+        <Bloom
+          luminanceThreshold={0.2}
+          luminanceSmoothing={0.025}
+          intensity={0.7}
+        />
+      </EffectComposer> */}
 
       <OrbitControls
         minPolarAngle={Math.PI * 0.4}

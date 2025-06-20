@@ -9,21 +9,25 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
 
   // Preload tower textures
   useTexture.preload(TEXTURES.TOWER_DIFFUSE);
+  useTexture.preload(TEXTURES.TOWER_DIFFUSE_NIGHT);
 
   // Preload hill and grass blade textures
   useTexture.preload(TEXTURES.BLADE_DIFFUSE);
   useTexture.preload(TEXTURES.BLADE_ALPHA);
   useTexture.preload(TEXTURES.HILL_BAKED);
+  useTexture.preload(TEXTURES.HILL_BAKED_NIGHT);
   useTexture.preload(TEXTURES.HILL_PATCHES);
 
   // Preload rock textures
-  useTexture.preload(TEXTURES.ROCK_DIFFUSE);
+  useTexture.preload(TEXTURES.OBJECTS_DIFFUSE);
+  useTexture.preload(TEXTURES.OBJECTS_DIFFUSE_NIGHT);
 
   // Preload flag textures
   useTexture.preload(TEXTURES.FLAG_ALPHA);
 
   // Preload door textures
   useTexture.preload(TEXTURES.DOOR_DIFFUSE);
+  useTexture.preload(TEXTURES.DOOR_DIFFUSE_NIGHT);
 
   // Preload Others
   useTexture.preload(TEXTURES.PERLIN_NOISE);

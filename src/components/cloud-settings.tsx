@@ -74,6 +74,8 @@ export default function CloudSettings() {
         scale={[20, 20, 20]}
         opacity={cloudOpacity}
         speed={0.2}
+        color={"white"}
+        frustumCulled
       />
 
       <Cloud
@@ -82,6 +84,8 @@ export default function CloudSettings() {
         scale={[40, 40, 40]}
         opacity={cloudOpacity}
         speed={0.2}
+        color={"white"}
+        frustumCulled
       />
     </>
   );
