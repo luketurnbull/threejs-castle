@@ -56,6 +56,11 @@ export default function Grass() {
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
   const hillGeom = nodes.hill.geometry;
 
+  useEffect(() => {
+    hillGeom.attributes.uv = hillGeom.attributes.uv1;
+    hillGeom.attributes.uv.needsUpdate = true;
+  }, [hillGeom]);
+
   const texture = useTexture(TEXTURES.BLADE_DIFFUSE);
   const alphaMap = useTexture(TEXTURES.BLADE_ALPHA);
 
@@ -364,7 +369,7 @@ export default function Grass() {
           transparent={true}
           side={THREE.DoubleSide}
           bladeHeight={1}
-          brightness={5.0}
+          brightness={15.0}
           aoMap={bakedTexture}
           aoMapNight={bakeNightTexture}
         />
@@ -380,7 +385,7 @@ export default function Grass() {
           ref={hillMaterialRef}
           uDayDiffuse={bakedTexture}
           uNightDiffuse={bakeNightTexture}
-          color={"#666666"}
+          color={"#aaaaaa"}
         />
       </mesh>
     </group>

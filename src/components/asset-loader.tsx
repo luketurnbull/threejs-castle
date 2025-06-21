@@ -25,10 +25,6 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
   // Preload flag textures
   useTexture.preload(TEXTURES.FLAG_ALPHA);
 
-  // Preload door textures
-  useTexture.preload(TEXTURES.DOOR_DIFFUSE);
-  useTexture.preload(TEXTURES.DOOR_DIFFUSE_NIGHT);
-
   // Preload Others
   useTexture.preload(TEXTURES.PERLIN_NOISE);
 
