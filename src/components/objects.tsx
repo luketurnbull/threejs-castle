@@ -44,8 +44,9 @@ export default function Objects() {
       receiveShadow
       geometry={nodes.objects.geometry}
       material={nodes.objects.material}
-      position={[7.225, 2.852, 16.36]}
-      scale={[1, 1.542, 1]}
+      position={[5.043, 7.913, 7.884]}
+      rotation={[Math.PI / 2, 0, -0.737]}
+      scale={4.22}
     >
       <dayNightMaterial
         ref={materialRef}

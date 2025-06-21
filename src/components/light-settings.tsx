@@ -1,3 +1,3 @@
 export default function LightSettings() {
-  return <ambientLight color="white" intensity={1.0} />;
+  return <ambientLight color="white" intensity={2.0} />;
 }
