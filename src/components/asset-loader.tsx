@@ -7,10 +7,6 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
   // Preload model
   useGLTF.preload("/scene.glb", true);
 
-  // Preload tower textures
-  useTexture.preload(TEXTURES.TOWER_DIFFUSE);
-  useTexture.preload(TEXTURES.TOWER_DIFFUSE_NIGHT);
-
   // Preload hill and grass blade textures
   useTexture.preload(TEXTURES.BLADE_DIFFUSE);
   useTexture.preload(TEXTURES.BLADE_ALPHA);
