@@ -9,6 +9,8 @@ import { useAppStore } from "@/store";
 
 export default function Objects() {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
+  const transitionStartTimeRef = useRef<number>(0);
+  const previousModeRef = useRef<string>("day");
 
   const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
 
@@ -29,13 +31,31 @@ export default function Objects() {
 
   const targetTransition = mode === "day" ? 0 : 1;
 
-  useFrame((_, delta) => {
-    const speed = delta / NIGHT_TIME_TRANSITION_DURATION;
+  // Reset transition start time when mode changes
+  useEffect(() => {
+    if (mode !== previousModeRef.current) {
+      transitionStartTimeRef.current = 0;
+      previousModeRef.current = mode;
+    }
+  }, [mode]);
 
+  useFrame((state) => {
     if (materialRef.current) {
-      const current = materialRef.current.uniforms.uTransitionFactor.value;
-      const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
-      materialRef.current.uniforms.uTransitionFactor.value = newValue;
+      // Start timing the transition
+      if (transitionStartTimeRef.current === 0) {
+        transitionStartTimeRef.current = state.clock.elapsedTime;
+      }
+
+      const elapsed = state.clock.elapsedTime - transitionStartTimeRef.current;
+      const progress = Math.min(elapsed / NIGHT_TIME_TRANSITION_DURATION, 1);
+
+      // Use smoothstep for easing (similar to GSAP's power2.inOut)
+      const easedProgress = progress * progress * (3 - 2 * progress);
+
+      // Directly set the transition factor based on time, not lerp
+      const transitionValue =
+        targetTransition === 1 ? easedProgress : 1 - easedProgress;
+      materialRef.current.uniforms.uTransitionFactor.value = transitionValue;
     }
   });
 

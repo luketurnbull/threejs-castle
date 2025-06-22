@@ -49,7 +49,7 @@ export default function Smoke() {
   });
 
   return (
-    <mesh position={[76, -15, 9]} scale={10}>
+    <mesh position={[76, -16, 9]} scale={10}>
       <planeGeometry args={[1, 1, 32, 128]} />
       <smokeMaterial
         ref={smokeMaterial}

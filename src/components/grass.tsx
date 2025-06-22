@@ -37,6 +37,8 @@ export default function Grass() {
   const targetVolumeRef = useRef<number>(0);
   const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rustleSoundRef = useRef<HTMLAudioElement | null>(null);
+  const transitionStartTimeRef = useRef<number>(0);
+  const previousModeRef = useRef<string>("day");
 
   useEffect(() => {
     // Clone the preloaded audio to avoid issues with multiple instances
@@ -219,20 +221,39 @@ export default function Grass() {
 
   const targetTransition = mode === "day" ? 0 : 1;
 
-  useFrame((state, delta) => {
-    const speed = delta / NIGHT_TIME_TRANSITION_DURATION;
+  // Reset transition start time when mode changes
+  useEffect(() => {
+    if (mode !== previousModeRef.current) {
+      transitionStartTimeRef.current = 0;
+      previousModeRef.current = mode;
+    }
+  }, [mode]);
 
+  useFrame((state) => {
+    // Start timing the transition
+    if (transitionStartTimeRef.current === 0) {
+      transitionStartTimeRef.current = state.clock.elapsedTime;
+    }
+
+    const elapsed = state.clock.elapsedTime - transitionStartTimeRef.current;
+    const progress = Math.min(elapsed / NIGHT_TIME_TRANSITION_DURATION, 1);
+
+    // Use smoothstep for easing (similar to GSAP's power2.inOut)
+    const easedProgress = progress * progress * (3 - 2 * progress);
+
+    // Directly set the transition factor based on time, not lerp
+    const transitionValue =
+      targetTransition === 1 ? easedProgress : 1 - easedProgress;
+
+    // Handle hill material transition
     if (hillMaterialRef.current) {
-      const current = hillMaterialRef.current.uniforms.uTransitionFactor.value;
-      const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
-      hillMaterialRef.current.uniforms.uTransitionFactor.value = newValue;
+      hillMaterialRef.current.uniforms.uTransitionFactor.value =
+        transitionValue;
     }
 
     if (materialRef.current && rustleSoundRef.current) {
       // Animate transition for grass aoMap
-      const current = materialRef.current.uniforms.uTransitionFactor.value;
-      const newValue = THREE.MathUtils.lerp(current, targetTransition, speed);
-      materialRef.current.uniforms.uTransitionFactor.value = newValue;
+      materialRef.current.uniforms.uTransitionFactor.value = transitionValue;
 
       materialRef.current.uniforms.time.value = state.clock.elapsedTime * 0.25;
 
