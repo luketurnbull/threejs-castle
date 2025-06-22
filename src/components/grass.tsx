@@ -408,7 +408,7 @@ export default function Grass() {
           uNightDiffuse={bakeNightTexture}
           uShadowMap={hillPatchesTexture}
           uHasShadowMap={!!hillPatchesTexture}
-          color={"#aaaaaa"}
+          color={"#999999"}
         />
       </mesh>
     </group>
