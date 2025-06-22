@@ -7,6 +7,8 @@ import { shaderMaterial } from "@react-three/drei";
 type DayNightMaterialProps = {
   uDayDiffuse: THREE.Texture | null;
   uNightDiffuse: THREE.Texture | null;
+  uShadowMap?: THREE.Texture | null;
+  uHasShadowMap?: boolean;
   uTransitionFactor: number;
   color: THREE.Color;
 };
@@ -14,6 +16,8 @@ type DayNightMaterialProps = {
 const defaultDayNightUniforms: DayNightMaterialProps = {
   uDayDiffuse: null,
   uNightDiffuse: null,
+  uShadowMap: null,
+  uHasShadowMap: false,
   uTransitionFactor: 0,
   color: new THREE.Color(1, 1, 1),
 };

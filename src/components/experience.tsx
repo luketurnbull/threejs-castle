@@ -14,9 +14,16 @@ import "./day-night-material";
 import SkySettings from "./sky-settings";
 import LightSettings from "./light-settings";
 import CloudSettings from "./cloud-settings";
+import { useFrame, useThree } from "@react-three/fiber";
 // import { EffectComposer, Bloom } from "@react-three/postprocessing";
 
 export default function Experience() {
+  const { camera } = useThree();
+
+  useFrame(() => {
+    console.log(camera.position);
+  });
+
   return (
     <>
       <SkySettings />
@@ -34,8 +41,8 @@ export default function Experience() {
       </EffectComposer> */}
 
       <OrbitControls
-        minPolarAngle={Math.PI * 0.4}
-        maxPolarAngle={Math.PI * 0.5}
+        minPolarAngle={Math.PI * 0.45}
+        maxPolarAngle={Math.PI * 0.55}
         enableZoom={false}
         makeDefault={true}
         enablePan={false}

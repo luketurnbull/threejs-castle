@@ -406,6 +406,8 @@ export default function Grass() {
           ref={hillMaterialRef}
           uDayDiffuse={bakedTexture}
           uNightDiffuse={bakeNightTexture}
+          uShadowMap={hillPatchesTexture}
+          uHasShadowMap={!!hillPatchesTexture}
           color={"#aaaaaa"}
         />
       </mesh>
