@@ -20,11 +20,12 @@ export default function Objects() {
   const diffuseNight = useTexture(TEXTURES.OBJECTS_DIFFUSE_NIGHT);
   diffuseNight.flipY = false;
 
+  const geometry = nodes.objects.geometry;
+
   useEffect(() => {
-    const geometry = nodes.objects.geometry;
     geometry.attributes.uv = geometry.attributes.uv1;
     geometry.attributes.uv.needsUpdate = true;
-  }, [nodes]);
+  }, [geometry]);
 
   const targetTransition = mode === "day" ? 0 : 1;
 
@@ -42,7 +43,7 @@ export default function Objects() {
     <mesh
       castShadow
       receiveShadow
-      geometry={nodes.objects.geometry}
+      geometry={geometry}
       material={nodes.objects.material}
       position={[5.043, 7.913, 7.884]}
       rotation={[Math.PI / 2, 0, -0.737]}

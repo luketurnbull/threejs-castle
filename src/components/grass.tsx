@@ -14,8 +14,8 @@ const preloadedAudio = new Audio(rustleAudio);
 preloadedAudio.load();
 
 const NUM_BLADES = 150000;
-const HILL_SCALE = new THREE.Vector3(119.355, 60.27, 119.355);
-const HILL_POSITION = new THREE.Vector3(4.324, 3.324, -0.949);
+const HILL_SCALE = new THREE.Vector3(131.333, 95.653, 131.333);
+const HILL_POSITION = new THREE.Vector3(-1.637, -89.253, 0.168);
 
 // Audio settings
 const MIN_DISTANCE = 60; // Distance at which volume will be 1
@@ -376,7 +376,7 @@ export default function Grass() {
       </mesh>
       <mesh
         ref={hillRef}
-        geometry={nodes.hill.geometry}
+        geometry={hillGeom}
         scale={HILL_SCALE}
         position={HILL_POSITION}
         visible={true}
