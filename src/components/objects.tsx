@@ -22,6 +22,9 @@ export default function Objects() {
   const diffuseNight = useTexture(TEXTURES.OBJECTS_DIFFUSE_NIGHT);
   diffuseNight.flipY = false;
 
+  const diffuseNightDim = useTexture(TEXTURES.OBJECTS_DIFFUSE_NIGHT_DIM);
+  diffuseNightDim.flipY = false;
+
   const geometry = nodes.objects.geometry;
 
   useEffect(() => {
@@ -56,6 +59,7 @@ export default function Objects() {
       const transitionValue =
         targetTransition === 1 ? easedProgress : 1 - easedProgress;
       materialRef.current.uniforms.uTransitionFactor.value = transitionValue;
+      materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
     }
   });
 
@@ -73,6 +77,7 @@ export default function Objects() {
         ref={materialRef}
         uDayDiffuse={diffuse}
         uNightDiffuse={diffuseNight}
+        uNightDiffuseDim={diffuseNightDim}
       />
     </mesh>
   );

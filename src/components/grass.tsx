@@ -72,6 +72,9 @@ export default function Grass() {
   const bakeNightTexture = useTexture(TEXTURES.HILL_BAKED_NIGHT);
   bakeNightTexture.flipY = false;
 
+  const bakeNightDimTexture = useTexture(TEXTURES.HILL_BAKED_NIGHT_DIM);
+  bakeNightDimTexture.flipY = false;
+
   const hillPatchesTexture = useTexture(TEXTURES.HILL_PATCHES);
   hillPatchesTexture.flipY = false;
 
@@ -249,6 +252,7 @@ export default function Grass() {
     if (hillMaterialRef.current) {
       hillMaterialRef.current.uniforms.uTransitionFactor.value =
         transitionValue;
+      hillMaterialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
     }
 
     if (materialRef.current && rustleSoundRef.current) {
@@ -406,6 +410,7 @@ export default function Grass() {
           ref={hillMaterialRef}
           uDayDiffuse={bakedTexture}
           uNightDiffuse={bakeNightTexture}
+          uNightDiffuseDim={bakeNightDimTexture}
           uShadowMap={hillPatchesTexture}
           uHasShadowMap={!!hillPatchesTexture}
           color={"#999999"}
