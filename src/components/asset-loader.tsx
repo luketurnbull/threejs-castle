@@ -12,11 +12,13 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
   useTexture.preload(TEXTURES.BLADE_ALPHA);
   useTexture.preload(TEXTURES.HILL_BAKED);
   useTexture.preload(TEXTURES.HILL_BAKED_NIGHT);
+  useTexture.preload(TEXTURES.HILL_BAKED_NIGHT_DIM);
   useTexture.preload(TEXTURES.HILL_PATCHES);
 
   // Preload rock textures
   useTexture.preload(TEXTURES.OBJECTS_DIFFUSE);
   useTexture.preload(TEXTURES.OBJECTS_DIFFUSE_NIGHT);
+  useTexture.preload(TEXTURES.OBJECTS_DIFFUSE_NIGHT_DIM);
 
   // Preload flag textures
   useTexture.preload(TEXTURES.FLAG_ALPHA);
