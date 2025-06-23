@@ -31,28 +31,30 @@ float noise2D(vec2 p) {
 void main() {
    vec4 finalColor;
    
-   // Optimize: avoid mixing when at extremes
+   // First, determine the final night color, including the flicker effect.
+   // This is the state we want to be in when uTransitionFactor is 1.0.
+   vec2 flickerPos = vUv + vec2(uTime * 0.1, uTime * 0.05); // Moving noise position
+   float flickerNoise = noise2D(flickerPos * 10.0); // High frequency noise
+   float slowFlicker = noise2D(vec2(uTime * 0.5, 0.0)); // Slower overall flicker
+   
+   float flickerFactor = mix(flickerNoise, slowFlicker, 0.3);
+   flickerFactor = smoothstep(0.0, 1.0, flickerFactor);
+   
+   vec4 nightBright = texture2D(uNightDiffuse, vUv);
+   vec4 nightDim = texture2D(uNightDiffuseDim, vUv);
+   vec4 finalNightColor = mix(nightBright, nightDim, flickerFactor);
+
+   // Now, handle the transition logic.
    if (uTransitionFactor <= 0.0) {
       // Pure day mode
       finalColor = texture2D(uDayDiffuse, vUv);
    } else if (uTransitionFactor >= 1.0) {
-      // Pure night mode - flicker between bright and dim night textures for fire effect
-      vec2 flickerPos = vUv + vec2(uTime * 0.1, uTime * 0.05); // Moving noise position
-      float flickerNoise = noise2D(flickerPos * 10.0); // High frequency noise
-      float slowFlicker = noise2D(vec2(uTime * 0.5, 0.0)); // Slower overall flicker
-      
-      // Combine fast and slow flicker for realistic fire effect
-      float flickerFactor = mix(flickerNoise, slowFlicker, 0.3);
-      flickerFactor = smoothstep(0.0, 1.0, flickerFactor);
-      
-      vec4 nightBright = texture2D(uNightDiffuse, vUv);
-      vec4 nightDim = texture2D(uNightDiffuseDim, vUv);
-      finalColor = mix(nightBright, nightDim, flickerFactor);
+      // Pure night mode
+      finalColor = finalNightColor;
    } else {
-      // Transition mode - mix day and night
+      // Transition mode: mix from day color to the final flickering night color.
       vec4 dayColor = texture2D(uDayDiffuse, vUv);
-      vec4 nightColor = texture2D(uNightDiffuse, vUv);
-      finalColor = mix(dayColor, nightColor, smoothstep(0.0, 1.0, uTransitionFactor));
+      finalColor = mix(dayColor, finalNightColor, smoothstep(0.0, 1.0, uTransitionFactor));
    }
 
    if (uHasShadowMap) {
