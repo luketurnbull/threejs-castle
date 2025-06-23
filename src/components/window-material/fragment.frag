@@ -40,18 +40,18 @@ void main() {
                  smoothstep(0.0, 0.42, 1.0 - vUv.x) * 
                  smoothstep(0.0, 0.42, 1.0 - vUv.y);
     
-    // Create window interior effect with reduced light intensity
+    // Create window interior effect with stronger light
     float interior = 1.0 - frame;
-    float light = flicker(uTime + vTimeOffset) * interior * 0.6; // Reduced light intensity by 40%
+    float light = flicker(uTime + vTimeOffset) * interior;
     
-    // Less intense flame-like colors
-    vec3 flameColor = vec3(0.8, 0.4, 0.1); // Reduced intensity flame color
-    vec3 brightFlame = vec3(0.8, 0.7, 0.3); // Reduced intensity bright flame
-    vec3 warmLight = mix(flameColor, brightFlame, light) * light * 1.2; // Reduced brightness multiplier from 2.0 to 1.2
-    vec3 coolShadow = vec3(0.3, 0.1, 0.05) * (1.0 - light); // Darker shadows
+    // More intense flame-like colors
+    vec3 flameColor = vec3(1.0, 0.6, 0.2); // More orange flame color
+    vec3 brightFlame = vec3(1.0, 0.95, 0.4); // Bright yellow-orange
+    vec3 warmLight = mix(flameColor, brightFlame, light) * light * 2.0; // Slightly reduced brightness
+    vec3 coolShadow = vec3(0.5, 0.2, 0.1) * (1.0 - light);
     
-    // Combine everything with reduced contrast
-    vec3 finalColor = mix(coolShadow, warmLight, depth * 1.2); // Reduced depth multiplier from 1.4 to 1.2
+    // Combine everything with enhanced contrast
+    vec3 finalColor = mix(coolShadow, warmLight, depth * 1.4);
     
     // Softer ambient occlusion
     float ao = smoothstep(0.0, 0.8, depth);
@@ -60,9 +60,9 @@ void main() {
     // Darker frame for better contrast
     finalColor = mix(vec3(0.1, 0.1, 0.1), finalColor, frame);
     
-    // Reduced glow effect
-    float glow = smoothstep(0.0, 0.4, interior) * 0.2; // Reduced glow from 0.4 to 0.2
-    finalColor += mix(flameColor, brightFlame, light) * glow * light * 0.8; // Reduced glow multiplier from 1.3 to 0.8
+    // Stronger glow effect
+    float glow = smoothstep(0.0, 0.4, interior) * 0.4;
+    finalColor += mix(flameColor, brightFlame, light) * glow * light * 1.3; // Slightly reduced glow
     
     // Add a subtle pulsing effect to the glow (slowed down)
     float pulse = sin((uTime + vTimeOffset) * 1.0) * 0.08 + 0.92; // Reduced pulse amplitude
