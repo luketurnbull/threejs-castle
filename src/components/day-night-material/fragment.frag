@@ -28,21 +28,40 @@ float noise2D(vec2 p) {
     return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
+// Fire-like flickering function
+float fireFlicker(vec2 uv, float time) {
+    // Multiple layers of noise at different frequencies and speeds
+    float noise1 = noise2D(uv * 3.0 + vec2(time * 0.8, time * 0.3));
+    float noise2 = noise2D(uv * 7.0 + vec2(time * 1.2, time * 0.7));
+    float noise3 = noise2D(uv * 15.0 + vec2(time * 2.1, time * 1.4));
+    
+    // Combine noise layers with different weights
+    float combinedNoise = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
+    
+    // Add some temporal variation that's not tied to UV position
+    float temporalNoise = hash(time * 0.5) * 0.3 + hash(time * 1.1) * 0.2;
+    
+    // Combine spatial and temporal noise
+    float flickerValue = combinedNoise * 0.7 + temporalNoise * 0.3;
+    
+    // Apply smoothstep to create more natural fade in/out
+    flickerValue = smoothstep(0.2, 0.8, flickerValue);
+    
+    // Add some randomness to the intensity
+    float intensityVariation = hash(time * 0.3) * 0.4 + 0.6;
+    
+    return flickerValue * intensityVariation;
+}
+
 void main() {
    vec4 finalColor;
    
-   // First, determine the final night color, including the flicker effect.
-   // This is the state we want to be in when uTransitionFactor is 1.0.
-   vec2 flickerPos = vUv + vec2(uTime * 0.1, uTime * 0.05); // Moving noise position
-   float flickerNoise = noise2D(flickerPos * 10.0); // High frequency noise
-   float slowFlicker = noise2D(vec2(uTime * 0.5, 0.0)); // Slower overall flicker
-   
-   float flickerFactor = mix(flickerNoise, slowFlicker, 0.3);
-   flickerFactor = smoothstep(0.0, 1.0, flickerFactor);
+   // Create fire-like flickering effect
+   float flickerFactor = fireFlicker(vUv, uTime);
    
    vec4 nightBright = texture2D(uNightDiffuse, vUv);
    vec4 nightDim = texture2D(uNightDiffuseDim, vUv);
-   vec4 finalNightColor = mix(nightBright, nightDim, flickerFactor);
+   vec4 finalNightColor = mix(nightDim, nightBright, flickerFactor);
 
    // Now, handle the transition logic.
    if (uTransitionFactor <= 0.0) {
