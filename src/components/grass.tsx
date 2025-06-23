@@ -394,7 +394,7 @@ export default function Grass() {
           transparent={true}
           side={THREE.DoubleSide}
           bladeHeight={1}
-          brightness={15.0}
+          brightness={30.0}
           aoMap={bakedTexture}
           aoMapNight={bakeNightTexture}
         />
@@ -413,7 +413,7 @@ export default function Grass() {
           uNightDiffuseDim={bakeNightDimTexture}
           uShadowMap={hillPatchesTexture}
           uHasShadowMap={!!hillPatchesTexture}
-          color={"#999999"}
+          // color={"#ddd"}
         />
       </mesh>
     </group>

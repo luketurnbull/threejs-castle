@@ -59,7 +59,7 @@ void main() {
 
    if (uHasShadowMap) {
       float shadow = texture2D(uShadowMap, vUv).r;
-      float shadowEffect = mix(0.2, 1.0, shadow);
+      float shadowEffect = mix(0.4, 1.0, shadow);
       finalColor.rgb *= shadowEffect;
    }
   
