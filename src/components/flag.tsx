@@ -1,8 +1,10 @@
 import { TEXTURES } from "@/constants/assets";
 import { useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { useAppStore } from "@/store";
+import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 
 const HOVER_TRANSITION_SPEED = 2.0; // Speed of hover transition
 
@@ -14,6 +16,18 @@ export default function Flag() {
   const [hoverTransition, setHoverTransition] = useState(0.0);
   const { camera, raycaster, pointer } = useThree();
   const flagRef = useRef<THREE.Mesh>(null!);
+
+  const mode = useAppStore((state) => state.mode);
+  const transitionStartTimeRef = useRef<number>(0);
+  const previousModeRef = useRef<string>("day");
+
+  // Reset transition start time when mode changes
+  useEffect(() => {
+    if (mode !== previousModeRef.current) {
+      transitionStartTimeRef.current = 0;
+      previousModeRef.current = mode;
+    }
+  }, [mode]);
 
   useFrame((state, delta) => {
     if (flagMaterial.current && flagRef.current) {
@@ -43,6 +57,21 @@ export default function Flag() {
       // Pass mouse position and smooth hover transition to shader
       flagMaterial.current.uniforms.uMousePosition.value = mousePosition;
       flagMaterial.current.uniforms.uIsHovered.value = newHoverTransition;
+
+      // Day/Night Transition
+      const targetTransition = mode === "day" ? 0 : 1;
+      // Start timing the transition
+      if (transitionStartTimeRef.current === 0) {
+        transitionStartTimeRef.current = state.clock.elapsedTime;
+      }
+
+      const elapsed = state.clock.elapsedTime - transitionStartTimeRef.current;
+      const progress = Math.min(elapsed / NIGHT_TIME_TRANSITION_DURATION, 1);
+
+      const easedProgress = progress * progress * (3 - 2 * progress);
+      const transitionValue =
+        targetTransition === 1 ? easedProgress : 1 - easedProgress;
+      flagMaterial.current.uniforms.uTransitionFactor.value = transitionValue;
     }
   });
 
@@ -56,6 +85,8 @@ export default function Flag() {
           uSunPosition={new THREE.Vector3(4, 0.25, -12)}
           uMousePosition={mousePosition}
           uIsHovered={hoverTransition}
+          uDayColor={new THREE.Color("#ff0000")}
+          uNightColor={new THREE.Color("#4d0000")}
         />
       </mesh>
     </group>

@@ -10,6 +10,9 @@ type FlagMaterialProps = {
   uSunPosition: THREE.Vector3;
   uMousePosition: THREE.Vector3;
   uIsHovered: number;
+  uTransitionFactor: number;
+  uDayColor: THREE.Color;
+  uNightColor: THREE.Color;
 };
 
 const defaultFlagUniforms: FlagMaterialProps = {
@@ -18,6 +21,9 @@ const defaultFlagUniforms: FlagMaterialProps = {
   uSunPosition: new THREE.Vector3(4, 0.25, -12),
   uMousePosition: new THREE.Vector3(),
   uIsHovered: 0.0,
+  uTransitionFactor: 0.0,
+  uDayColor: new THREE.Color("red"),
+  uNightColor: new THREE.Color("#4d0000"),
 };
 
 const FlagMaterial = shaderMaterial(

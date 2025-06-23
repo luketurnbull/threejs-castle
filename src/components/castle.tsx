@@ -5,7 +5,7 @@ export default function Castle() {
   return (
     <Canvas
       camera={{
-        position: [139, -23, 55],
+        position: [139, -15, 55],
         fov: 45,
         near: 0.1,
         far: 1000,
