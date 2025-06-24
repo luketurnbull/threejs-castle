@@ -29,7 +29,11 @@ function createBladeGeometry() {
   return geometry;
 }
 
-export default function Grass() {
+export default function Grass({
+  geometry,
+}: {
+  geometry: THREE.BufferGeometry;
+}) {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
   const hillMaterialRef = useRef<THREE.ShaderMaterial>(null!);
   const hillRef = useRef<THREE.Mesh>(null!);
@@ -55,13 +59,10 @@ export default function Grass() {
 
   const audioEnabled = useAppStore((state) => state.audioEnabled);
 
-  const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
-  const hillGeom = nodes.hill.geometry;
-
   useEffect(() => {
-    hillGeom.attributes.uv = hillGeom.attributes.uv1;
-    hillGeom.attributes.uv.needsUpdate = true;
-  }, [hillGeom]);
+    geometry.attributes.uv = geometry.attributes.uv1;
+    geometry.attributes.uv.needsUpdate = true;
+  }, [geometry]);
 
   const texture = useTexture(TEXTURES.BLADE_DIFFUSE);
   const alphaMap = useTexture(TEXTURES.BLADE_ALPHA);
@@ -114,8 +115,8 @@ export default function Grass() {
 
     for (let i = 0; i < NUM_BLADES; i++) {
       // Sample point, normal, and barycentric info
-      const position = hillGeom.attributes.position;
-      const index = hillGeom.index;
+      const position = geometry.attributes.position;
+      const index = geometry.index;
       const faceCount = index ? index.count / 3 : position.count / 3;
       const faceIndex = Math.floor(Math.random() * faceCount);
 
@@ -148,7 +149,7 @@ export default function Grass() {
         .addScaledVector(vC, w);
 
       // Interpolated UV
-      const uvAttr = hillGeom.attributes.uv;
+      const uvAttr = geometry.attributes.uv;
       const uvA = new THREE.Vector2().fromBufferAttribute(
         uvAttr as THREE.BufferAttribute,
         a
@@ -220,7 +221,7 @@ export default function Grass() {
       halfRootAngleCos,
       hillUVs,
     };
-  }, [hillGeom, patchesPixelData, hillPatchesTexture]);
+  }, [geometry, patchesPixelData, hillPatchesTexture]);
 
   const targetTransition = mode === "day" ? 0 : 1;
 
@@ -401,7 +402,7 @@ export default function Grass() {
       </mesh>
       <mesh
         ref={hillRef}
-        geometry={hillGeom}
+        geometry={geometry}
         scale={HILL_SCALE}
         position={HILL_POSITION}
         visible={true}

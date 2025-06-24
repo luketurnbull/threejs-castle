@@ -1,12 +1,9 @@
 import { TEXTURES } from "@/constants/assets";
-import { useGLTF, useProgress, useTexture } from "@react-three/drei";
+import { useProgress, useTexture } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 
 export default function AssetLoader({ onReady }: { onReady: () => void }) {
-  // Preload model
-  useGLTF.preload("/scene.glb", true);
-
   // Preload hill and grass blade textures
   useTexture.preload(TEXTURES.BLADE_DIFFUSE);
   useTexture.preload(TEXTURES.BLADE_ALPHA);

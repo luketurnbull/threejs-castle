@@ -18,13 +18,15 @@ const windowPositions: WindowPosition[] = [
   { position: [-8.512, 20.556, 7.78], rotation: [-0.022, 1.014, 0.02] },
 ];
 
-export default function Windows() {
-  const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
-
+export default function Windows({
+  geometry,
+}: {
+  geometry: THREE.BufferGeometry;
+}) {
   // Create instanced mesh
   const instancedMesh = useMemo(() => {
     const mesh = new THREE.InstancedMesh(
-      nodes.windowInside.geometry,
+      geometry,
       windowMaterial,
       windowPositions.length
     );
@@ -53,7 +55,7 @@ export default function Windows() {
     });
 
     return mesh;
-  }, [nodes.windowInside.geometry]);
+  }, [geometry]);
 
   return (
     <>
