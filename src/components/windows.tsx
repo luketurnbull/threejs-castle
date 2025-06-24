@@ -1,5 +1,3 @@
-import { useGLTF } from "@react-three/drei";
-import type { Model } from "@/types/model";
 import * as THREE from "three";
 import { useMemo } from "react";
 import { windowMaterial, WindowMaterial } from "./window-material";

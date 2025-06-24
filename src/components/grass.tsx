@@ -1,8 +1,7 @@
-import { useGLTF, useKTX2, useTexture } from "@react-three/drei";
+import { useKTX2, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useEffect, useState } from "react";
 import * as THREE from "three";
-import type { Model } from "../types/model";
 import rustleAudio from "../assets/leavesRustling2.mp3";
 import { TEXTURES } from "../constants/assets";
 import { getTexturePixelData } from "../utils/textureUtils";

@@ -1,5 +1,5 @@
 import { TEXTURES } from "@/constants/assets";
-import { useKTX2, useProgress, useTexture } from "@react-three/drei";
+import { useProgress, useTexture } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 
