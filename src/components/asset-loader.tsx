@@ -1,5 +1,5 @@
 import { TEXTURES } from "@/constants/assets";
-import { useProgress, useTexture } from "@react-three/drei";
+import { useKTX2, useProgress, useTexture } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 
@@ -7,15 +7,6 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
   // Preload hill and grass blade textures
   useTexture.preload(TEXTURES.BLADE_DIFFUSE);
   useTexture.preload(TEXTURES.BLADE_ALPHA);
-  useTexture.preload(TEXTURES.HILL_BAKED);
-  useTexture.preload(TEXTURES.HILL_BAKED_NIGHT);
-  useTexture.preload(TEXTURES.HILL_BAKED_NIGHT_DIM);
-  useTexture.preload(TEXTURES.HILL_PATCHES);
-
-  // Preload rock textures
-  useTexture.preload(TEXTURES.OBJECTS_DIFFUSE);
-  useTexture.preload(TEXTURES.OBJECTS_DIFFUSE_NIGHT);
-  useTexture.preload(TEXTURES.OBJECTS_DIFFUSE_NIGHT_DIM);
 
   // Preload flag textures
   useTexture.preload(TEXTURES.FLAG_ALPHA);

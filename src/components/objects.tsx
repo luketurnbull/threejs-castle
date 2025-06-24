@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useTexture } from "@react-three/drei";
+import { useKTX2 } from "@react-three/drei";
 import * as THREE from "three";
 import { TEXTURES } from "../constants/assets";
 import { useFrame } from "@react-three/fiber";
@@ -17,13 +17,19 @@ export default function Objects({
 
   const mode = useAppStore((state) => state.mode);
 
-  const diffuse = useTexture(TEXTURES.OBJECTS_DIFFUSE);
+  const diffuse = useKTX2(TEXTURES.OBJECTS_DIFFUSE_COMPRESSED, "/basis/");
   diffuse.flipY = false;
 
-  const diffuseNight = useTexture(TEXTURES.OBJECTS_DIFFUSE_NIGHT);
+  const diffuseNight = useKTX2(
+    TEXTURES.OBJECTS_DIFFUSE_NIGHT_COMPRESSED,
+    "/basis/"
+  );
   diffuseNight.flipY = false;
 
-  const diffuseNightDim = useTexture(TEXTURES.OBJECTS_DIFFUSE_NIGHT_DIM);
+  const diffuseNightDim = useKTX2(
+    TEXTURES.OBJECTS_DIFFUSE_NIGHT_DIM_COMPRESSED,
+    "/basis/"
+  );
   diffuseNightDim.flipY = false;
 
   useEffect(() => {

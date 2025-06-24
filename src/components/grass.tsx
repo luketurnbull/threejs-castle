@@ -1,4 +1,4 @@
-import { useGLTF, useTexture } from "@react-three/drei";
+import { useGLTF, useKTX2, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useEffect, useState } from "react";
 import * as THREE from "three";
@@ -67,13 +67,19 @@ export default function Grass({
   const texture = useTexture(TEXTURES.BLADE_DIFFUSE);
   const alphaMap = useTexture(TEXTURES.BLADE_ALPHA);
 
-  const bakedTexture = useTexture(TEXTURES.HILL_BAKED);
+  const bakedTexture = useKTX2(TEXTURES.HILL_BAKED_COMPRESSED, "/basis/");
   bakedTexture.flipY = false;
 
-  const bakeNightTexture = useTexture(TEXTURES.HILL_BAKED_NIGHT);
+  const bakeNightTexture = useKTX2(
+    TEXTURES.HILL_BAKED_NIGHT_COMPRESSED,
+    "/basis/"
+  );
   bakeNightTexture.flipY = false;
 
-  const bakeNightDimTexture = useTexture(TEXTURES.HILL_BAKED_NIGHT_DIM);
+  const bakeNightDimTexture = useKTX2(
+    TEXTURES.HILL_BAKED_NIGHT_DIM_COMPRESSED,
+    "/basis/"
+  );
   bakeNightDimTexture.flipY = false;
 
   const hillPatchesTexture = useTexture(TEXTURES.HILL_PATCHES);

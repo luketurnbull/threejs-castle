@@ -10,9 +10,7 @@ import { useThree } from "@react-three/fiber";
 import type { Model } from "@/types/model";
 
 const ktx2Loader = new KTX2Loader();
-ktx2Loader.setTranscoderPath(
-  "https://unpkg.com/three@0.168.0/examples/jsm/libs/basis/"
-);
+ktx2Loader.setTranscoderPath("/basis/");
 
 export default function Scene(props: JSX.IntrinsicElements["group"]) {
   const { gl } = useThree();
