@@ -4,66 +4,36 @@ Castle Project for ThreeJS Journey Challenge 18
 
 # TODO/ Ideas list
 
-## Loading screen and background sounds
+## Styling buttons
 
-- [x] Add basic loading screen and background sound
-- [x] Think of loading screen concept that fits with concept/ colours themes, svg pictures?
-- [x] Add way to toggle audio off
-- [x] Add shadcn/ui so we can quickly add buttons
-- [ ] Style buttons better
-- [ ] Animate sound next to audio button to show it's on?
-- [ ] Make sure audio loops properly
+There are three buttons:
 
-## Castle
+- Start
+- Audio
+- Day/Night Mode
 
-- [x] Way less emissions coming from windows in Blender, looks too orange
-- [x] Less area light, otherwise looking great!
-- [x] Create door
-- [ ] Add chains to door
-- [ ] Door that lowers when you click on it
+I want to make the buttons look more castle themed.
+I want to use the same style for all three buttons.
 
-## Grass
+GSAP MorphSVG to morph the moon and sun SVGs in the mode toggle, and also change the mood of the buttons depending on the mode. Maybe orange and yellow for day, and blue and purple for night.
 
-- [x] Make grass strands different heights
-- [ ] Fade grass sound out when users mouse leaves the hill
-- [ ] Make hover over grass effect better, currently the grass warps too much
+I would like when the audio button is clicked, the sound icon should animate to show it's on with musical notes.
 
-## Windows
+I would like to add sounds and cool hover effect/ click effect to the buttons.
 
-- [x] Make windows all an instance mesh so we're using the same mesh and material
-- [x] Make sure window normals are facing the correct way in Blender so we don't have to use THREE.DoubleSide
-- [x] Add cool shader to the mesh, that looks like a flickering light
+## Compressing images / Performance optimizations
 
-## Rocks
+Possible make all images half the size and see if it improves the performance. And then BASIS compress them:
+https://github.com/BinomialLLC/basis_universal
 
-- [x] Add a bunch of rocks to the scene in Blender and rebake everything
+Potentially do adaptive performance? Less grass blades and no clouds if the users computer can't handle it?
 
-## Flag
+## Post processing
 
-- [x] Add waving flag to the top of the castle
+If the smaller images work, I would like to add some post processing effects.
 
-## Fire
+# Audio
 
-- [x] Make a camp fire
-- [x] Smoke shader during day
-- [ ] Fire shader during night
+Different audio for day and night.
 
-## Night mode
-
-- [x] Change the Sun settings
-- [x] Add stars
-- [x] Dim down the ambient light in the scene
-- [ ] Show a moon in the Sky some how?
-- [ ] Bake lighting for night time (moon light and more emission from castle windows?)
-- [ ] Add transition
-
-## Refinements
-
-- [ ] Refine experience for mobile
-- [ ] Potentially do adaptive performance? Less grass blades and no clouds if the users computer can't handle it?
-- [ ] Play with some Post Processor effects?
-- [ ] Use GSAP MorphSVG to morph the moon and sun SVGs in the mode toggle
-
-## Tree
-
-- [ ] Come up with a concept for a tree
+Audio for fire, when the camera is close to the fire, make it louder.
