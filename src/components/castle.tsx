@@ -5,10 +5,11 @@ export default function Castle() {
   return (
     <Canvas
       camera={{
-        position: [139, -15, 55],
+        position: [0, 20, 0],
         fov: 45,
         near: 0.1,
         far: 1000,
+        lookAt: [0, 40, 0],
       }}
       dpr={[1, 2]}
       performance={{ min: 0.5 }}

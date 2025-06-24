@@ -13,9 +13,28 @@ const STAR_ANIMATION_DURATION = NIGHT_TIME_TRANSITION_DURATION * 0.8;
 
 export default function SkySettings() {
   const mode = useAppStore((state) => state.mode);
+  const renderer = useAppStore((state) => state.renderer);
+  const scene = useAppStore((state) => state.scene);
+  const camera = useAppStore((state) => state.camera);
+
   const [yPos, setYPos] = useState(SUN_POSITION_DAY);
   const [starOpacity, setStarOpacity] = useState(0);
   const starsRef = useRef<THREE.Points>(null);
+
+  // Example: Access Three.js references from store
+  useEffect(() => {
+    if (renderer && scene && camera) {
+      console.log("Sky component can access Three.js references from store:", {
+        renderer,
+        scene,
+        camera,
+      });
+
+      // You can now use these references for custom operations
+      // For example, you could manually add objects to the scene
+      // or manipulate the camera directly
+    }
+  }, [renderer, scene, camera]);
 
   useEffect(() => {
     gsap.to(

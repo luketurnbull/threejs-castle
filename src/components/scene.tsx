@@ -22,9 +22,9 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
   return (
     <group {...props} dispose={null}>
       <Flag />
+      <Smoke />
       <Windows geometry={nodes.windowInside.geometry} />
       <Objects geometry={nodes.objects.geometry} />
-      <Smoke />
       <Grass geometry={nodes.hill.geometry} />
     </group>
   );
