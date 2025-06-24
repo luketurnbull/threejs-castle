@@ -7,6 +7,7 @@ export default function AssetLoader({ onReady }: { onReady: () => void }) {
   // Preload hill and grass blade textures
   useTexture.preload(TEXTURES.BLADE_DIFFUSE);
   useTexture.preload(TEXTURES.BLADE_ALPHA);
+  useTexture.preload(TEXTURES.HILL_PATCHES);
 
   // Preload flag textures
   useTexture.preload(TEXTURES.FLAG_ALPHA);
