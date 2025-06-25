@@ -1,9 +1,7 @@
-import { useKTX2, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import rustleAudio from "../assets/leavesRustling2.mp3";
-import { TEXTURES } from "../constants/assets";
 import { getTexturePixelData } from "../utils/textureUtils";
 import { useAppStore } from "@/store";
 import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
@@ -43,6 +41,16 @@ export default function Grass({
   const transitionStartTimeRef = useRef<number>(0);
   const previousModeRef = useRef<string>("day");
 
+  // Get textures from store
+  const texture = useAppStore((state) => state.grass_diffuse);
+  const alphaMap = useAppStore((state) => state.grass_alpha);
+  const bakedTexture = useAppStore((state) => state.hill_day);
+  const bakeNightTexture = useAppStore((state) => state.hill_night);
+  const bakeNightDimTexture = useAppStore((state) => state.hill_nightDim);
+  const hillPatchesTexture = useAppStore((state) => state.hill_patches);
+  const mode = useAppStore((state) => state.mode);
+  const audioEnabled = useAppStore((state) => state.audioEnabled);
+
   useEffect(() => {
     // Clone the preloaded audio to avoid issues with multiple instances
     rustleSoundRef.current = preloadedAudio.cloneNode(true) as HTMLAudioElement;
@@ -56,41 +64,16 @@ export default function Grass({
     };
   }, []);
 
-  const audioEnabled = useAppStore((state) => state.audioEnabled);
-
   useEffect(() => {
     geometry.attributes.uv = geometry.attributes.uv1;
     geometry.attributes.uv.needsUpdate = true;
   }, [geometry]);
 
-  const texture = useTexture(TEXTURES.BLADE_DIFFUSE);
-  const alphaMap = useTexture(TEXTURES.BLADE_ALPHA);
-
-  const bakedTexture = useKTX2(TEXTURES.HILL_BAKED_COMPRESSED, "/basis/");
-  bakedTexture.flipY = false;
-
-  const bakeNightTexture = useKTX2(
-    TEXTURES.HILL_BAKED_NIGHT_COMPRESSED,
-    "/basis/"
-  );
-  bakeNightTexture.flipY = false;
-
-  const bakeNightDimTexture = useKTX2(
-    TEXTURES.HILL_BAKED_NIGHT_DIM_COMPRESSED,
-    "/basis/"
-  );
-  bakeNightDimTexture.flipY = false;
-
-  const hillPatchesTexture = useTexture(TEXTURES.HILL_PATCHES);
-  hillPatchesTexture.flipY = false;
-
-  const mode = useAppStore((state) => state.mode);
-
   const [patchesPixelData, setPatchesPixelData] =
     useState<Uint8ClampedArray | null>(null);
 
   useEffect(() => {
-    if (hillPatchesTexture.image) {
+    if (hillPatchesTexture?.image) {
       setPatchesPixelData(getTexturePixelData(hillPatchesTexture));
     }
   }, [hillPatchesTexture]);
@@ -177,8 +160,8 @@ export default function Grass({
 
       // Sample patch density from texture pixel data
       if (patchesPixelData) {
-        const imgWidth = hillPatchesTexture.image.width;
-        const imgHeight = hillPatchesTexture.image.height;
+        const imgWidth = hillPatchesTexture!.image.width;
+        const imgHeight = hillPatchesTexture!.image.height;
         const x = Math.min(imgWidth - 1, Math.floor(uv.x * imgWidth));
         const y = Math.min(imgHeight - 1, Math.floor(uv.y * imgHeight)); // Use uv.y directly, consistent with hill_baked texture behavior
 

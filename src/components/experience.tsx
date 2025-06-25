@@ -16,16 +16,14 @@ export default function Experience() {
 
   useEffect(() => {
     if (gl) {
-      init(gl);
+      void init(gl);
     }
   }, [gl, init]);
 
   return (
     <>
       <SkySettings />
-
       <CloudSettings />
-
       <Scene />
 
       {/* <OrbitControls

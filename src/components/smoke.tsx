@@ -1,5 +1,3 @@
-import { TEXTURES } from "@/constants/assets";
-import { useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState, useEffect } from "react";
 import * as THREE from "three";
@@ -8,12 +6,9 @@ import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 
 export default function Smoke() {
   const smokeMaterial = useRef<THREE.ShaderMaterial>(null!);
-  const perlinTexture = useTexture(TEXTURES.PERLIN_NOISE);
+  const perlinTexture = useAppStore((state) => state.perlinNoise);
   const mode = useAppStore((state) => state.mode);
   const [transitionValue, setTransitionValue] = useState(0.0);
-
-  perlinTexture.wrapS = THREE.RepeatWrapping;
-  perlinTexture.wrapT = THREE.RepeatWrapping;
 
   // Smooth transition effect
   useEffect(() => {

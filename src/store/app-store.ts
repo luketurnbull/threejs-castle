@@ -2,13 +2,22 @@ import { create } from "zustand";
 import backgroundSounds from "../assets/background.mp3";
 import * as THREE from "three";
 import { GLTFLoader, KTX2Loader } from "three-stdlib";
-import type { Model } from "@/types/model";
 import { TextureLoader } from "three";
 import { TEXTURES } from "@/constants/assets";
 
 export type Mode = "day" | "night";
+export type LoadingState =
+  | "idle"
+  | "loading-sky"
+  | "loading-model"
+  | "loading-textures"
+  | "complete";
 
 interface AppState {
+  // Loading state
+  loadingState: LoadingState;
+  isLoading: boolean;
+
   // Audio state
   audioEnabled: boolean;
   backgroundAudio: HTMLAudioElement;
@@ -25,8 +34,10 @@ interface AppState {
   ktx2Loader: KTX2Loader | null;
   textureLoader: TextureLoader | null;
 
-  // Model
-  model: Model | null;
+  // Individual meshes
+  hillMesh: THREE.Mesh | null;
+  objectsMesh: THREE.Mesh | null;
+  windowInsideMesh: THREE.Mesh | null;
 
   // Textures
   grass_diffuse: THREE.Texture | null;
@@ -43,7 +54,12 @@ interface AppState {
 
   // Actions
   init: (renderer: THREE.WebGLRenderer) => void;
-  loadScene: () => void;
+  startLoadingSequence: () => void;
+  loadSkyAndClouds: () => Promise<void>;
+  loadModel: () => Promise<void>;
+  loadDayTextures: () => Promise<void>;
+  loadNightTextures: () => Promise<void>;
+  moveCameraToScene: () => void;
 
   // Audio
   toggleAudio: () => void;
@@ -62,10 +78,13 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
+// Initial camera position looking up at the sky
 camera.position.set(0, 50, 0);
-camera.lookAt(0, 100, 0);
+camera.lookAt(0, 200, 0);
 
 export const useAppStore = create<AppState>((set, get) => ({
+  loadingState: "idle",
+  isLoading: false,
   audioEnabled: true,
   backgroundAudio: new Audio(backgroundSounds),
   mode: "day",
@@ -74,7 +93,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   gltfLoader: null,
   ktx2Loader: null,
   textureLoader: null,
-  model: null,
+  hillMesh: null,
+  objectsMesh: null,
+  windowInsideMesh: null,
   grass_diffuse: null,
   grass_alpha: null,
   hill_day: null,
@@ -88,7 +109,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   flag: null,
 
   // Init
-  init: (renderer: THREE.WebGLRenderer) => {
+  init: async (renderer: THREE.WebGLRenderer) => {
     const ktx2Loader = new KTX2Loader();
     const gltfLoader = new GLTFLoader();
     const textureLoader = new TextureLoader();
@@ -102,74 +123,256 @@ export const useAppStore = create<AppState>((set, get) => ({
       ktx2Loader,
       textureLoader,
     });
+
+    await get().startLoadingSequence();
   },
 
-  // Loading
-  loadScene: () => {
+  // Loading sequence
+  startLoadingSequence: async () => {
+    set({ isLoading: true, loadingState: "loading-sky" });
+
+    try {
+      // Step 1: Load sky and clouds (camera already pointing up)
+      await get().loadSkyAndClouds();
+
+      // Step 2: Load model
+      set({ loadingState: "loading-model" });
+      await get().loadModel();
+
+      // Step 3: Load day textures
+      set({ loadingState: "loading-textures" });
+      await get().loadDayTextures();
+
+      // Step 4: Move camera to scene and complete
+      get().moveCameraToScene();
+      set({ loadingState: "complete", isLoading: false });
+    } catch (error) {
+      console.error("Loading sequence failed:", error);
+      set({ loadingState: "idle", isLoading: false });
+    }
+  },
+
+  loadSkyAndClouds: async () => {
+    // Sky and clouds are loaded by Drei components, so we just wait a bit
+    // to ensure they're rendered before proceeding
+    return new Promise((resolve) => {
+      setTimeout(resolve, 500);
+    });
+  },
+
+  loadModel: async () => {
     const { gltfLoader } = get();
 
-    if (gltfLoader) {
-      gltfLoader.load("/scene.gltf", (gltf) => {
-        set({ model: gltf.scene as unknown as Model });
-      });
+    if (!gltfLoader) {
+      throw new Error("GLTF loader not initialized");
     }
+
+    return new Promise<void>((resolve, reject) => {
+      gltfLoader.load(
+        "/scene.glb",
+        (gltf) => {
+          console.log(gltf);
+
+          // Extract individual meshes from the loaded model
+          const scene = gltf.scene;
+          const hillMesh = scene.children.find(
+            (child) => child.name === "hill"
+          ) as THREE.Mesh;
+          const objectsMesh = scene.children.find(
+            (child) => child.name === "objects"
+          ) as THREE.Mesh;
+          const windowInsideMesh = scene.children.find(
+            (child) => child.name === "windowInside"
+          ) as THREE.Mesh;
+
+          set({
+            hillMesh,
+            objectsMesh,
+            windowInsideMesh,
+          });
+
+          resolve();
+        },
+        undefined,
+        reject
+      );
+    });
   },
 
-  loadDayTextures: () => {
+  loadDayTextures: async () => {
     const { textureLoader, ktx2Loader } = get();
 
-    if (textureLoader) {
-      textureLoader.load(TEXTURES.BLADE_DIFFUSE, (texture) => {
-        set({ grass_diffuse: texture });
-      });
-
-      textureLoader.load(TEXTURES.BLADE_ALPHA, (texture) => {
-        set({ grass_alpha: texture });
-      });
-
-      textureLoader.load(TEXTURES.PERLIN_NOISE, (texture) => {
-        set({ perlinNoise: texture });
-      });
-
-      textureLoader.load(TEXTURES.HILL_PATCHES, (texture) => {
-        set({ hill_patches: texture });
-      });
+    if (!textureLoader || !ktx2Loader) {
+      throw new Error("Loaders not initialized");
     }
 
-    if (ktx2Loader) {
-      ktx2Loader.load(TEXTURES.HILL_BAKED_COMPRESSED, (texture) => {
-        set({ hill_day: texture });
-      });
+    const texturePromises: Promise<THREE.Texture>[] = [];
+    const ktx2Promises: Promise<THREE.Texture>[] = [];
 
-      ktx2Loader.load(TEXTURES.OBJECTS_DIFFUSE_COMPRESSED, (texture) => {
-        set({ objects_day: texture });
+    // Load regular textures
+    texturePromises.push(
+      new Promise<THREE.Texture>((resolve, reject) => {
+        textureLoader.load(TEXTURES.BLADE_DIFFUSE, resolve, undefined, reject);
+      }),
+      new Promise<THREE.Texture>((resolve, reject) => {
+        textureLoader.load(TEXTURES.BLADE_ALPHA, resolve, undefined, reject);
+      }),
+      new Promise<THREE.Texture>((resolve, reject) => {
+        textureLoader.load(
+          TEXTURES.PERLIN_NOISE,
+          (texture) => {
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            resolve(texture);
+          },
+          undefined,
+          reject
+        );
+      }),
+      new Promise<THREE.Texture>((resolve, reject) => {
+        textureLoader.load(
+          TEXTURES.HILL_PATCHES,
+          (texture) => {
+            texture.flipY = false;
+            resolve(texture);
+          },
+          undefined,
+          reject
+        );
+      }),
+      new Promise<THREE.Texture>((resolve, reject) => {
+        textureLoader.load(TEXTURES.FLAG_ALPHA, resolve, undefined, reject);
+      })
+    );
+
+    // Load KTX2 textures
+    ktx2Promises.push(
+      new Promise<THREE.Texture>((resolve, reject) => {
+        ktx2Loader.load(
+          TEXTURES.HILL_BAKED_COMPRESSED,
+          (texture) => {
+            texture.flipY = false;
+            resolve(texture);
+          },
+          undefined,
+          reject
+        );
+      }),
+      new Promise<THREE.Texture>((resolve, reject) => {
+        ktx2Loader.load(
+          TEXTURES.OBJECTS_DIFFUSE_COMPRESSED,
+          (texture) => {
+            texture.flipY = false;
+            resolve(texture);
+          },
+          undefined,
+          reject
+        );
+      })
+    );
+
+    try {
+      const [
+        grass_diffuse,
+        grass_alpha,
+        perlinNoise,
+        hill_patches,
+        flag,
+        hill_day,
+        objects_day,
+      ] = await Promise.all([...texturePromises, ...ktx2Promises]);
+
+      set({
+        grass_diffuse,
+        grass_alpha,
+        perlinNoise,
+        hill_patches,
+        flag,
+        hill_day,
+        objects_day,
       });
+    } catch (error) {
+      throw new Error(`Failed to load textures: ${error}`);
     }
   },
 
-  loadNightTextures: () => {
+  loadNightTextures: async () => {
     const { ktx2Loader } = get();
 
-    if (ktx2Loader) {
-      ktx2Loader.load(TEXTURES.HILL_BAKED_NIGHT_COMPRESSED, (texture) => {
-        set({ hill_night: texture });
-      });
-
-      ktx2Loader.load(TEXTURES.HILL_BAKED_NIGHT_DIM_COMPRESSED, (texture) => {
-        set({ hill_nightDim: texture });
-      });
-
-      ktx2Loader.load(TEXTURES.OBJECTS_DIFFUSE_NIGHT_COMPRESSED, (texture) => {
-        set({ objects_night: texture });
-      });
-
-      ktx2Loader.load(
-        TEXTURES.OBJECTS_DIFFUSE_NIGHT_DIM_COMPRESSED,
-        (texture) => {
-          set({ objects_nightDim: texture });
-        }
-      );
+    if (!ktx2Loader) {
+      throw new Error("KTX2 loader not initialized");
     }
+
+    const ktx2Promises: Promise<THREE.Texture>[] = [];
+
+    // Load KTX2 night textures
+    ktx2Promises.push(
+      new Promise<THREE.Texture>((resolve, reject) => {
+        ktx2Loader.load(
+          TEXTURES.HILL_BAKED_NIGHT_COMPRESSED,
+          (texture) => {
+            texture.flipY = false;
+            resolve(texture);
+          },
+          undefined,
+          reject
+        );
+      }),
+      new Promise<THREE.Texture>((resolve, reject) => {
+        ktx2Loader.load(
+          TEXTURES.HILL_BAKED_NIGHT_DIM_COMPRESSED,
+          (texture) => {
+            texture.flipY = false;
+            resolve(texture);
+          },
+          undefined,
+          reject
+        );
+      }),
+      new Promise<THREE.Texture>((resolve, reject) => {
+        ktx2Loader.load(
+          TEXTURES.OBJECTS_DIFFUSE_NIGHT_COMPRESSED,
+          (texture) => {
+            texture.flipY = false;
+            resolve(texture);
+          },
+          undefined,
+          reject
+        );
+      }),
+      new Promise<THREE.Texture>((resolve, reject) => {
+        ktx2Loader.load(
+          TEXTURES.OBJECTS_DIFFUSE_NIGHT_DIM_COMPRESSED,
+          (texture) => {
+            texture.flipY = false;
+            resolve(texture);
+          },
+          undefined,
+          reject
+        );
+      })
+    );
+
+    try {
+      const [hill_night, hill_nightDim, objects_night, objects_nightDim] =
+        await Promise.all(ktx2Promises);
+
+      set({
+        hill_night,
+        hill_nightDim,
+        objects_night,
+        objects_nightDim,
+      });
+    } catch (error) {
+      throw new Error(`Failed to load night textures: ${error}`);
+    }
+  },
+
+  moveCameraToScene: () => {
+    const { camera } = get();
+    // Move camera to look at the scene
+    camera.position.set(150, 0, 0);
+    camera.lookAt(0, 0, 0);
   },
 
   // Audio

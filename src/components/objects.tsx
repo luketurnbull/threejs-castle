@@ -1,7 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useKTX2 } from "@react-three/drei";
 import * as THREE from "three";
-import { TEXTURES } from "../constants/assets";
 import { useFrame } from "@react-three/fiber";
 import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 import { useAppStore } from "@/store";
@@ -17,20 +15,10 @@ export default function Objects({
 
   const mode = useAppStore((state) => state.mode);
 
-  const diffuse = useKTX2(TEXTURES.OBJECTS_DIFFUSE_COMPRESSED, "/basis/");
-  diffuse.flipY = false;
-
-  const diffuseNight = useKTX2(
-    TEXTURES.OBJECTS_DIFFUSE_NIGHT_COMPRESSED,
-    "/basis/"
-  );
-  diffuseNight.flipY = false;
-
-  const diffuseNightDim = useKTX2(
-    TEXTURES.OBJECTS_DIFFUSE_NIGHT_DIM_COMPRESSED,
-    "/basis/"
-  );
-  diffuseNightDim.flipY = false;
+  // Get textures from store
+  const diffuse = useAppStore((state) => state.objects_day);
+  const diffuseNight = useAppStore((state) => state.objects_night);
+  const diffuseNightDim = useAppStore((state) => state.objects_nightDim);
 
   useEffect(() => {
     geometry.attributes.uv = geometry.attributes.uv1;

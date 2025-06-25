@@ -4,28 +4,30 @@ import Windows from "./windows";
 import Flag from "./flag";
 import Objects from "./objects";
 import Smoke from "./smoke";
-import { KTX2Loader } from "three-stdlib";
-import { useGLTF } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
-import type { Model } from "@/types/model";
-
-const ktx2Loader = new KTX2Loader();
-ktx2Loader.setTranscoderPath("/basis/");
+import { useAppStore } from "@/store";
 
 export default function Scene(props: JSX.IntrinsicElements["group"]) {
-  const { gl } = useThree();
+  const hillMesh = useAppStore((state) => state.hillMesh);
+  const objectsMesh = useAppStore((state) => state.objectsMesh);
+  const windowInsideMesh = useAppStore((state) => state.windowInsideMesh);
+  const loadingState = useAppStore((state) => state.loadingState);
 
-  const { nodes } = useGLTF("/scene.glb", true, true, (loader) => {
-    loader.setKTX2Loader(ktx2Loader.detectSupport(gl));
-  }) as unknown as Model;
+  if (
+    !hillMesh ||
+    !objectsMesh ||
+    !windowInsideMesh ||
+    loadingState !== "complete"
+  ) {
+    return null;
+  }
 
   return (
     <group {...props} dispose={null}>
       <Flag />
       <Smoke />
-      <Windows geometry={nodes.windowInside.geometry} />
-      <Objects geometry={nodes.objects.geometry} />
-      <Grass geometry={nodes.hill.geometry} />
+      <Windows geometry={windowInsideMesh.geometry} />
+      <Objects geometry={objectsMesh.geometry} />
+      <Grass geometry={hillMesh.geometry} />
     </group>
   );
 }
