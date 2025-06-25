@@ -26,9 +26,7 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
             setSceneY(this.targets()[0].value);
           },
           onComplete: function () {
-            setTimeout(() => {
-              setComplete();
-            }, 300);
+            setComplete();
           },
         }
       );
