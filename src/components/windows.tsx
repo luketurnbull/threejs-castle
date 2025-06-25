@@ -19,6 +19,7 @@ const windowPositions: WindowPosition[] = [
 
 export default function Windows() {
   const windowInsideMesh = useAppStore((state) => state.windowInsideMesh);
+  const loadingState = useAppStore((state) => state.loadingState);
 
   // Create instanced mesh
   const instancedMesh = useMemo(() => {
@@ -60,6 +61,10 @@ export default function Windows() {
 
   // Don't render if mesh isn't loaded
   if (!instancedMesh) {
+    return null;
+  }
+
+  if (loadingState !== "complete") {
     return null;
   }
 

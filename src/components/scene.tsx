@@ -11,12 +11,11 @@ import gsap from "gsap";
 export default function Scene(props: JSX.IntrinsicElements["group"]) {
   const loadingState = useAppStore((state) => state.loadingState);
   const setComplete = useAppStore((state) => state.setComplete);
-  const [sceneY, setSceneY] = useState(-200); // Start below the view
-  const [sceneAnimationComplete, setSceneAnimationComplete] = useState(false);
+  const [sceneY, setSceneY] = useState(-200);
 
   // Animate scene appearing from below when night-time loading is complete
   useEffect(() => {
-    if (loadingState === "night-time-complete") {
+    if (loadingState === "daytime-complete") {
       gsap.to(
         { value: sceneY },
         {
@@ -28,8 +27,7 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
           },
           onComplete: function () {
             setTimeout(() => {
-              setSceneAnimationComplete(true);
-              setComplete(); // Update global state to complete
+              setComplete();
             }, 1500);
           },
         }
@@ -41,15 +39,11 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
     }
   }, [loadingState, sceneY, setComplete]);
 
-  if (loadingState !== "night-time-complete" && loadingState !== "complete") {
-    return null;
-  }
-
   return (
     <group {...props} dispose={null} position={[0, sceneY, 0]}>
       <Flag />
       <Smoke />
-      {sceneAnimationComplete && <Windows />}
+      <Windows />
       <Objects />
       <Hill />
     </group>
