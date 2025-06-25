@@ -1,4 +1,4 @@
-import { Center, Text } from "@react-three/drei";
+import { Text } from "@react-three/drei";
 import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
