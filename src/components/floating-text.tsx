@@ -1,4 +1,4 @@
-import { Text } from "@react-three/drei";
+import { Center, Text } from "@react-three/drei";
 import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
@@ -46,7 +46,7 @@ export default function FloatingText() {
   return (
     <group
       ref={textRef}
-      position={[-36, -8, 0]}
+      position={[-36, -7, 0]}
       rotation={[0, -Math.PI / 2, 0]}
       scale={textScale * 4}
     >
