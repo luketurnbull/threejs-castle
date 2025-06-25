@@ -28,7 +28,7 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
           onComplete: function () {
             setTimeout(() => {
               setComplete();
-            }, 1500);
+            }, 300);
           },
         }
       );

@@ -26,9 +26,12 @@ export default function ControlPanel() {
   }, [loadingState, started]);
 
   // Show start button when loading is complete but not started
-  if (loadingState === "complete" && !started) {
+  if (
+    (loadingState === "daytime-complete" || loadingState === "complete") &&
+    !started
+  ) {
     return (
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+      <div className="fixed bottom-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
         <Button
           size="lg"
           onClick={start}
