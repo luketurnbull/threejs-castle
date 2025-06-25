@@ -158,25 +158,17 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({ loadingState: "loading-audio" });
       await get().loadAudio();
 
-      console.log("loadAudio");
-
       // Step 3: Load model
       set({ loadingState: "loading-model" });
       await get().loadModel();
-
-      console.log("loadModel");
 
       // Step 4: Load day textures
       set({ loadingState: "loading-textures" });
       await get().loadDayTextures();
 
-      console.log("loadDayTextures");
-
       // Step 5: Set daytime complete and load night textures
       set({ loadingState: "daytime-complete" });
       await get().loadNightTextures();
-
-      console.log("loadNightTextures");
 
       // Step 6: Set night-time complete (scene animation will set to complete)
       set({ loadingState: "night-time-complete", isLoading: false });
