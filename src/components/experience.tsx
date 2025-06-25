@@ -1,10 +1,5 @@
 import Scene from "./scene";
-import {
-  OrbitControls,
-  AdaptiveDpr,
-  AdaptiveEvents,
-  Bvh,
-} from "@react-three/drei";
+import { AdaptiveDpr, AdaptiveEvents, Bvh } from "@react-three/drei";
 import "./grass-material";
 import "./flag-material";
 import "./smoke-material";
@@ -16,14 +11,14 @@ import { useThree } from "@react-three/fiber";
 import { useAppStore } from "@/store";
 
 export default function Experience() {
-  const { gl, camera } = useThree();
+  const { gl } = useThree();
   const init = useAppStore((state) => state.init);
 
   useEffect(() => {
-    if (gl && camera) {
-      init(camera, gl);
+    if (gl) {
+      init(gl);
     }
-  }, [gl, camera, init]);
+  }, [gl, init]);
 
   return (
     <>
@@ -33,7 +28,7 @@ export default function Experience() {
 
       <Scene />
 
-      <OrbitControls
+      {/* <OrbitControls
         minPolarAngle={Math.PI * 0.45}
         maxPolarAngle={Math.PI * 0.55}
         enableZoom={false}
@@ -41,7 +36,7 @@ export default function Experience() {
         enablePan={false}
         enableDamping={true}
         dampingFactor={0.05}
-      />
+      /> */}
 
       <Bvh firstHitOnly={true} />
       <AdaptiveDpr pixelated={true} />

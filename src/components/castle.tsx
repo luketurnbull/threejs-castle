@@ -1,16 +1,13 @@
 import { Canvas } from "@react-three/fiber";
 import Experience from "./experience";
+import { useAppStore } from "@/store";
 
 export default function Castle() {
+  const camera = useAppStore((state) => state.camera);
+
   return (
     <Canvas
-      camera={{
-        position: [0, 20, 0],
-        fov: 45,
-        near: 0.1,
-        far: 1000,
-        lookAt: [0, 40, 0],
-      }}
+      camera={camera}
       dpr={[1, 2]}
       performance={{ min: 0.5 }}
       gl={{

@@ -13,28 +13,9 @@ const STAR_ANIMATION_DURATION = NIGHT_TIME_TRANSITION_DURATION * 0.8;
 
 export default function SkySettings() {
   const mode = useAppStore((state) => state.mode);
-  const renderer = useAppStore((state) => state.renderer);
-  const scene = useAppStore((state) => state.scene);
-  const camera = useAppStore((state) => state.camera);
-
   const [yPos, setYPos] = useState(SUN_POSITION_DAY);
-  const [starOpacity, setStarOpacity] = useState(0);
-  const starsRef = useRef<THREE.Points>(null);
-
-  // Example: Access Three.js references from store
-  useEffect(() => {
-    if (renderer && scene && camera) {
-      console.log("Sky component can access Three.js references from store:", {
-        renderer,
-        scene,
-        camera,
-      });
-
-      // You can now use these references for custom operations
-      // For example, you could manually add objects to the scene
-      // or manipulate the camera directly
-    }
-  }, [renderer, scene, camera]);
+  // const [starOpacity, setStarOpacity] = useState(0);
+  // const starsRef = useRef<THREE.Points>(null);
 
   useEffect(() => {
     gsap.to(
@@ -48,26 +29,26 @@ export default function SkySettings() {
         },
       }
     );
-    gsap.to(
-      { value: mode === "day" ? 1 : 0 },
-      {
-        value: mode === "day" ? 0 : 1,
-        duration: STAR_ANIMATION_DURATION,
-        ease: "power2.inOut",
-        onUpdate: function () {
-          setStarOpacity(this.targets()[0].value);
-        },
-      }
-    );
+    // gsap.to(
+    //   { value: mode === "day" ? 1 : 0 },
+    //   {
+    //     value: mode === "day" ? 0 : 1,
+    //     duration: STAR_ANIMATION_DURATION,
+    //     ease: "power2.inOut",
+    //     onUpdate: function () {
+    //       setStarOpacity(this.targets()[0].value);
+    //     },
+    //   }
+    // );
   }, [mode]);
 
-  useFrame(() => {
-    if (starsRef.current && starsRef.current.material) {
-      const mat = starsRef.current.material as THREE.PointsMaterial;
-      mat.opacity = starOpacity;
-      mat.transparent = true;
-    }
-  });
+  // useFrame(() => {
+  //   if (starsRef.current && starsRef.current.material) {
+  //     const mat = starsRef.current.material as THREE.PointsMaterial;
+  //     mat.opacity = starOpacity;
+  //     mat.transparent = true;
+  //   }
+  // });
 
   return (
     <>
@@ -80,7 +61,7 @@ export default function SkySettings() {
         mieDirectionalG={0.8}
       />
 
-      <Stars
+      {/* <Stars
         ref={starsRef}
         count={STAR_COUNT_NIGHT}
         radius={100}
@@ -89,7 +70,7 @@ export default function SkySettings() {
         saturation={0}
         fade
         speed={1}
-      />
+      /> */}
     </>
   );
 }
