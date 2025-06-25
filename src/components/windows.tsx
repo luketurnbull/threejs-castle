@@ -23,7 +23,6 @@ interface WindowsProps {
 
 export default function Windows({ groupPosition = [0, 0, 0] }: WindowsProps) {
   const windowInsideMesh = useAppStore((state) => state.windowInsideMesh);
-  const loadingState = useAppStore((state) => state.loadingState);
   const instancedMeshRef = useRef<THREE.InstancedMesh | null>(null);
 
   // Create instanced mesh
