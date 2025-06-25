@@ -4,7 +4,6 @@ import * as THREE from "three";
 import { GLTFLoader, KTX2Loader } from "three-stdlib";
 import { TextureLoader } from "three";
 import { TEXTURES } from "@/constants/assets";
-import gsap from "gsap";
 
 const camera = new THREE.PerspectiveCamera(
   45,
@@ -13,9 +12,9 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-// Initial camera position looking up at the sky
+// Initial camera position looking at the center
 camera.position.set(-150, 0, 0);
-camera.lookAt(0, 200, 0);
+camera.lookAt(0, 0, 0);
 
 export type Mode = "day" | "night";
 export type LoadingState =
@@ -67,11 +66,9 @@ interface AppState {
   // Actions
   init: (renderer: THREE.WebGLRenderer) => void;
   startLoadingSequence: () => void;
-  loadSkyAndClouds: () => Promise<void>;
   loadModel: () => Promise<void>;
   loadDayTextures: () => Promise<void>;
   loadNightTextures: () => Promise<void>;
-  moveCameraToScene: () => void;
 
   // Audio
   toggleAudio: () => void;
@@ -132,14 +129,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   startLoadingSequence: async () => {
     set({ isLoading: true, loadingState: "loading-sky" });
 
-    console.log("startLoadingSequence");
-
     try {
-      // Step 1: Load sky and clouds (camera already pointing up)
-      await get().loadSkyAndClouds();
-
-      console.log("loadSkyAndClouds");
-
       // Step 2: Load model
       set({ loadingState: "loading-model" });
       await get().loadModel();
@@ -152,21 +142,12 @@ export const useAppStore = create<AppState>((set, get) => ({
 
       console.log("loadDayTextures");
 
-      // Step 4: Move camera to scene and complete
-      get().moveCameraToScene();
+      // Step 4: Complete loading (no camera movement)
       set({ loadingState: "complete", isLoading: false });
     } catch (error) {
       console.error("Loading sequence failed:", error);
       set({ loadingState: "idle", isLoading: false });
     }
-  },
-
-  loadSkyAndClouds: async () => {
-    // Sky and clouds are loaded by Drei components, so we just wait a bit
-    // to ensure they're rendered before proceeding
-    return new Promise((resolve) => {
-      setTimeout(resolve, 1000);
-    });
   },
 
   loadModel: async () => {
@@ -373,26 +354,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     } catch (error) {
       throw new Error(`Failed to load night textures: ${error}`);
     }
-  },
-
-  moveCameraToScene: () => {
-    const { camera } = get();
-
-    // Create a target object to animate
-    const target = new THREE.Vector3(0, 200, 0); // Start looking up at the sky
-
-    // Use GSAP to animate the lookAt target
-    gsap.to(target, {
-      x: 0,
-      y: 0,
-      z: 0,
-      duration: 2,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        // Update the camera's lookAt target on each frame
-        camera.lookAt(target);
-      },
-    });
   },
 
   // Audio

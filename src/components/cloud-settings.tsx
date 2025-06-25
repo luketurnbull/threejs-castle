@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import gsap from "gsap";
 import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 import LightSettings from "./light-settings";
+import FloatingText from "./floating-text";
 
 export default function CloudSettings() {
   const mode = useAppStore((state) => state.mode);
@@ -92,6 +93,8 @@ export default function CloudSettings() {
           frustumCulled
         />
       </Clouds>
+
+      <FloatingText />
     </>
   );
 }
