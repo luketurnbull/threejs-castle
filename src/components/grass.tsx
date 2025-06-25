@@ -9,6 +9,12 @@ const NUM_BLADES = 150000;
 const HILL_SCALE = new THREE.Vector3(131.333, 95.653, 131.333);
 const HILL_POSITION = new THREE.Vector3(-1.637, -89.253, 0.168);
 
+// Color constants for day/night transitions
+const DAY_TIP_COLOR = new THREE.Color(0.0, 0.6, 0.0).convertSRGBToLinear();
+const NIGHT_TIP_COLOR = new THREE.Color(0.8, 0.0, 0.8).convertSRGBToLinear();
+const DAY_BOTTOM_COLOR = new THREE.Color(0.0, 0.0, 0.0).convertSRGBToLinear();
+const NIGHT_BOTTOM_COLOR = new THREE.Color(0.2, 0.0, 0.2).convertSRGBToLinear();
+
 // Audio settings
 const MIN_DISTANCE = 60; // Distance at which volume will be 1
 const MAX_DISTANCE = 230; // Distance at which volume will be 0
@@ -249,6 +255,18 @@ export default function Grass({
     if (materialRef.current && rustleSoundRef.current) {
       // Animate transition for grass aoMap
       materialRef.current.uniforms.uTransitionFactor.value = transitionValue;
+
+      // Interpolate colors based on transition value
+      materialRef.current.uniforms.tipColor.value.lerpColors(
+        DAY_TIP_COLOR,
+        NIGHT_TIP_COLOR,
+        transitionValue
+      );
+      materialRef.current.uniforms.bottomColor.value.lerpColors(
+        DAY_BOTTOM_COLOR,
+        NIGHT_BOTTOM_COLOR,
+        transitionValue
+      );
 
       materialRef.current.uniforms.time.value = state.clock.elapsedTime * 0.25;
 
