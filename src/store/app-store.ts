@@ -80,7 +80,7 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 // Initial camera position looking up at the sky
-camera.position.set(0, 50, 0);
+camera.position.set(150, 0, 0);
 camera.lookAt(0, 200, 0);
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -132,17 +132,25 @@ export const useAppStore = create<AppState>((set, get) => ({
   startLoadingSequence: async () => {
     set({ isLoading: true, loadingState: "loading-sky" });
 
+    console.log("startLoadingSequence");
+
     try {
       // Step 1: Load sky and clouds (camera already pointing up)
       await get().loadSkyAndClouds();
+
+      console.log("loadSkyAndClouds");
 
       // Step 2: Load model
       set({ loadingState: "loading-model" });
       await get().loadModel();
 
+      console.log("loadModel");
+
       // Step 3: Load day textures
       set({ loadingState: "loading-textures" });
       await get().loadDayTextures();
+
+      console.log("loadDayTextures");
 
       // Step 4: Move camera to scene and complete
       get().moveCameraToScene();
@@ -157,7 +165,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     // Sky and clouds are loaded by Drei components, so we just wait a bit
     // to ensure they're rendered before proceeding
     return new Promise((resolve) => {
-      setTimeout(resolve, 500);
+      setTimeout(resolve, 1000);
     });
   },
 
@@ -370,16 +378,19 @@ export const useAppStore = create<AppState>((set, get) => ({
   moveCameraToScene: () => {
     const { camera } = get();
 
-    // Use GSAP for smooth camera transition
-    gsap.to(camera.position, {
-      x: 150,
+    // Create a target object to animate
+    const target = new THREE.Vector3(0, 200, 0); // Start looking up at the sky
+
+    // Use GSAP to animate the lookAt target
+    gsap.to(target, {
+      x: 0,
       y: 0,
       z: 0,
       duration: 2,
       ease: "power2.inOut",
       onUpdate: () => {
-        // Keep looking at the scene center during the transition
-        camera.lookAt(0, 0, 0);
+        // Update the camera's lookAt target on each frame
+        camera.lookAt(target);
       },
     });
   },

@@ -45,6 +45,7 @@ export default function Grass({
   const bakedTexture = useAppStore((state) => state.hill_day);
   const bakeNightTexture = useAppStore((state) => state.hill_night);
   const hillPatchesTexture = useAppStore((state) => state.hill_patches);
+  const hillMesh = useAppStore((state) => state.hillMesh);
   const mode = useAppStore((state) => state.mode);
   const audioEnabled = useAppStore((state) => state.audioEnabled);
 
@@ -256,7 +257,7 @@ export default function Grass({
       // Update player position based on mouse position (always for visual effects)
       raycaster.setFromCamera(pointer, camera);
 
-      const hits = raycaster.intersectObjects([], true);
+      const hits = hillMesh ? raycaster.intersectObject(hillMesh) : [];
 
       if (hits.length > 0) {
         const hitPoint = hits[0].point;
