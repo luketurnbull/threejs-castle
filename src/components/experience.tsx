@@ -1,5 +1,10 @@
 import Scene from "./scene";
-import { AdaptiveDpr, AdaptiveEvents, Bvh } from "@react-three/drei";
+import {
+  AdaptiveDpr,
+  AdaptiveEvents,
+  Bvh,
+  OrbitControls,
+} from "@react-three/drei";
 import "./grass-material";
 import "./flag-material";
 import "./smoke-material";
@@ -25,20 +30,31 @@ export default function Experience() {
       <SkySettings />
       <CloudSettings />
       <Scene />
-
-      {/* <OrbitControls
-        minPolarAngle={Math.PI * 0.45}
-        maxPolarAngle={Math.PI * 0.55}
-        enableZoom={false}
-        makeDefault={true}
-        enablePan={false}
-        enableDamping={true}
-        dampingFactor={0.05}
-      /> */}
+      <Controls />
 
       <Bvh firstHitOnly={true} />
       <AdaptiveDpr pixelated={true} />
       <AdaptiveEvents />
     </>
+  );
+}
+
+function Controls() {
+  const loadingState = useAppStore((state) => state.loadingState);
+
+  if (loadingState !== "complete") {
+    return null;
+  }
+
+  return (
+    <OrbitControls
+      minPolarAngle={Math.PI * 0.45}
+      maxPolarAngle={Math.PI * 0.55}
+      enableZoom={false}
+      makeDefault={true}
+      enablePan={false}
+      enableDamping={true}
+      dampingFactor={0.05}
+    />
   );
 }
