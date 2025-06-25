@@ -1,14 +1,9 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useEffect, useState } from "react";
 import * as THREE from "three";
-import rustleAudio from "../assets/leavesRustling2.mp3";
 import { getTexturePixelData } from "../utils/textureUtils";
 import { useAppStore } from "@/store";
 import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
-
-// Preload the audio
-const preloadedAudio = new Audio(rustleAudio);
-preloadedAudio.load();
 
 const NUM_BLADES = 150000;
 const HILL_SCALE = new THREE.Vector3(131.333, 95.653, 131.333);
@@ -48,15 +43,18 @@ export default function Grass({
   const hillMesh = useAppStore((state) => state.hillMesh);
   const mode = useAppStore((state) => state.mode);
   const audioEnabled = useAppStore((state) => state.audioEnabled);
+  const rustleAudio = useAppStore((state) => state.rustleAudio);
 
   // Check if all required textures are loaded
   const texturesLoaded =
     texture && alphaMap && bakedTexture && hillPatchesTexture;
 
   useEffect(() => {
-    // Clone the preloaded audio to avoid issues with multiple instances
-    rustleSoundRef.current = preloadedAudio.cloneNode(true) as HTMLAudioElement;
-    rustleSoundRef.current.loop = true;
+    // Clone the audio from store to avoid issues with multiple instances
+    if (rustleAudio) {
+      rustleSoundRef.current = rustleAudio.cloneNode(true) as HTMLAudioElement;
+      rustleSoundRef.current.loop = true;
+    }
 
     return () => {
       if (rustleSoundRef.current) {
@@ -64,7 +62,7 @@ export default function Grass({
         rustleSoundRef.current = null;
       }
     };
-  }, []);
+  }, [rustleAudio]);
 
   useEffect(() => {
     geometry.attributes.uv = geometry.attributes.uv1;

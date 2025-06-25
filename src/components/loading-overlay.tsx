@@ -8,7 +8,7 @@ export default function LoadingOverlay() {
 
   useEffect(() => {
     // Start fade out when daytime-complete is reached
-    if (loadingState === "daytime-complete") {
+    if (loadingState === "loading-audio") {
       if (overlayRef.current) {
         gsap.to(overlayRef.current, {
           opacity: 0,

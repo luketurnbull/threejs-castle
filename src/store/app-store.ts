@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import backgroundSounds from "../assets/background.mp3";
+import rustleAudio from "../assets/leavesRustling2.mp3";
 import * as THREE from "three";
 import { GLTFLoader, KTX2Loader, DRACOLoader } from "three-stdlib";
 import { TextureLoader } from "three";
@@ -20,6 +21,7 @@ export type Mode = "day" | "night";
 export type LoadingState =
   | "idle"
   | "loading-sky"
+  | "loading-audio"
   | "loading-model"
   | "loading-textures"
   | "daytime-complete"
@@ -35,6 +37,7 @@ interface AppState {
   // Audio state
   audioEnabled: boolean;
   backgroundAudio: HTMLAudioElement;
+  rustleAudio: HTMLAudioElement;
 
   // Mode
   mode: Mode;
@@ -70,6 +73,7 @@ interface AppState {
   // Actions
   init: (renderer: THREE.WebGLRenderer) => void;
   startLoadingSequence: () => void;
+  loadAudio: () => Promise<void>;
   loadModel: () => Promise<void>;
   loadDayTextures: () => Promise<void>;
   loadNightTextures: () => Promise<void>;
@@ -96,6 +100,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   started: false,
   audioEnabled: true,
   backgroundAudio: new Audio(backgroundSounds),
+  rustleAudio: new Audio(rustleAudio),
   mode: "day",
   camera,
   renderer: null,
@@ -149,30 +154,75 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ isLoading: true, loadingState: "loading-sky" });
 
     try {
-      // Step 2: Load model
+      // Step 2: Load audio
+      set({ loadingState: "loading-audio" });
+      await get().loadAudio();
+
+      console.log("loadAudio");
+
+      // Step 3: Load model
       set({ loadingState: "loading-model" });
       await get().loadModel();
 
       console.log("loadModel");
 
-      // Step 3: Load day textures
+      // Step 4: Load day textures
       set({ loadingState: "loading-textures" });
       await get().loadDayTextures();
 
       console.log("loadDayTextures");
 
-      // Step 4: Set daytime complete and load night textures
+      // Step 5: Set daytime complete and load night textures
       set({ loadingState: "daytime-complete" });
       await get().loadNightTextures();
 
       console.log("loadNightTextures");
 
-      // Step 5: Set night-time complete (scene animation will set to complete)
+      // Step 6: Set night-time complete (scene animation will set to complete)
       set({ loadingState: "night-time-complete", isLoading: false });
     } catch (error) {
       console.error("Loading sequence failed:", error);
       set({ loadingState: "idle", isLoading: false });
     }
+  },
+
+  loadAudio: async () => {
+    const { backgroundAudio, rustleAudio } = get();
+
+    const audioFiles = [backgroundAudio, rustleAudio];
+
+    return new Promise<void>((resolve) => {
+      let loadedCount = 0;
+      const totalFiles = audioFiles.length;
+
+      const checkAllLoaded = () => {
+        loadedCount++;
+        if (loadedCount === totalFiles) {
+          resolve();
+        }
+      };
+
+      audioFiles.forEach((audio) => {
+        // Preload each audio file
+        audio.addEventListener("canplaythrough", checkAllLoaded, {
+          once: true,
+        });
+        audio.addEventListener(
+          "error",
+          (error) => {
+            console.warn(
+              "Audio loading failed, continuing without audio:",
+              error
+            );
+            checkAllLoaded(); // Continue even if audio fails
+          },
+          { once: true }
+        );
+
+        // Start loading the audio
+        audio.load();
+      });
+    });
   },
 
   loadModel: async () => {
