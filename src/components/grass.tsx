@@ -1,10 +1,7 @@
-import { useGLTF, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useEffect, useState } from "react";
 import * as THREE from "three";
-import type { Model } from "../types/model";
 import rustleAudio from "../assets/leavesRustling2.mp3";
-import { TEXTURES } from "../constants/assets";
 import { getTexturePixelData } from "../utils/textureUtils";
 import { useAppStore } from "@/store";
 import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
@@ -29,16 +26,32 @@ function createBladeGeometry() {
   return geometry;
 }
 
-export default function Grass() {
+export default function Grass({
+  geometry,
+}: {
+  geometry: THREE.BufferGeometry;
+}) {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
-  const hillMaterialRef = useRef<THREE.ShaderMaterial>(null!);
-  const hillRef = useRef<THREE.Mesh>(null!);
   const prevPointerRef = useRef<THREE.Vector2>(new THREE.Vector2());
   const targetVolumeRef = useRef<number>(0);
   const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rustleSoundRef = useRef<HTMLAudioElement | null>(null);
   const transitionStartTimeRef = useRef<number>(0);
   const previousModeRef = useRef<string>("day");
+
+  // Get textures from store
+  const texture = useAppStore((state) => state.grass_diffuse);
+  const alphaMap = useAppStore((state) => state.grass_alpha);
+  const bakedTexture = useAppStore((state) => state.hill_day);
+  const bakeNightTexture = useAppStore((state) => state.hill_night);
+  const hillPatchesTexture = useAppStore((state) => state.hill_patches);
+  const hillMesh = useAppStore((state) => state.hillMesh);
+  const mode = useAppStore((state) => state.mode);
+  const audioEnabled = useAppStore((state) => state.audioEnabled);
+
+  // Check if all required textures are loaded
+  const texturesLoaded =
+    texture && alphaMap && bakedTexture && hillPatchesTexture;
 
   useEffect(() => {
     // Clone the preloaded audio to avoid issues with multiple instances
@@ -53,38 +66,16 @@ export default function Grass() {
     };
   }, []);
 
-  const audioEnabled = useAppStore((state) => state.audioEnabled);
-
-  const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
-  const hillGeom = nodes.hill.geometry;
-
   useEffect(() => {
-    hillGeom.attributes.uv = hillGeom.attributes.uv1;
-    hillGeom.attributes.uv.needsUpdate = true;
-  }, [hillGeom]);
-
-  const texture = useTexture(TEXTURES.BLADE_DIFFUSE);
-  const alphaMap = useTexture(TEXTURES.BLADE_ALPHA);
-
-  const bakedTexture = useTexture(TEXTURES.HILL_BAKED);
-  bakedTexture.flipY = false;
-
-  const bakeNightTexture = useTexture(TEXTURES.HILL_BAKED_NIGHT);
-  bakeNightTexture.flipY = false;
-
-  const bakeNightDimTexture = useTexture(TEXTURES.HILL_BAKED_NIGHT_DIM);
-  bakeNightDimTexture.flipY = false;
-
-  const hillPatchesTexture = useTexture(TEXTURES.HILL_PATCHES);
-  hillPatchesTexture.flipY = false;
-
-  const mode = useAppStore((state) => state.mode);
+    geometry.attributes.uv = geometry.attributes.uv1;
+    geometry.attributes.uv.needsUpdate = true;
+  }, [geometry]);
 
   const [patchesPixelData, setPatchesPixelData] =
     useState<Uint8ClampedArray | null>(null);
 
   useEffect(() => {
-    if (hillPatchesTexture.image) {
+    if (hillPatchesTexture?.image) {
       setPatchesPixelData(getTexturePixelData(hillPatchesTexture));
     }
   }, [hillPatchesTexture]);
@@ -102,20 +93,29 @@ export default function Grass() {
     const hillUVs = [];
 
     if (!patchesPixelData) {
+      // Create minimal grass even without patches data
+      for (let i = 0; i < 1000; i++) {
+        offsets.push(0, 0, 0);
+        orientations.push(0, 1, 0, 0);
+        stretches.push(1);
+        halfRootAngleSin.push(0);
+        halfRootAngleCos.push(1);
+        hillUVs.push(0.5, 0.5);
+      }
       return {
-        offsets: [],
-        orientations: [],
-        stretches: [],
-        halfRootAngleSin: [],
-        halfRootAngleCos: [],
-        hillUVs: [],
+        offsets,
+        orientations,
+        stretches,
+        halfRootAngleSin,
+        halfRootAngleCos,
+        hillUVs,
       };
     }
 
     for (let i = 0; i < NUM_BLADES; i++) {
       // Sample point, normal, and barycentric info
-      const position = hillGeom.attributes.position;
-      const index = hillGeom.index;
+      const position = geometry.attributes.position;
+      const index = geometry.index;
       const faceCount = index ? index.count / 3 : position.count / 3;
       const faceIndex = Math.floor(Math.random() * faceCount);
 
@@ -148,7 +148,7 @@ export default function Grass() {
         .addScaledVector(vC, w);
 
       // Interpolated UV
-      const uvAttr = hillGeom.attributes.uv;
+      const uvAttr = geometry.attributes.uv;
       const uvA = new THREE.Vector2().fromBufferAttribute(
         uvAttr as THREE.BufferAttribute,
         a
@@ -171,8 +171,8 @@ export default function Grass() {
 
       // Sample patch density from texture pixel data
       if (patchesPixelData) {
-        const imgWidth = hillPatchesTexture.image.width;
-        const imgHeight = hillPatchesTexture.image.height;
+        const imgWidth = hillPatchesTexture!.image.width;
+        const imgHeight = hillPatchesTexture!.image.height;
         const x = Math.min(imgWidth - 1, Math.floor(uv.x * imgWidth));
         const y = Math.min(imgHeight - 1, Math.floor(uv.y * imgHeight)); // Use uv.y directly, consistent with hill_baked texture behavior
 
@@ -220,7 +220,7 @@ export default function Grass() {
       halfRootAngleCos,
       hillUVs,
     };
-  }, [hillGeom, patchesPixelData, hillPatchesTexture]);
+  }, [geometry, patchesPixelData, hillPatchesTexture]);
 
   const targetTransition = mode === "day" ? 0 : 1;
 
@@ -248,13 +248,6 @@ export default function Grass() {
     const transitionValue =
       targetTransition === 1 ? easedProgress : 1 - easedProgress;
 
-    // Handle hill material transition
-    if (hillMaterialRef.current) {
-      hillMaterialRef.current.uniforms.uTransitionFactor.value =
-        transitionValue;
-      hillMaterialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-    }
-
     if (materialRef.current && rustleSoundRef.current) {
       // Animate transition for grass aoMap
       materialRef.current.uniforms.uTransitionFactor.value = transitionValue;
@@ -264,7 +257,7 @@ export default function Grass() {
       // Update player position based on mouse position (always for visual effects)
       raycaster.setFromCamera(pointer, camera);
 
-      const hits = raycaster.intersectObject(hillRef.current);
+      const hits = hillMesh ? raycaster.intersectObject(hillMesh) : [];
 
       if (hits.length > 0) {
         const hitPoint = hits[0].point;
@@ -353,69 +346,55 @@ export default function Grass() {
     }
   });
 
+  // Don't render if textures aren't loaded
+  if (!texturesLoaded) {
+    return null;
+  }
+
   return (
-    <group>
-      <mesh>
-        <instancedBufferGeometry
-          index={baseGeom.index}
-          attributes-position={baseGeom.attributes.position}
-          attributes-uv={baseGeom.attributes.uv}
-        >
-          <instancedBufferAttribute
-            attach={"attributes-offset"}
-            args={[new Float32Array(grassAttributes.offsets), 3]}
-          />
-          <instancedBufferAttribute
-            attach={"attributes-orientation"}
-            args={[new Float32Array(grassAttributes.orientations), 4]}
-          />
-          <instancedBufferAttribute
-            attach={"attributes-stretch"}
-            args={[new Float32Array(grassAttributes.stretches), 1]}
-          />
-          <instancedBufferAttribute
-            attach={"attributes-halfRootAngleSin"}
-            args={[new Float32Array(grassAttributes.halfRootAngleSin), 1]}
-          />
-          <instancedBufferAttribute
-            attach={"attributes-halfRootAngleCos"}
-            args={[new Float32Array(grassAttributes.halfRootAngleCos), 1]}
-          />
-          <instancedBufferAttribute
-            attach={"attributes-hillUv"}
-            args={[new Float32Array(grassAttributes.hillUVs), 2]}
-          />
-        </instancedBufferGeometry>
-        <grassMaterial
-          ref={materialRef}
-          map={texture}
-          alphaMap={alphaMap}
-          toneMapped={false}
-          transparent={true}
-          side={THREE.DoubleSide}
-          bladeHeight={1}
-          brightness={30.0}
-          aoMap={bakedTexture}
-          aoMapNight={bakeNightTexture}
-        />
-      </mesh>
-      <mesh
-        ref={hillRef}
-        geometry={hillGeom}
-        scale={HILL_SCALE}
-        position={HILL_POSITION}
-        visible={true}
+    <mesh>
+      <instancedBufferGeometry
+        index={baseGeom.index}
+        attributes-position={baseGeom.attributes.position}
+        attributes-uv={baseGeom.attributes.uv}
       >
-        <dayNightMaterial
-          ref={hillMaterialRef}
-          uDayDiffuse={bakedTexture}
-          uNightDiffuse={bakeNightTexture}
-          uNightDiffuseDim={bakeNightDimTexture}
-          uShadowMap={hillPatchesTexture}
-          uHasShadowMap={!!hillPatchesTexture}
-          // color={"#ddd"}
+        <instancedBufferAttribute
+          attach={"attributes-offset"}
+          args={[new Float32Array(grassAttributes.offsets), 3]}
         />
-      </mesh>
-    </group>
+        <instancedBufferAttribute
+          attach={"attributes-orientation"}
+          args={[new Float32Array(grassAttributes.orientations), 4]}
+        />
+        <instancedBufferAttribute
+          attach={"attributes-stretch"}
+          args={[new Float32Array(grassAttributes.stretches), 1]}
+        />
+        <instancedBufferAttribute
+          attach={"attributes-halfRootAngleSin"}
+          args={[new Float32Array(grassAttributes.halfRootAngleSin), 1]}
+        />
+        <instancedBufferAttribute
+          attach={"attributes-halfRootAngleCos"}
+          args={[new Float32Array(grassAttributes.halfRootAngleCos), 1]}
+        />
+        <instancedBufferAttribute
+          attach={"attributes-hillUv"}
+          args={[new Float32Array(grassAttributes.hillUVs), 2]}
+        />
+      </instancedBufferGeometry>
+      <grassMaterial
+        ref={materialRef}
+        map={texture}
+        alphaMap={alphaMap}
+        toneMapped={false}
+        transparent={true}
+        side={THREE.DoubleSide}
+        bladeHeight={1}
+        brightness={30.0}
+        aoMap={bakedTexture}
+        aoMapNight={bakeNightTexture}
+      />
+    </mesh>
   );
 }

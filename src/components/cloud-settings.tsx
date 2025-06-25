@@ -1,8 +1,10 @@
 import { useAppStore } from "@/store";
-import { Cloud } from "@react-three/drei";
+import { Cloud, Clouds } from "@react-three/drei";
 import { useEffect, useState } from "react";
 import gsap from "gsap";
 import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
+import LightSettings from "./light-settings";
+import FloatingText from "./floating-text";
 
 export default function CloudSettings() {
   const mode = useAppStore((state) => state.mode);
@@ -68,25 +70,31 @@ export default function CloudSettings() {
 
   return (
     <>
-      <Cloud
-        seed={1}
-        position={cloud1Pos}
-        scale={[20, 20, 20]}
-        opacity={cloudOpacity}
-        speed={0.2}
-        color={"white"}
-        frustumCulled
-      />
+      <LightSettings />
 
-      <Cloud
-        seed={2}
-        position={cloud2Pos}
-        scale={[40, 40, 40]}
-        opacity={cloudOpacity}
-        speed={0.2}
-        color={"white"}
-        frustumCulled
-      />
+      <Clouds texture={"/cloud.png"}>
+        <Cloud
+          seed={1}
+          position={cloud1Pos}
+          scale={[20, 20, 20]}
+          opacity={cloudOpacity}
+          speed={0.2}
+          color={"white"}
+          frustumCulled
+        />
+
+        <Cloud
+          seed={2}
+          position={cloud2Pos}
+          scale={[40, 40, 40]}
+          opacity={cloudOpacity}
+          speed={0.2}
+          color={"white"}
+          frustumCulled
+        />
+      </Clouds>
+
+      <FloatingText />
     </>
   );
 }

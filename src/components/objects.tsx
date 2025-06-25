@@ -1,8 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useGLTF, useTexture } from "@react-three/drei";
 import * as THREE from "three";
-import type { Model } from "../types/model";
-import { TEXTURES } from "../constants/assets";
 import { useFrame } from "@react-three/fiber";
 import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 import { useAppStore } from "@/store";
@@ -12,25 +9,23 @@ export default function Objects() {
   const transitionStartTimeRef = useRef<number>(0);
   const previousModeRef = useRef<string>("day");
 
-  const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
-
   const mode = useAppStore((state) => state.mode);
+  const objectsMesh = useAppStore((state) => state.objectsMesh);
 
-  const diffuse = useTexture(TEXTURES.OBJECTS_DIFFUSE);
-  diffuse.flipY = false;
+  // Get textures from store
+  const diffuse = useAppStore((state) => state.objects_day);
+  const diffuseNight = useAppStore((state) => state.objects_night);
+  const diffuseNightDim = useAppStore((state) => state.objects_nightDim);
 
-  const diffuseNight = useTexture(TEXTURES.OBJECTS_DIFFUSE_NIGHT);
-  diffuseNight.flipY = false;
-
-  const diffuseNightDim = useTexture(TEXTURES.OBJECTS_DIFFUSE_NIGHT_DIM);
-  diffuseNightDim.flipY = false;
-
-  const geometry = nodes.objects.geometry;
+  // Check if all required textures and mesh are loaded
+  const texturesLoaded = diffuse && objectsMesh;
 
   useEffect(() => {
-    geometry.attributes.uv = geometry.attributes.uv1;
-    geometry.attributes.uv.needsUpdate = true;
-  }, [geometry]);
+    if (objectsMesh) {
+      objectsMesh.geometry.attributes.uv = objectsMesh.geometry.attributes.uv1;
+      objectsMesh.geometry.attributes.uv.needsUpdate = true;
+    }
+  }, [objectsMesh]);
 
   const targetTransition = mode === "day" ? 0 : 1;
 
@@ -63,12 +58,17 @@ export default function Objects() {
     }
   });
 
+  // Don't render if textures or mesh aren't loaded
+  if (!texturesLoaded || !objectsMesh) {
+    return null;
+  }
+
   return (
     <mesh
       castShadow
       receiveShadow
-      geometry={geometry}
-      material={nodes.objects.material}
+      geometry={objectsMesh.geometry}
+      material={materialRef.current}
       position={[5.043, 7.913, 7.884]}
       rotation={[Math.PI / 2, 0, -0.737]}
       scale={4.22}

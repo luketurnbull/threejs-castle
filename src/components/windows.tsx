@@ -1,8 +1,7 @@
-import { useGLTF } from "@react-three/drei";
-import type { Model } from "@/types/model";
 import * as THREE from "three";
 import { useMemo } from "react";
 import { windowMaterial, WindowMaterial } from "./window-material";
+import { useAppStore } from "@/store";
 
 type WindowPosition = {
   position: [number, number, number];
@@ -19,12 +18,17 @@ const windowPositions: WindowPosition[] = [
 ];
 
 export default function Windows() {
-  const { nodes } = useGLTF("/scene.glb", true) as unknown as Model;
+  const windowInsideMesh = useAppStore((state) => state.windowInsideMesh);
+  const loadingState = useAppStore((state) => state.loadingState);
 
   // Create instanced mesh
   const instancedMesh = useMemo(() => {
+    if (!windowInsideMesh) {
+      return null;
+    }
+
     const mesh = new THREE.InstancedMesh(
-      nodes.windowInside.geometry,
+      windowInsideMesh.geometry,
       windowMaterial,
       windowPositions.length
     );
@@ -53,7 +57,16 @@ export default function Windows() {
     });
 
     return mesh;
-  }, [nodes.windowInside.geometry]);
+  }, [windowInsideMesh]);
+
+  // Don't render if mesh isn't loaded
+  if (!instancedMesh) {
+    return null;
+  }
+
+  if (loadingState !== "complete") {
+    return null;
+  }
 
   return (
     <>

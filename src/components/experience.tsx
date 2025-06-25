@@ -1,60 +1,61 @@
 import Scene from "./scene";
 import {
-  BakeShadows,
-  OrbitControls,
   AdaptiveDpr,
   AdaptiveEvents,
   Bvh,
-  Stats,
+  OrbitControls,
 } from "@react-three/drei";
 import "./grass-material";
 import "./flag-material";
 import "./smoke-material";
 import "./day-night-material";
 import SkySettings from "./sky-settings";
-import LightSettings from "./light-settings";
 import CloudSettings from "./cloud-settings";
-import { useFrame, useThree } from "@react-three/fiber";
-// import { EffectComposer, Bloom } from "@react-three/postprocessing";
+import { useEffect } from "react";
+import { useThree } from "@react-three/fiber";
+import { useAppStore } from "@/store";
 
 export default function Experience() {
-  const { camera } = useThree();
+  const { gl } = useThree();
+  const init = useAppStore((state) => state.init);
 
-  useFrame(() => {
-    console.log(camera.position);
-  });
+  useEffect(() => {
+    if (gl) {
+      void init(gl);
+    }
+  }, [gl, init]);
 
   return (
     <>
       <SkySettings />
-      <LightSettings />
       <CloudSettings />
-
       <Scene />
+      <Controls />
 
-      {/* <EffectComposer enableNormalPass={true} resolutionScale={0.5}>
-        <Bloom
-          luminanceThreshold={0.2}
-          luminanceSmoothing={0.025}
-          intensity={0.7}
-        />
-      </EffectComposer> */}
-
-      <OrbitControls
-        minPolarAngle={Math.PI * 0.45}
-        maxPolarAngle={Math.PI * 0.55}
-        enableZoom={false}
-        makeDefault={true}
-        enablePan={false}
-        enableDamping={true}
-        dampingFactor={0.05}
-      />
-
-      <BakeShadows />
       <Bvh firstHitOnly={true} />
       <AdaptiveDpr pixelated={true} />
       <AdaptiveEvents />
-      <Stats />
     </>
+  );
+}
+
+function Controls() {
+  const loadingState = useAppStore((state) => state.loadingState);
+  const started = useAppStore((state) => state.started);
+
+  if (loadingState !== "complete" || !started) {
+    return null;
+  }
+
+  return (
+    <OrbitControls
+      minPolarAngle={Math.PI * 0.45}
+      maxPolarAngle={Math.PI * 0.55}
+      enableZoom={false}
+      makeDefault={true}
+      enablePan={false}
+      enableDamping={true}
+      dampingFactor={0.05}
+    />
   );
 }

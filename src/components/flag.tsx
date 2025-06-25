@@ -1,5 +1,3 @@
-import { TEXTURES } from "@/constants/assets";
-import { useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
@@ -10,7 +8,7 @@ const HOVER_TRANSITION_SPEED = 2.0; // Speed of hover transition
 
 export default function Flag() {
   const flagMaterial = useRef<THREE.ShaderMaterial>(null!);
-  const alphaMap = useTexture(TEXTURES.FLAG_ALPHA);
+  const alphaMap = useAppStore((state) => state.flag);
   const [mousePosition, setMousePosition] = useState(new THREE.Vector3());
   const [isHovered, setIsHovered] = useState(false);
   const [hoverTransition, setHoverTransition] = useState(0.0);
