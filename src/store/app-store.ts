@@ -22,12 +22,15 @@ export type LoadingState =
   | "loading-sky"
   | "loading-model"
   | "loading-textures"
+  | "daytime-complete"
+  | "night-time-complete"
   | "complete";
 
 interface AppState {
   // Loading state
   loadingState: LoadingState;
   isLoading: boolean;
+  started: boolean;
 
   // Audio state
   audioEnabled: boolean;
@@ -78,11 +81,18 @@ interface AppState {
   // Mode
   setDay: () => void;
   setNight: () => void;
+
+  // Start experience
+  start: () => void;
+
+  // Set complete
+  setComplete: () => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
   loadingState: "idle",
   isLoading: false,
+  started: false,
   audioEnabled: true,
   backgroundAudio: new Audio(backgroundSounds),
   mode: "day",
@@ -142,8 +152,14 @@ export const useAppStore = create<AppState>((set, get) => ({
 
       console.log("loadDayTextures");
 
-      // Step 4: Complete loading (no camera movement)
-      set({ loadingState: "complete", isLoading: false });
+      // Step 4: Set daytime complete and load night textures
+      set({ loadingState: "daytime-complete" });
+      await get().loadNightTextures();
+
+      console.log("loadNightTextures");
+
+      // Step 5: Set night-time complete (scene animation will set to complete)
+      set({ loadingState: "night-time-complete", isLoading: false });
     } catch (error) {
       console.error("Loading sequence failed:", error);
       set({ loadingState: "idle", isLoading: false });
@@ -391,5 +407,16 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setNight: () => {
     set({ mode: "night" });
+  },
+
+  // Start experience
+  start: () => {
+    set({ started: true });
+    get().startBackgroundAudio();
+  },
+
+  // Set complete
+  setComplete: () => {
+    set({ loadingState: "complete" });
   },
 }));

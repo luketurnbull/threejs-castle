@@ -41,8 +41,9 @@ export default function Experience() {
 
 function Controls() {
   const loadingState = useAppStore((state) => state.loadingState);
+  const started = useAppStore((state) => state.started);
 
-  if (loadingState !== "complete") {
+  if (loadingState !== "complete" || !started) {
     return null;
   }
 
