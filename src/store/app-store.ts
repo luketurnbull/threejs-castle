@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import backgroundSounds from "../assets/background.mp3";
 import * as THREE from "three";
-import { GLTFLoader, KTX2Loader } from "three-stdlib";
+import { GLTFLoader, KTX2Loader, DRACOLoader } from "three-stdlib";
 import { TextureLoader } from "three";
 import { TEXTURES } from "@/constants/assets";
 
@@ -47,6 +47,7 @@ interface AppState {
   gltfLoader: GLTFLoader | null;
   ktx2Loader: KTX2Loader | null;
   textureLoader: TextureLoader | null;
+  dracoLoader: DRACOLoader | null;
 
   // Individual meshes
   hillMesh: THREE.Mesh | null;
@@ -101,6 +102,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   gltfLoader: null,
   ktx2Loader: null,
   textureLoader: null,
+  dracoLoader: null,
   hillMesh: null,
   objectsMesh: null,
   windowInsideMesh: null,
@@ -121,15 +123,22 @@ export const useAppStore = create<AppState>((set, get) => ({
     const ktx2Loader = new KTX2Loader();
     const gltfLoader = new GLTFLoader();
     const textureLoader = new TextureLoader();
+    const dracoLoader = new DRACOLoader();
+
+    // Set up DRACO compression
+    dracoLoader.setDecoderPath("/draco/");
+    dracoLoader.setDecoderConfig({ type: "js" });
 
     ktx2Loader.setTranscoderPath("/basis/");
     gltfLoader.setKTX2Loader(ktx2Loader.detectSupport(renderer));
+    gltfLoader.setDRACOLoader(dracoLoader);
 
     set({
       renderer,
       gltfLoader,
       ktx2Loader,
       textureLoader,
+      dracoLoader,
     });
 
     await get().startLoadingSequence();
