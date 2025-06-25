@@ -6,6 +6,17 @@ import { TextureLoader } from "three";
 import { TEXTURES } from "@/constants/assets";
 import gsap from "gsap";
 
+const camera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+
+// Initial camera position looking up at the sky
+camera.position.set(-150, 0, 0);
+camera.lookAt(0, 200, 0);
+
 export type Mode = "day" | "night";
 export type LoadingState =
   | "idle"
@@ -71,17 +82,6 @@ interface AppState {
   setDay: () => void;
   setNight: () => void;
 }
-
-const camera = new THREE.PerspectiveCamera(
-  45,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-
-// Initial camera position looking up at the sky
-camera.position.set(150, 0, 0);
-camera.lookAt(0, 200, 0);
 
 export const useAppStore = create<AppState>((set, get) => ({
   loadingState: "idle",
