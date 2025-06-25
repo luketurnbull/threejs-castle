@@ -43,7 +43,7 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
     <group {...props} dispose={null} position={[0, sceneY, 0]}>
       <Flag />
       <Smoke />
-      <Windows />
+      <Windows groupPosition={[0, sceneY, 0]} />
       <Objects />
       <Hill />
     </group>
