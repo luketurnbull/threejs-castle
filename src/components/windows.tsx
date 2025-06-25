@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { useMemo } from "react";
 import { windowMaterial, WindowMaterial } from "./window-material";
+import { useAppStore } from "@/store";
 
 type WindowPosition = {
   position: [number, number, number];
@@ -16,15 +17,17 @@ const windowPositions: WindowPosition[] = [
   { position: [-8.512, 20.556, 7.78], rotation: [-0.022, 1.014, 0.02] },
 ];
 
-export default function Windows({
-  geometry,
-}: {
-  geometry: THREE.BufferGeometry;
-}) {
+export default function Windows() {
+  const windowInsideMesh = useAppStore((state) => state.windowInsideMesh);
+
   // Create instanced mesh
   const instancedMesh = useMemo(() => {
+    if (!windowInsideMesh) {
+      return null;
+    }
+
     const mesh = new THREE.InstancedMesh(
-      geometry,
+      windowInsideMesh.geometry,
       windowMaterial,
       windowPositions.length
     );
@@ -53,7 +56,12 @@ export default function Windows({
     });
 
     return mesh;
-  }, [geometry]);
+  }, [windowInsideMesh]);
+
+  // Don't render if mesh isn't loaded
+  if (!instancedMesh) {
+    return null;
+  }
 
   return (
     <>

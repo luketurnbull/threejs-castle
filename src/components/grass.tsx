@@ -32,8 +32,6 @@ export default function Grass({
   geometry: THREE.BufferGeometry;
 }) {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
-  const hillMaterialRef = useRef<THREE.ShaderMaterial>(null!);
-  const hillRef = useRef<THREE.Mesh>(null!);
   const prevPointerRef = useRef<THREE.Vector2>(new THREE.Vector2());
   const targetVolumeRef = useRef<number>(0);
   const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -46,10 +44,13 @@ export default function Grass({
   const alphaMap = useAppStore((state) => state.grass_alpha);
   const bakedTexture = useAppStore((state) => state.hill_day);
   const bakeNightTexture = useAppStore((state) => state.hill_night);
-  const bakeNightDimTexture = useAppStore((state) => state.hill_nightDim);
   const hillPatchesTexture = useAppStore((state) => state.hill_patches);
   const mode = useAppStore((state) => state.mode);
   const audioEnabled = useAppStore((state) => state.audioEnabled);
+
+  // Check if all required textures are loaded
+  const texturesLoaded =
+    texture && alphaMap && bakedTexture && hillPatchesTexture;
 
   useEffect(() => {
     // Clone the preloaded audio to avoid issues with multiple instances
@@ -91,13 +92,22 @@ export default function Grass({
     const hillUVs = [];
 
     if (!patchesPixelData) {
+      // Create minimal grass even without patches data
+      for (let i = 0; i < 1000; i++) {
+        offsets.push(0, 0, 0);
+        orientations.push(0, 1, 0, 0);
+        stretches.push(1);
+        halfRootAngleSin.push(0);
+        halfRootAngleCos.push(1);
+        hillUVs.push(0.5, 0.5);
+      }
       return {
-        offsets: [],
-        orientations: [],
-        stretches: [],
-        halfRootAngleSin: [],
-        halfRootAngleCos: [],
-        hillUVs: [],
+        offsets,
+        orientations,
+        stretches,
+        halfRootAngleSin,
+        halfRootAngleCos,
+        hillUVs,
       };
     }
 
@@ -237,13 +247,6 @@ export default function Grass({
     const transitionValue =
       targetTransition === 1 ? easedProgress : 1 - easedProgress;
 
-    // Handle hill material transition
-    if (hillMaterialRef.current) {
-      hillMaterialRef.current.uniforms.uTransitionFactor.value =
-        transitionValue;
-      hillMaterialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-    }
-
     if (materialRef.current && rustleSoundRef.current) {
       // Animate transition for grass aoMap
       materialRef.current.uniforms.uTransitionFactor.value = transitionValue;
@@ -253,7 +256,7 @@ export default function Grass({
       // Update player position based on mouse position (always for visual effects)
       raycaster.setFromCamera(pointer, camera);
 
-      const hits = raycaster.intersectObject(hillRef.current);
+      const hits = raycaster.intersectObjects([], true);
 
       if (hits.length > 0) {
         const hitPoint = hits[0].point;
@@ -342,69 +345,55 @@ export default function Grass({
     }
   });
 
+  // Don't render if textures aren't loaded
+  if (!texturesLoaded) {
+    return null;
+  }
+
   return (
-    <group>
-      <mesh>
-        <instancedBufferGeometry
-          index={baseGeom.index}
-          attributes-position={baseGeom.attributes.position}
-          attributes-uv={baseGeom.attributes.uv}
-        >
-          <instancedBufferAttribute
-            attach={"attributes-offset"}
-            args={[new Float32Array(grassAttributes.offsets), 3]}
-          />
-          <instancedBufferAttribute
-            attach={"attributes-orientation"}
-            args={[new Float32Array(grassAttributes.orientations), 4]}
-          />
-          <instancedBufferAttribute
-            attach={"attributes-stretch"}
-            args={[new Float32Array(grassAttributes.stretches), 1]}
-          />
-          <instancedBufferAttribute
-            attach={"attributes-halfRootAngleSin"}
-            args={[new Float32Array(grassAttributes.halfRootAngleSin), 1]}
-          />
-          <instancedBufferAttribute
-            attach={"attributes-halfRootAngleCos"}
-            args={[new Float32Array(grassAttributes.halfRootAngleCos), 1]}
-          />
-          <instancedBufferAttribute
-            attach={"attributes-hillUv"}
-            args={[new Float32Array(grassAttributes.hillUVs), 2]}
-          />
-        </instancedBufferGeometry>
-        <grassMaterial
-          ref={materialRef}
-          map={texture}
-          alphaMap={alphaMap}
-          toneMapped={false}
-          transparent={true}
-          side={THREE.DoubleSide}
-          bladeHeight={1}
-          brightness={30.0}
-          aoMap={bakedTexture}
-          aoMapNight={bakeNightTexture}
-        />
-      </mesh>
-      <mesh
-        ref={hillRef}
-        geometry={geometry}
-        scale={HILL_SCALE}
-        position={HILL_POSITION}
-        visible={true}
+    <mesh>
+      <instancedBufferGeometry
+        index={baseGeom.index}
+        attributes-position={baseGeom.attributes.position}
+        attributes-uv={baseGeom.attributes.uv}
       >
-        <dayNightMaterial
-          ref={hillMaterialRef}
-          uDayDiffuse={bakedTexture}
-          uNightDiffuse={bakeNightTexture}
-          uNightDiffuseDim={bakeNightDimTexture}
-          uShadowMap={hillPatchesTexture}
-          uHasShadowMap={!!hillPatchesTexture}
-          // color={"#ddd"}
+        <instancedBufferAttribute
+          attach={"attributes-offset"}
+          args={[new Float32Array(grassAttributes.offsets), 3]}
         />
-      </mesh>
-    </group>
+        <instancedBufferAttribute
+          attach={"attributes-orientation"}
+          args={[new Float32Array(grassAttributes.orientations), 4]}
+        />
+        <instancedBufferAttribute
+          attach={"attributes-stretch"}
+          args={[new Float32Array(grassAttributes.stretches), 1]}
+        />
+        <instancedBufferAttribute
+          attach={"attributes-halfRootAngleSin"}
+          args={[new Float32Array(grassAttributes.halfRootAngleSin), 1]}
+        />
+        <instancedBufferAttribute
+          attach={"attributes-halfRootAngleCos"}
+          args={[new Float32Array(grassAttributes.halfRootAngleCos), 1]}
+        />
+        <instancedBufferAttribute
+          attach={"attributes-hillUv"}
+          args={[new Float32Array(grassAttributes.hillUVs), 2]}
+        />
+      </instancedBufferGeometry>
+      <grassMaterial
+        ref={materialRef}
+        map={texture}
+        alphaMap={alphaMap}
+        toneMapped={false}
+        transparent={true}
+        side={THREE.DoubleSide}
+        bladeHeight={1}
+        brightness={30.0}
+        aoMap={bakedTexture}
+        aoMapNight={bakeNightTexture}
+      />
+    </mesh>
   );
 }

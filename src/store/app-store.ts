@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { GLTFLoader, KTX2Loader } from "three-stdlib";
 import { TextureLoader } from "three";
 import { TEXTURES } from "@/constants/assets";
+import gsap from "gsap";
 
 export type Mode = "day" | "night";
 export type LoadingState =
@@ -171,8 +172,6 @@ export const useAppStore = create<AppState>((set, get) => ({
       gltfLoader.load(
         "/scene.glb",
         (gltf) => {
-          console.log(gltf);
-
           // Extract individual meshes from the loaded model
           const scene = gltf.scene;
           const hillMesh = scene.children.find(
@@ -370,9 +369,19 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   moveCameraToScene: () => {
     const { camera } = get();
-    // Move camera to look at the scene
-    camera.position.set(150, 0, 0);
-    camera.lookAt(0, 0, 0);
+
+    // Use GSAP for smooth camera transition
+    gsap.to(camera.position, {
+      x: 150,
+      y: 0,
+      z: 0,
+      duration: 2,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        // Keep looking at the scene center during the transition
+        camera.lookAt(0, 0, 0);
+      },
+    });
   },
 
   // Audio

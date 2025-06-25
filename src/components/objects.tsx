@@ -4,26 +4,28 @@ import { useFrame } from "@react-three/fiber";
 import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 import { useAppStore } from "@/store";
 
-export default function Objects({
-  geometry,
-}: {
-  geometry: THREE.BufferGeometry;
-}) {
+export default function Objects() {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
   const transitionStartTimeRef = useRef<number>(0);
   const previousModeRef = useRef<string>("day");
 
   const mode = useAppStore((state) => state.mode);
+  const objectsMesh = useAppStore((state) => state.objectsMesh);
 
   // Get textures from store
   const diffuse = useAppStore((state) => state.objects_day);
   const diffuseNight = useAppStore((state) => state.objects_night);
   const diffuseNightDim = useAppStore((state) => state.objects_nightDim);
 
+  // Check if all required textures and mesh are loaded
+  const texturesLoaded = diffuse && objectsMesh;
+
   useEffect(() => {
-    geometry.attributes.uv = geometry.attributes.uv1;
-    geometry.attributes.uv.needsUpdate = true;
-  }, [geometry]);
+    if (objectsMesh) {
+      objectsMesh.geometry.attributes.uv = objectsMesh.geometry.attributes.uv1;
+      objectsMesh.geometry.attributes.uv.needsUpdate = true;
+    }
+  }, [objectsMesh]);
 
   const targetTransition = mode === "day" ? 0 : 1;
 
@@ -56,11 +58,16 @@ export default function Objects({
     }
   });
 
+  // Don't render if textures or mesh aren't loaded
+  if (!texturesLoaded || !objectsMesh) {
+    return null;
+  }
+
   return (
     <mesh
       castShadow
       receiveShadow
-      geometry={geometry}
+      geometry={objectsMesh.geometry}
       material={materialRef.current}
       position={[5.043, 7.913, 7.884]}
       rotation={[Math.PI / 2, 0, -0.737]}
