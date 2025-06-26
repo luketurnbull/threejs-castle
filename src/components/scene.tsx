@@ -4,6 +4,7 @@ import Windows from "./windows";
 import Flag from "./flag";
 import Objects from "./objects";
 import Smoke from "./smoke";
+import FireAudio from "./fire-audio";
 import { useAppStore } from "@/store";
 import { useEffect, useState } from "react";
 import gsap from "gsap";
@@ -44,6 +45,7 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
       <Windows groupPosition={[0, sceneY, 0]} />
       <Objects />
       <Hill />
+      <FireAudio />
     </group>
   );
 }

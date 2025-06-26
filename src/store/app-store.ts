@@ -7,7 +7,7 @@ import * as THREE from "three";
 import { GLTFLoader, KTX2Loader, DRACOLoader } from "three-stdlib";
 import { TextureLoader } from "three";
 import { TEXTURES } from "@/constants/assets";
-import { AUDIO_VOLUMES } from "@/constants/audio";
+import { AUDIO_VOLUMES, FIRE_AUDIO_DISTANCES } from "@/constants/audio";
 import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 
 const isMobile = window.innerWidth < 750;
@@ -94,6 +94,7 @@ interface AppState {
   stopBackgroundAudio: () => void;
   transitionToDayAudio: () => void;
   transitionToNightAudio: () => void;
+  updateFireAudioVolume: (distance: number) => void;
 
   // Mode
   setDay: () => void;
@@ -617,10 +618,52 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ currentBackgroundAudio: backgroundNightAudio });
   },
 
+  updateFireAudioVolume: (distance: number) => {
+    const { fireCracklingAudio, mode, audioEnabled, started } = get();
+
+    if (!fireCracklingAudio || !audioEnabled || !started) return;
+
+    // Only play fire audio during night mode
+    if (mode !== "night") {
+      if (!fireCracklingAudio.paused) {
+        fireCracklingAudio.pause();
+      }
+      return;
+    }
+
+    // Start playing if not already playing
+    if (fireCracklingAudio.paused) {
+      fireCracklingAudio.play().catch(console.error);
+    }
+
+    // Distance-based volume calculation
+    const maxDistance = FIRE_AUDIO_DISTANCES.MAX_DISTANCE;
+    const minDistance = FIRE_AUDIO_DISTANCES.MIN_DISTANCE;
+
+    let volume = 0;
+    if (distance <= minDistance) {
+      volume = AUDIO_VOLUMES.FIRE_CRACKLING; // Full volume when close
+    } else if (distance <= maxDistance) {
+      // Linear fade from full volume to zero
+      const fadeRange = maxDistance - minDistance;
+      const fadeProgress = (distance - minDistance) / fadeRange;
+      volume = AUDIO_VOLUMES.FIRE_CRACKLING * (1 - fadeProgress);
+    } else {
+      volume = 0; // No volume when too far
+    }
+
+    fireCracklingAudio.volume = volume;
+  },
+
   // Mode
   setDay: () => {
-    const { mode } = get();
+    const { mode, fireCracklingAudio } = get();
     if (mode !== "day") {
+      // Stop fire audio when switching to day mode
+      if (fireCracklingAudio && !fireCracklingAudio.paused) {
+        fireCracklingAudio.pause();
+      }
+
       set({ mode: "day" });
       get().transitionToDayAudio();
     }
@@ -631,6 +674,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (mode !== "night") {
       set({ mode: "night" });
       get().transitionToNightAudio();
+      // Fire audio will start automatically when updateFireAudioVolume is called
     }
   },
 
