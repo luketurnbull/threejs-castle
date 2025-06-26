@@ -56,22 +56,22 @@ float fireFlicker(vec2 uv, float time) {
 void main() {
    vec4 finalColor;
    
-   // Create fire-like flickering effect
-   float flickerFactor = fireFlicker(vUv, uTime);
-   
-   vec4 nightBright = texture2D(uNightDiffuse, vUv);
-   vec4 nightDim = texture2D(uNightDiffuseDim, vUv);
-   vec4 finalNightColor = mix(nightDim, nightBright, flickerFactor);
-
-   // Now, handle the transition logic.
+   // Optimized transition logic - only compute what's needed
    if (uTransitionFactor <= 0.0) {
-      // Pure day mode
+      // Pure day mode - only sample day texture
       finalColor = texture2D(uDayDiffuse, vUv);
    } else if (uTransitionFactor >= 1.0) {
-      // Pure night mode
-      finalColor = finalNightColor;
+      // Pure night mode - only compute night effects
+      float flickerFactor = fireFlicker(vUv, uTime);
+      vec4 nightBright = texture2D(uNightDiffuse, vUv);
+      vec4 nightDim = texture2D(uNightDiffuseDim, vUv);
+      finalColor = mix(nightDim, nightBright, flickerFactor);
    } else {
-      // Transition mode: mix from day color to the final flickering night color.
+      // Transition mode - compute both day and night, then mix
+      float flickerFactor = fireFlicker(vUv, uTime);
+      vec4 nightBright = texture2D(uNightDiffuse, vUv);
+      vec4 nightDim = texture2D(uNightDiffuseDim, vUv);
+      vec4 finalNightColor = mix(nightDim, nightBright, flickerFactor);
       vec4 dayColor = texture2D(uDayDiffuse, vUv);
       finalColor = mix(dayColor, finalNightColor, smoothstep(0.0, 1.0, uTransitionFactor));
    }

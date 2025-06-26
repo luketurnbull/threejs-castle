@@ -262,6 +262,7 @@ export default function Grass({
         NIGHT_TIP_COLOR,
         transitionValue
       );
+
       materialRef.current.uniforms.bottomColor.value.lerpColors(
         DAY_BOTTOM_COLOR,
         NIGHT_BOTTOM_COLOR,
