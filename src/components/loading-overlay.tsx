@@ -7,8 +7,8 @@ export default function LoadingOverlay() {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Start fade out when daytime-complete is reached
-    if (loadingState === "loading-audio") {
+    // Start fade out when daytime audio is loaded and start button appears
+    if (loadingState === "initialised") {
       if (overlayRef.current) {
         gsap.to(overlayRef.current, {
           opacity: 0,

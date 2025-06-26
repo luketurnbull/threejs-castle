@@ -27,17 +27,15 @@ camera.lookAt(0, 0, 0);
 export type Mode = "day" | "night";
 export type LoadingState =
   | "idle"
-  | "loading-sky"
-  | "loading-audio"
-  | "loading-model"
-  | "loading-textures"
-  | "daytime-complete"
-  | "night-time-complete"
+  | "initialised"
+  | "daytime-loaded"
+  | "daytime-audio-loaded"
   | "complete";
 
 interface AppState {
   // Loading state
   loadingState: LoadingState;
+  isLoading: boolean;
   started: boolean;
 
   // Audio state
@@ -83,7 +81,8 @@ interface AppState {
   // Actions
   init: (renderer: THREE.WebGLRenderer) => void;
   startLoadingSequence: () => void;
-  loadAudio: () => Promise<void>;
+  loadDaytimeAudio: () => Promise<void>;
+  loadNightAudio: () => Promise<void>;
   loadModel: () => Promise<void>;
   loadDayTextures: () => Promise<void>;
   loadNightTextures: () => Promise<void>;
@@ -110,6 +109,7 @@ interface AppState {
 export const useAppStore = create<AppState>((set, get) => ({
   // Loading
   loadingState: "idle",
+  isLoading: false,
   started: false,
 
   // Audio
@@ -151,8 +151,16 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Init
   init: async (renderer: THREE.WebGLRenderer) => {
-    const ktx2Loader = new KTX2Loader();
-    const gltfLoader = new GLTFLoader();
+    const { loadingState, ktx2Loader, gltfLoader } = get();
+
+    // Prevent multiple initializations - check if we already have loaders
+    if (ktx2Loader || gltfLoader || loadingState !== "idle") {
+      console.log("Already initialized, skipping init");
+      return;
+    }
+
+    const newKtx2Loader = new KTX2Loader();
+    const newGltfLoader = new GLTFLoader();
     const textureLoader = new TextureLoader();
     const dracoLoader = new DRACOLoader();
 
@@ -160,14 +168,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     dracoLoader.setDecoderPath("/draco/");
     dracoLoader.setDecoderConfig({ type: "js" });
 
-    ktx2Loader.setTranscoderPath("/basis/");
-    gltfLoader.setKTX2Loader(ktx2Loader.detectSupport(renderer));
-    gltfLoader.setDRACOLoader(dracoLoader);
+    newKtx2Loader.setTranscoderPath("/basis/");
+    newGltfLoader.setKTX2Loader(newKtx2Loader.detectSupport(renderer));
+    newGltfLoader.setDRACOLoader(dracoLoader);
 
     set({
       renderer,
-      gltfLoader,
-      ktx2Loader,
+      gltfLoader: newGltfLoader,
+      ktx2Loader: newKtx2Loader,
       textureLoader,
       dracoLoader,
     });
@@ -177,64 +185,76 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Loading sequence
   startLoadingSequence: async () => {
-    console.log("Starting loading sequence");
-    set({ loadingState: "loading-sky" });
+    const { loadingState, isLoading } = get();
 
-    console.log("App initialized, loading audio");
+    // Prevent multiple loading sequences
+    if (isLoading || loadingState !== "idle") {
+      console.log("Loading sequence already in progress, skipping");
+      return;
+    }
+
+    set({ loadingState: "initialised" });
+
+    // Set loading flag
+    set({ isLoading: true });
 
     try {
-      // Step 2: Load audio
-      set({ loadingState: "loading-audio" });
-      await get().loadAudio();
+      // Step 1: Load model and day textures simultaneously
+      await Promise.all([get().loadModel(), get().loadDayTextures()]);
 
-      console.log("Audio loaded, loading model");
+      console.log("Model and day textures loaded");
+      set({ loadingState: "daytime-loaded" });
 
-      // Step 3: Load model
-      set({ loadingState: "loading-model" });
-      await get().loadModel();
+      // Step 2: Load daytime audio (rustling + background day)
+      await get().loadDaytimeAudio();
 
-      console.log("Model loaded, loading day textures");
+      console.log("Daytime audio loaded");
+      set({ loadingState: "daytime-audio-loaded" });
 
-      // Step 4: Load day textures
-      set({ loadingState: "loading-textures" });
-      await get().loadDayTextures();
+      // Step 3: Load night textures and night audio
+      await Promise.all([get().loadNightTextures(), get().loadNightAudio()]);
 
-      console.log("Day textures loaded, loading night textures");
-
-      // Step 5: Set daytime complete and load night textures
-      set({ loadingState: "daytime-complete" });
-      await get().loadNightTextures();
+      console.log("Night textures and audio loaded");
+      get().setComplete();
     } catch (error) {
       console.error("Loading sequence failed:", error);
-      set({ loadingState: "idle" });
+      // Don't reset to idle, just set loading to false
+      set({ isLoading: false });
     }
   },
 
-  loadAudio: async () => {
-    // Create audio elements during loading
-    const backgroundDayAudio = new Audio(backgroundDayAudioFile);
-    // Set initial properties
-    backgroundDayAudio.loop = true;
-    backgroundDayAudio.volume = AUDIO_VOLUMES.BACKGROUND_DAY;
+  loadDaytimeAudio: async () => {
+    const {
+      backgroundDayAudio: existingBackgroundDay,
+      rustleAudio: existingRustle,
+    } = get();
 
-    const backgroundNightAudio = new Audio(backgroundNightAudioFile);
-    backgroundNightAudio.loop = true;
-    backgroundNightAudio.volume = AUDIO_VOLUMES.BACKGROUND_NIGHT;
+    // Prevent multiple audio loading
+    if (existingBackgroundDay && existingRustle) {
+      console.log("Daytime audio already loaded, skipping");
+      return;
+    }
 
-    const rustleAudio = new Audio(leavesRustlingAudioFile);
-    rustleAudio.loop = true;
-    rustleAudio.volume = AUDIO_VOLUMES.RUSTLE;
+    console.log("Starting daytime audio loading...");
 
-    const fireCracklingAudio = new Audio(fireCracklingAudioFile);
-    fireCracklingAudio.loop = true;
-    fireCracklingAudio.volume = AUDIO_VOLUMES.FIRE_CRACKLING;
+    // Check if browser supports audio
+    if (typeof Audio === "undefined") {
+      console.warn("Audio not supported in this browser");
+      return;
+    }
 
-    const audioFiles = [
-      backgroundDayAudio,
-      backgroundNightAudio,
-      rustleAudio,
-      fireCracklingAudio,
-    ];
+    // Create daytime audio elements
+    const newBackgroundDayAudio = new Audio(backgroundDayAudioFile);
+    newBackgroundDayAudio.loop = true;
+    newBackgroundDayAudio.volume = AUDIO_VOLUMES.BACKGROUND_DAY;
+    newBackgroundDayAudio.preload = "auto";
+
+    const newRustleAudio = new Audio(leavesRustlingAudioFile);
+    newRustleAudio.loop = true;
+    newRustleAudio.volume = AUDIO_VOLUMES.RUSTLE;
+    newRustleAudio.preload = "auto";
+
+    const audioFiles = [newBackgroundDayAudio, newRustleAudio];
 
     return new Promise<void>((resolve) => {
       let loadedCount = 0;
@@ -242,46 +262,160 @@ export const useAppStore = create<AppState>((set, get) => ({
 
       const checkAllLoaded = () => {
         loadedCount++;
+        console.log(`Daytime audio loaded: ${loadedCount}/${totalFiles}`);
+
         if (loadedCount === totalFiles) {
+          console.log("All daytime audio files loaded successfully");
           set({
             audioLoaded: true,
-            backgroundDayAudio,
-            backgroundNightAudio,
-            rustleAudio,
-            fireCracklingAudio,
-            currentBackgroundAudio: backgroundDayAudio, // Start with day audio
+            backgroundDayAudio: newBackgroundDayAudio,
+            rustleAudio: newRustleAudio,
+            currentBackgroundAudio: newBackgroundDayAudio,
           });
-
           resolve();
         }
       };
 
-      audioFiles.forEach((audio) => {
-        // Check if audio is already loaded
+      audioFiles.forEach((audio, index) => {
+        const audioNames = ["backgroundDay", "rustle"];
+        const audioName = audioNames[index];
+
         if (audio && audio.readyState >= 2) {
-          // HAVE_CURRENT_DATA
+          console.log(`${audioName} already loaded`);
           checkAllLoaded();
         } else {
-          // Wait for audio to be ready
           if (audio) {
-            audio.addEventListener("canplaythrough", checkAllLoaded, {
-              once: true,
-            });
+            audio.addEventListener(
+              "canplaythrough",
+              () => {
+                console.log(`${audioName} loaded successfully`);
+                checkAllLoaded();
+              },
+              { once: true }
+            );
 
             audio.addEventListener(
               "error",
               (error: Event) => {
-                console.warn(
-                  "Audio loading failed, continuing without audio:",
-                  error
-                );
-                checkAllLoaded(); // Continue even if audio fails
+                console.error(`${audioName} loading failed:`, error);
+                checkAllLoaded();
               },
               { once: true }
             );
           }
         }
       });
+
+      setTimeout(() => {
+        if (loadedCount < totalFiles) {
+          console.warn(
+            "Daytime audio loading timeout, continuing with loaded files"
+          );
+          set({
+            backgroundDayAudio: loadedCount > 0 ? newBackgroundDayAudio : null,
+            rustleAudio: loadedCount > 1 ? newRustleAudio : null,
+            currentBackgroundAudio: newBackgroundDayAudio,
+          });
+          resolve();
+        }
+      }, 5000);
+    });
+  },
+
+  loadNightAudio: async () => {
+    const {
+      backgroundNightAudio: existingBackgroundNight,
+      fireCracklingAudio: existingFire,
+    } = get();
+
+    // Prevent multiple audio loading
+    if (existingBackgroundNight && existingFire) {
+      console.log("Night audio already loaded, skipping");
+      return;
+    }
+
+    console.log("Starting night audio loading...");
+
+    // Check if browser supports audio
+    if (typeof Audio === "undefined") {
+      console.warn("Audio not supported in this browser");
+      return;
+    }
+
+    // Create night audio elements
+    const newBackgroundNightAudio = new Audio(backgroundNightAudioFile);
+    newBackgroundNightAudio.loop = true;
+    newBackgroundNightAudio.volume = AUDIO_VOLUMES.BACKGROUND_NIGHT;
+    newBackgroundNightAudio.preload = "auto";
+
+    const newFireCracklingAudio = new Audio(fireCracklingAudioFile);
+    newFireCracklingAudio.loop = true;
+    newFireCracklingAudio.volume = AUDIO_VOLUMES.FIRE_CRACKLING;
+    newFireCracklingAudio.preload = "auto";
+
+    const audioFiles = [newBackgroundNightAudio, newFireCracklingAudio];
+
+    return new Promise<void>((resolve) => {
+      let loadedCount = 0;
+      const totalFiles = audioFiles.length;
+
+      const checkAllLoaded = () => {
+        loadedCount++;
+        console.log(`Night audio loaded: ${loadedCount}/${totalFiles}`);
+
+        if (loadedCount === totalFiles) {
+          console.log("All night audio files loaded successfully");
+          set({
+            backgroundNightAudio: newBackgroundNightAudio,
+            fireCracklingAudio: newFireCracklingAudio,
+          });
+          resolve();
+        }
+      };
+
+      audioFiles.forEach((audio, index) => {
+        const audioNames = ["backgroundNight", "fireCrackling"];
+        const audioName = audioNames[index];
+
+        if (audio && audio.readyState >= 2) {
+          console.log(`${audioName} already loaded`);
+          checkAllLoaded();
+        } else {
+          if (audio) {
+            audio.addEventListener(
+              "canplaythrough",
+              () => {
+                console.log(`${audioName} loaded successfully`);
+                checkAllLoaded();
+              },
+              { once: true }
+            );
+
+            audio.addEventListener(
+              "error",
+              (error: Event) => {
+                console.error(`${audioName} loading failed:`, error);
+                checkAllLoaded();
+              },
+              { once: true }
+            );
+          }
+        }
+      });
+
+      setTimeout(() => {
+        if (loadedCount < totalFiles) {
+          console.warn(
+            "Night audio loading timeout, continuing with loaded files"
+          );
+          set({
+            backgroundNightAudio:
+              loadedCount > 0 ? newBackgroundNightAudio : null,
+            fireCracklingAudio: loadedCount > 1 ? newFireCracklingAudio : null,
+          });
+          resolve();
+        }
+      }, 5000);
     });
   },
 
@@ -686,6 +820,6 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Set complete
   setComplete: () => {
-    set({ loadingState: "complete" });
+    set({ loadingState: "complete", isLoading: false });
   },
 }));

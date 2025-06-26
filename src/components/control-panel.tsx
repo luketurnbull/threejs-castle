@@ -8,15 +8,16 @@ export default function ControlPanel() {
   const audioEnabled = useAppStore((state) => state.audioEnabled);
   const toggleAudio = useAppStore((state) => state.toggleAudio);
   const loadingState = useAppStore((state) => state.loadingState);
+  const audioLoaded = useAppStore((state) => state.audioLoaded);
   const started = useAppStore((state) => state.started);
   const start = useAppStore((state) => state.start);
   const [showStartButton, setShowStartButton] = useState(false);
 
   useEffect(() => {
-    if (loadingState === "daytime-complete") {
+    if (loadingState === "daytime-audio-loaded" && audioLoaded) {
       setShowStartButton(true);
     }
-  }, [loadingState]);
+  }, [loadingState, audioLoaded]);
 
   useEffect(() => {
     if (started) {

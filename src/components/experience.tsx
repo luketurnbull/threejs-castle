@@ -18,12 +18,13 @@ import { useAppStore } from "@/store";
 export default function Experience() {
   const { gl } = useThree();
   const init = useAppStore((state) => state.init);
+  const loadingState = useAppStore((state) => state.loadingState);
 
   useEffect(() => {
-    if (gl) {
+    if (gl && loadingState === "idle") {
       void init(gl);
     }
-  }, [gl, init]);
+  }, [gl]);
 
   return (
     <>
