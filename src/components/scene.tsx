@@ -19,7 +19,7 @@ export default function Scene(props: JSX.IntrinsicElements["group"]) {
       gsap.to(
         { value: sceneY },
         {
-          value: 0, // Move to normal position
+          value: 0,
           duration: 1,
           ease: "power2.out",
           onUpdate: function () {

@@ -6,6 +6,9 @@ import { GLTFLoader, KTX2Loader, DRACOLoader } from "three-stdlib";
 import { TextureLoader } from "three";
 import { TEXTURES } from "@/constants/assets";
 
+const isMobile = window.innerWidth < 750;
+const CAMERA_INIT_X = isMobile ? -180 : -140;
+
 const camera = new THREE.PerspectiveCamera(
   45,
   window.innerWidth / window.innerHeight,
@@ -14,7 +17,7 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 // Initial camera position looking at the center
-camera.position.set(-150, 0, 0);
+camera.position.set(CAMERA_INIT_X, 0, 0);
 camera.lookAt(0, 0, 0);
 
 export type Mode = "day" | "night";
@@ -31,7 +34,6 @@ export type LoadingState =
 interface AppState {
   // Loading state
   loadingState: LoadingState;
-  isLoading: boolean;
   started: boolean;
 
   // Audio state
@@ -96,23 +98,33 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
+  // Loading
   loadingState: "idle",
-  isLoading: false,
   started: false,
+
+  // Audio
   audioEnabled: true,
   audioLoaded: false,
   backgroundAudio: null,
   rustleAudio: null,
+
+  // Mode
   mode: "day",
+
+  // Three.js references
   camera,
   renderer: null,
   gltfLoader: null,
   ktx2Loader: null,
   textureLoader: null,
   dracoLoader: null,
+
+  // Individual meshes
   hillMesh: null,
   objectsMesh: null,
   windowInsideMesh: null,
+
+  // Textures
   grass_diffuse: null,
   grass_alpha: null,
   hill_day: null,
@@ -154,7 +166,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Loading sequence
   startLoadingSequence: async () => {
     console.log("Starting loading sequence");
-    set({ isLoading: true, loadingState: "loading-sky" });
+    set({ loadingState: "loading-sky" });
 
     console.log("App initialized, loading audio");
 
@@ -182,7 +194,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       await get().loadNightTextures();
     } catch (error) {
       console.error("Loading sequence failed:", error);
-      set({ loadingState: "idle", isLoading: false });
+      set({ loadingState: "idle" });
     }
   },
 

@@ -29,6 +29,7 @@ export default function Experience() {
     <>
       <SkySettings />
       <CloudSettings />
+
       <Scene />
       <Controls />
 
@@ -40,22 +41,20 @@ export default function Experience() {
 }
 
 function Controls() {
-  const loadingState = useAppStore((state) => state.loadingState);
   const started = useAppStore((state) => state.started);
-
-  if (loadingState !== "complete" || !started) {
-    return null;
-  }
 
   return (
     <OrbitControls
-      minPolarAngle={Math.PI * 0.45}
-      maxPolarAngle={Math.PI * 0.55}
-      enableZoom={false}
+      minPolarAngle={Math.PI * 0.4}
+      maxPolarAngle={Math.PI * 0.52}
+      enableZoom={true}
+      minDistance={110}
+      maxDistance={180}
       makeDefault={true}
       enablePan={false}
       enableDamping={true}
       dampingFactor={0.05}
+      enabled={started}
     />
   );
 }
