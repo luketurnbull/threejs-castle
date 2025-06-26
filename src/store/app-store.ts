@@ -1,10 +1,14 @@
 import { create } from "zustand";
-import backgroundSounds from "../assets/background.mp3";
-import rustleAudioFile from "../assets/leavesRustling2.mp3";
+import backgroundNightAudioFile from "../assets/backgroundNight.mp3";
+import leavesRustlingAudioFile from "../assets/leavesRustling.mp3";
+import backgroundDayAudioFile from "../assets/backgroundDay.wav";
+import fireCracklingAudioFile from "../assets/fireCrackling.wav";
 import * as THREE from "three";
 import { GLTFLoader, KTX2Loader, DRACOLoader } from "three-stdlib";
 import { TextureLoader } from "three";
 import { TEXTURES } from "@/constants/assets";
+import { AUDIO_VOLUMES } from "@/constants/audio";
+import { NIGHT_TIME_TRANSITION_DURATION } from "@/lib/animation";
 
 const isMobile = window.innerWidth < 750;
 const CAMERA_INIT_X = isMobile ? -180 : -140;
@@ -39,8 +43,11 @@ interface AppState {
   // Audio state
   audioEnabled: boolean;
   audioLoaded: boolean;
-  backgroundAudio: HTMLAudioElement | null;
+  backgroundDayAudio: HTMLAudioElement | null;
+  backgroundNightAudio: HTMLAudioElement | null;
   rustleAudio: HTMLAudioElement | null;
+  fireCracklingAudio: HTMLAudioElement | null;
+  currentBackgroundAudio: HTMLAudioElement | null;
 
   // Mode
   mode: Mode;
@@ -85,6 +92,8 @@ interface AppState {
   toggleAudio: () => void;
   startBackgroundAudio: () => void;
   stopBackgroundAudio: () => void;
+  transitionToDayAudio: () => void;
+  transitionToNightAudio: () => void;
 
   // Mode
   setDay: () => void;
@@ -105,9 +114,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Audio
   audioEnabled: true,
   audioLoaded: false,
-  backgroundAudio: null,
+  backgroundDayAudio: null,
+  backgroundNightAudio: null,
   rustleAudio: null,
-
+  fireCracklingAudio: null,
+  currentBackgroundAudio: null,
   // Mode
   mode: "day",
 
@@ -200,15 +211,29 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   loadAudio: async () => {
     // Create audio elements during loading
-    const backgroundAudio = new Audio(backgroundSounds);
-    const rustleAudio = new Audio(rustleAudioFile);
-
+    const backgroundDayAudio = new Audio(backgroundDayAudioFile);
     // Set initial properties
-    backgroundAudio.loop = true;
-    backgroundAudio.volume = 0.5;
-    rustleAudio.loop = true;
+    backgroundDayAudio.loop = true;
+    backgroundDayAudio.volume = AUDIO_VOLUMES.BACKGROUND_DAY;
 
-    const audioFiles = [backgroundAudio, rustleAudio];
+    const backgroundNightAudio = new Audio(backgroundNightAudioFile);
+    backgroundNightAudio.loop = true;
+    backgroundNightAudio.volume = AUDIO_VOLUMES.BACKGROUND_NIGHT;
+
+    const rustleAudio = new Audio(leavesRustlingAudioFile);
+    rustleAudio.loop = true;
+    rustleAudio.volume = AUDIO_VOLUMES.RUSTLE;
+
+    const fireCracklingAudio = new Audio(fireCracklingAudioFile);
+    fireCracklingAudio.loop = true;
+    fireCracklingAudio.volume = AUDIO_VOLUMES.FIRE_CRACKLING;
+
+    const audioFiles = [
+      backgroundDayAudio,
+      backgroundNightAudio,
+      rustleAudio,
+      fireCracklingAudio,
+    ];
 
     return new Promise<void>((resolve) => {
       let loadedCount = 0;
@@ -219,9 +244,13 @@ export const useAppStore = create<AppState>((set, get) => ({
         if (loadedCount === totalFiles) {
           set({
             audioLoaded: true,
-            backgroundAudio,
+            backgroundDayAudio,
+            backgroundNightAudio,
             rustleAudio,
+            fireCracklingAudio,
+            currentBackgroundAudio: backgroundDayAudio, // Start with day audio
           });
+
           resolve();
         }
       };
@@ -237,6 +266,7 @@ export const useAppStore = create<AppState>((set, get) => ({
             audio.addEventListener("canplaythrough", checkAllLoaded, {
               once: true,
             });
+
             audio.addEventListener(
               "error",
               (error: Event) => {
@@ -462,45 +492,146 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Audio
   toggleAudio: () => {
-    const { audioEnabled, backgroundAudio, started } = get();
+    const { audioEnabled, currentBackgroundAudio, started } = get();
     const newAudioEnabled = !audioEnabled;
 
     set({ audioEnabled: newAudioEnabled });
 
-    if (newAudioEnabled && started && backgroundAudio) {
-      backgroundAudio.play().catch(console.error);
+    if (newAudioEnabled && started && currentBackgroundAudio) {
+      currentBackgroundAudio.play().catch(console.error);
     } else {
-      if (backgroundAudio) {
-        backgroundAudio.pause();
+      if (currentBackgroundAudio) {
+        currentBackgroundAudio.pause();
       }
     }
   },
 
   startBackgroundAudio: () => {
-    const { backgroundAudio, audioEnabled, started } = get();
+    const { currentBackgroundAudio, audioEnabled, started } = get();
 
-    if (audioEnabled && started && backgroundAudio) {
-      backgroundAudio.loop = true;
-      backgroundAudio.volume = 0.5;
-      backgroundAudio.play().catch(console.error);
+    if (audioEnabled && started && currentBackgroundAudio) {
+      currentBackgroundAudio.loop = true;
+      currentBackgroundAudio.volume = AUDIO_VOLUMES.BACKGROUND;
+      currentBackgroundAudio.play().catch(console.error);
     }
   },
 
   stopBackgroundAudio: () => {
-    const { backgroundAudio } = get();
+    const { currentBackgroundAudio } = get();
 
-    if (backgroundAudio) {
-      backgroundAudio.pause();
+    if (currentBackgroundAudio) {
+      currentBackgroundAudio.pause();
     }
+  },
+
+  transitionToDayAudio: () => {
+    const { backgroundDayAudio, backgroundNightAudio, audioEnabled, started } =
+      get();
+
+    if (!audioEnabled || !started) return;
+
+    // Start day audio if not already playing
+    if (backgroundDayAudio && backgroundDayAudio.paused) {
+      backgroundDayAudio.volume = 0;
+      backgroundDayAudio.play().catch(console.error);
+    }
+
+    // Fade out night audio and fade in day audio
+    if (backgroundNightAudio && backgroundDayAudio) {
+      const startTime = Date.now();
+      const duration = NIGHT_TIME_TRANSITION_DURATION * 1000; // Convert to milliseconds
+
+      const fadeInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        if (backgroundNightAudio) {
+          backgroundNightAudio.volume =
+            AUDIO_VOLUMES.BACKGROUND_NIGHT * (1 - progress);
+        }
+
+        if (backgroundDayAudio) {
+          backgroundDayAudio.volume = AUDIO_VOLUMES.BACKGROUND_DAY * progress;
+        }
+
+        if (progress >= 1) {
+          clearInterval(fadeInterval);
+          if (backgroundNightAudio) {
+            backgroundNightAudio.pause();
+            backgroundNightAudio.volume = AUDIO_VOLUMES.BACKGROUND_NIGHT; // Reset volume
+          }
+          if (backgroundDayAudio) {
+            backgroundDayAudio.volume = AUDIO_VOLUMES.BACKGROUND_DAY; // Ensure final volume
+          }
+        }
+      }, 16); // ~60fps
+    }
+
+    set({ currentBackgroundAudio: backgroundDayAudio });
+  },
+
+  transitionToNightAudio: () => {
+    const { backgroundDayAudio, backgroundNightAudio, audioEnabled, started } =
+      get();
+
+    if (!audioEnabled || !started) return;
+
+    // Start night audio if not already playing
+    if (backgroundNightAudio && backgroundNightAudio.paused) {
+      backgroundNightAudio.volume = 0;
+      backgroundNightAudio.play().catch(console.error);
+    }
+
+    // Fade out day audio and fade in night audio
+    if (backgroundDayAudio && backgroundNightAudio) {
+      const startTime = Date.now();
+      const duration = NIGHT_TIME_TRANSITION_DURATION * 1000; // Convert to milliseconds
+
+      const fadeInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        if (backgroundDayAudio) {
+          backgroundDayAudio.volume =
+            AUDIO_VOLUMES.BACKGROUND_DAY * (1 - progress);
+        }
+
+        if (backgroundNightAudio) {
+          backgroundNightAudio.volume =
+            AUDIO_VOLUMES.BACKGROUND_NIGHT * progress;
+        }
+
+        if (progress >= 1) {
+          clearInterval(fadeInterval);
+          if (backgroundDayAudio) {
+            backgroundDayAudio.pause();
+            backgroundDayAudio.volume = AUDIO_VOLUMES.BACKGROUND_DAY; // Reset volume
+          }
+          if (backgroundNightAudio) {
+            backgroundNightAudio.volume = AUDIO_VOLUMES.BACKGROUND_NIGHT; // Ensure final volume
+          }
+        }
+      }, 16); // ~60fps
+    }
+
+    set({ currentBackgroundAudio: backgroundNightAudio });
   },
 
   // Mode
   setDay: () => {
-    set({ mode: "day" });
+    const { mode } = get();
+    if (mode !== "day") {
+      set({ mode: "day" });
+      get().transitionToDayAudio();
+    }
   },
 
   setNight: () => {
-    set({ mode: "night" });
+    const { mode } = get();
+    if (mode !== "night") {
+      set({ mode: "night" });
+      get().transitionToNightAudio();
+    }
   },
 
   // Start experience
