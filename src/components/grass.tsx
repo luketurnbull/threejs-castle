@@ -49,6 +49,7 @@ export default function Grass({
   const hillMesh = useAppStore((state) => state.hillMesh);
   const mode = useAppStore((state) => state.mode);
   const audioEnabled = useAppStore((state) => state.audioEnabled);
+  const started = useAppStore((state) => state.started);
   const rustleAudio = useAppStore((state) => state.rustleAudio);
 
   // Check if all required textures are loaded
@@ -286,8 +287,8 @@ export default function Grass({
         // Always update the player position for visual rustling effects
         materialRef.current.uniforms.playerPosition.value.copy(hitPoint);
 
-        // Only handle audio if audio is enabled
-        if (audioEnabled) {
+        // Only handle audio if audio is enabled and experience has started
+        if (audioEnabled && started) {
           if (hasMoved) {
             const distance = camera.position.distanceTo(hitPoint);
 
@@ -348,8 +349,8 @@ export default function Grass({
           }
         }
       } else {
-        // When not hovering over hill, immediately stop the sound (only if audio enabled)
-        if (audioEnabled) {
+        // When not hovering over hill, immediately stop the sound (only if audio enabled and started)
+        if (audioEnabled && started) {
           if (stopTimeoutRef.current) {
             clearTimeout(stopTimeoutRef.current);
             stopTimeoutRef.current = null;

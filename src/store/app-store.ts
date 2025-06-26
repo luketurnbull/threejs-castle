@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import backgroundSounds from "../assets/background.mp3";
-import rustleAudio from "../assets/leavesRustling2.mp3";
+import rustleAudioFile from "../assets/leavesRustling2.mp3";
 import * as THREE from "three";
 import { GLTFLoader, KTX2Loader, DRACOLoader } from "three-stdlib";
 import { TextureLoader } from "three";
@@ -36,8 +36,9 @@ interface AppState {
 
   // Audio state
   audioEnabled: boolean;
-  backgroundAudio: HTMLAudioElement;
-  rustleAudio: HTMLAudioElement;
+  audioLoaded: boolean;
+  backgroundAudio: HTMLAudioElement | null;
+  rustleAudio: HTMLAudioElement | null;
 
   // Mode
   mode: Mode;
@@ -99,8 +100,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   isLoading: false,
   started: false,
   audioEnabled: true,
-  backgroundAudio: new Audio(backgroundSounds),
-  rustleAudio: new Audio(rustleAudio),
+  audioLoaded: false,
+  backgroundAudio: null,
+  rustleAudio: null,
   mode: "day",
   camera,
   renderer: null,
@@ -151,27 +153,33 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Loading sequence
   startLoadingSequence: async () => {
+    console.log("Starting loading sequence");
     set({ isLoading: true, loadingState: "loading-sky" });
+
+    console.log("App initialized, loading audio");
 
     try {
       // Step 2: Load audio
       set({ loadingState: "loading-audio" });
       await get().loadAudio();
 
+      console.log("Audio loaded, loading model");
+
       // Step 3: Load model
       set({ loadingState: "loading-model" });
       await get().loadModel();
+
+      console.log("Model loaded, loading day textures");
 
       // Step 4: Load day textures
       set({ loadingState: "loading-textures" });
       await get().loadDayTextures();
 
+      console.log("Day textures loaded, loading night textures");
+
       // Step 5: Set daytime complete and load night textures
       set({ loadingState: "daytime-complete" });
       await get().loadNightTextures();
-
-      // Step 6: Set night-time complete (scene animation will set to complete)
-      set({ loadingState: "night-time-complete", isLoading: false });
     } catch (error) {
       console.error("Loading sequence failed:", error);
       set({ loadingState: "idle", isLoading: false });
@@ -179,7 +187,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   loadAudio: async () => {
-    const { backgroundAudio, rustleAudio } = get();
+    // Create audio elements during loading
+    const backgroundAudio = new Audio(backgroundSounds);
+    const rustleAudio = new Audio(rustleAudioFile);
+
+    // Set initial properties
+    backgroundAudio.loop = true;
+    backgroundAudio.volume = 0.5;
+    rustleAudio.loop = true;
 
     const audioFiles = [backgroundAudio, rustleAudio];
 
@@ -190,29 +205,39 @@ export const useAppStore = create<AppState>((set, get) => ({
       const checkAllLoaded = () => {
         loadedCount++;
         if (loadedCount === totalFiles) {
+          set({
+            audioLoaded: true,
+            backgroundAudio,
+            rustleAudio,
+          });
           resolve();
         }
       };
 
       audioFiles.forEach((audio) => {
-        // Preload each audio file
-        audio.addEventListener("canplaythrough", checkAllLoaded, {
-          once: true,
-        });
-        audio.addEventListener(
-          "error",
-          (error) => {
-            console.warn(
-              "Audio loading failed, continuing without audio:",
-              error
+        // Check if audio is already loaded
+        if (audio && audio.readyState >= 2) {
+          // HAVE_CURRENT_DATA
+          checkAllLoaded();
+        } else {
+          // Wait for audio to be ready
+          if (audio) {
+            audio.addEventListener("canplaythrough", checkAllLoaded, {
+              once: true,
+            });
+            audio.addEventListener(
+              "error",
+              (error: Event) => {
+                console.warn(
+                  "Audio loading failed, continuing without audio:",
+                  error
+                );
+                checkAllLoaded(); // Continue even if audio fails
+              },
+              { once: true }
             );
-            checkAllLoaded(); // Continue even if audio fails
-          },
-          { once: true }
-        );
-
-        // Start loading the audio
-        audio.load();
+          }
+        }
       });
     });
   },
@@ -425,21 +450,24 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Audio
   toggleAudio: () => {
-    const { audioEnabled, backgroundAudio } = get();
+    const { audioEnabled, backgroundAudio, started } = get();
     const newAudioEnabled = !audioEnabled;
 
     set({ audioEnabled: newAudioEnabled });
 
-    if (newAudioEnabled) {
+    if (newAudioEnabled && started && backgroundAudio) {
       backgroundAudio.play().catch(console.error);
     } else {
-      backgroundAudio.pause();
+      if (backgroundAudio) {
+        backgroundAudio.pause();
+      }
     }
   },
 
   startBackgroundAudio: () => {
-    const { backgroundAudio, audioEnabled } = get();
-    if (audioEnabled) {
+    const { backgroundAudio, audioEnabled, started } = get();
+
+    if (audioEnabled && started && backgroundAudio) {
       backgroundAudio.loop = true;
       backgroundAudio.volume = 0.5;
       backgroundAudio.play().catch(console.error);
@@ -448,7 +476,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   stopBackgroundAudio: () => {
     const { backgroundAudio } = get();
-    backgroundAudio.pause();
+
+    if (backgroundAudio) {
+      backgroundAudio.pause();
+    }
   },
 
   // Mode
