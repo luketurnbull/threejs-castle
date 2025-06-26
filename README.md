@@ -21,29 +21,20 @@ I would like when the audio button is clicked, the sound icon should animate to 
 
 I would like to add sounds and cool hover effect/ click effect to the buttons.
 
-## Compressing images / Performance optimizations
-
-Possible make all images half the size and see if it improves the performance. And then BASIS compress them:
-https://github.com/BinomialLLC/basis_universal
-
-This seems to be the best setting:
-
-```
-basisu -file input.png -ktx2 -uastc -uastc_level 2 -linear
-```
-
-```
--resample-factor .5
-```
-
-Potentially do adaptive performance? Less grass blades and no clouds if the users computer can't handle it?
-
-## Post processing
-
-If the smaller images work, I would like to add some post processing effects.
-
 # Audio
 
 Different audio for day and night.
 
 Audio for fire, when the camera is close to the fire, make it louder.
+
+## Compressing images / Performance optimizations
+
+I compressed the images with the following command:
+
+```
+basisu -file input.png -ktx2 -uastc -uastc_level 2 -linear -resample-factor .5
+```
+
+```
+-resample-factor .5
+```
