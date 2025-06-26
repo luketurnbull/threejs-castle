@@ -51,7 +51,7 @@ export default function FloatingText() {
         scale={textScale * 4}
       >
         <Text
-          fontSize={1.8}
+          fontSize={1.75}
           color="#ffffff"
           anchorX="center"
           anchorY="middle"
