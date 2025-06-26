@@ -53,8 +53,10 @@ function Controls() {
       makeDefault={true}
       enablePan={false}
       enableDamping={true}
-      dampingFactor={0.05}
+      dampingFactor={0.02}
       enabled={started}
+      panSpeed={0.05}
+      zoomSpeed={0.06}
     />
   );
 }

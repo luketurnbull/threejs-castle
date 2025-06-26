@@ -61,7 +61,7 @@ export default function FloatingText() {
         </Text>
       </group>
       <group
-        position={[-48, -16, 0]}
+        position={[-45, -15, 0]}
         rotation={[0, -Math.PI / 2, 0]}
         scale={textScale * 2}
       >
