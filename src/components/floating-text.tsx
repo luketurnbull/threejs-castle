@@ -13,7 +13,6 @@ export default function FloatingText() {
 
     // Animate text in
     timeline
-      .to({}, { duration: 0.5 }) // Small delay
       .to(
         { value: textScale },
         {
@@ -44,21 +43,32 @@ export default function FloatingText() {
   }, []);
 
   return (
-    <group
-      ref={textRef}
-      position={[-36, -7, 0]}
-      rotation={[0, -Math.PI / 2, 0]}
-      scale={textScale * 4}
-    >
-      <Text
-        fontSize={2}
-        color="#ffffff"
-        anchorX="center"
-        anchorY="middle"
-        fillOpacity={textOpacity}
+    <>
+      <group
+        ref={textRef}
+        position={[-36, -7, 0]}
+        rotation={[0, -Math.PI / 2, 0]}
+        scale={textScale * 4}
       >
-        CASTLE ON A HILL
-      </Text>
-    </group>
+        <Text
+          fontSize={2}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+          fillOpacity={textOpacity}
+        >
+          CASTLE ON A HILL
+        </Text>
+      </group>
+      <group
+        position={[-48, -16, 0]}
+        rotation={[0, -Math.PI / 2, 0]}
+        scale={textScale * 2}
+      >
+        <Text fontSize={1} color="#ffffff" anchorX="center" anchorY="middle">
+          A ThreeJS Project by Luke Turnbull
+        </Text>
+      </group>
+    </>
   );
 }
