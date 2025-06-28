@@ -1,6 +1,7 @@
 import { useAppStore } from "@/store";
 import { ModeToggle } from "./ui/mode-toggle";
 import { useEffect, useState } from "react";
+import Button from "./ui/button";
 
 export default function ControlPanel() {
   const audioEnabled = useAppStore((state) => state.audioEnabled);
@@ -46,20 +47,18 @@ export default function ControlPanel() {
     <div
       style={{
         position: "fixed",
-        bottom: "16.666667%",
+        bottom: "5%",
         left: "50%",
         transform: "translate(-50%, -50%)",
         zIndex: 50,
       }}
     >
-      <button
+      <Button
         onClick={start}
         style={{
           display: "flex",
           alignItems: "center",
           gap: "8px",
-          padding: "16px 32px",
-          fontSize: "18px",
           transition: "all 700ms ease-out",
           opacity: showStartButton ? 1 : 0,
           transform: showStartButton
@@ -68,7 +67,7 @@ export default function ControlPanel() {
         }}
       >
         Start Experience
-      </button>
+      </Button>
     </div>
   );
 }
