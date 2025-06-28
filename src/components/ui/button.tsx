@@ -21,7 +21,14 @@ export default function Button({
         margin: 0,
         cursor: "pointer",
         display: "inline-block",
+        transition: "transform 0.2s cubic-bezier(.4,2,.6,1)",
         ...style,
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "scale(1.15)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "scale(1)";
       }}
     >
       <div style={{ position: "relative", display: "inline-block" }}>

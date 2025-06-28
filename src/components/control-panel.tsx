@@ -59,7 +59,6 @@ export default function ControlPanel() {
         style={{
           width: "100px",
           height: "100px",
-          transition: "all 700ms ease-out",
           opacity: showStartButton ? 1 : 0,
           transform: showStartButton
             ? "scale(1) translateY(0)"
