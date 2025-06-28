@@ -26,20 +26,21 @@ export default function ControlPanel() {
 
   if (started) {
     return (
-      <div
-        style={{
-          position: "fixed",
-          top: "24px",
-          right: "24px",
-          zIndex: 50,
-          display: "flex",
-          flexDirection: "column",
-          gap: "8px",
-        }}
-      >
-        <button onClick={toggleAudio}>{audioEnabled ? "On" : "Off"}</button>
+      <>
         <ModeToggle />
-      </div>
+        <Button
+          onClick={toggleAudio}
+          style={{
+            width: "50px",
+            height: "50px",
+            position: "fixed",
+            top: "20px",
+            left: "20px",
+          }}
+        >
+          {audioEnabled ? "On" : "Off"}
+        </Button>
+      </>
     );
   }
 
@@ -56,6 +57,8 @@ export default function ControlPanel() {
       <Button
         onClick={start}
         style={{
+          width: "100px",
+          height: "100px",
           transition: "all 700ms ease-out",
           opacity: showStartButton ? 1 : 0,
           transform: showStartButton

@@ -26,8 +26,8 @@ export default function Button({
     >
       <div style={{ position: "relative", display: "inline-block" }}>
         <svg
-          width="110"
-          height="110"
+          width="100%"
+          height="100%"
           viewBox="0 0 110 110"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
