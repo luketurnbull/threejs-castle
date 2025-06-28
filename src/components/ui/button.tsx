@@ -1,10 +1,16 @@
 interface ButtonProps {
   children?: React.ReactNode;
   style?: React.CSSProperties;
+  childrenStyle?: React.CSSProperties;
   onClick?: () => void;
 }
 
-export default function Button({ children, style, onClick }: ButtonProps) {
+export default function Button({
+  children,
+  style,
+  childrenStyle,
+  onClick,
+}: ButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -253,6 +259,7 @@ export default function Button({ children, style, onClick }: ButtonProps) {
               left: "50%",
               transform: "translate(-50%, -50%)",
               pointerEvents: "none",
+              ...childrenStyle,
             }}
           >
             {children}
