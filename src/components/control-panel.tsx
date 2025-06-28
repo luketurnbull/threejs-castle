@@ -1,6 +1,4 @@
 import { useAppStore } from "@/store";
-import { Button } from "./ui/button";
-import { Volume2, VolumeOff, Play } from "lucide-react";
 import { ModeToggle } from "./ui/mode-toggle";
 import { useEffect, useState } from "react";
 
@@ -27,29 +25,50 @@ export default function ControlPanel() {
 
   if (started) {
     return (
-      <div className="fixed top-6 right-6 z-50 flex flex-col gap-y-2">
-        <Button size="icon" onClick={toggleAudio}>
-          {audioEnabled ? <Volume2 /> : <VolumeOff />}
-        </Button>
+      <div
+        style={{
+          position: "fixed",
+          top: "24px",
+          right: "24px",
+          zIndex: 50,
+          display: "flex",
+          flexDirection: "column",
+          gap: "8px",
+        }}
+      >
+        <button onClick={toggleAudio}>{audioEnabled ? "On" : "Off"}</button>
         <ModeToggle />
       </div>
     );
   }
 
   return (
-    <div className="fixed bottom-1/6 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
-      <Button
-        size="lg"
+    <div
+      style={{
+        position: "fixed",
+        bottom: "16.666667%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        zIndex: 50,
+      }}
+    >
+      <button
         onClick={start}
-        className={`flex items-center gap-2 px-8 py-4 text-lg transition-all duration-700 ease-out ${
-          showStartButton
-            ? "opacity-100 scale-100 translate-y-0"
-            : "opacity-0 scale-95 translate-y-4"
-        }`}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          padding: "16px 32px",
+          fontSize: "18px",
+          transition: "all 700ms ease-out",
+          opacity: showStartButton ? 1 : 0,
+          transform: showStartButton
+            ? "scale(1) translateY(0)"
+            : "scale(0.95) translateY(16px)",
+        }}
       >
-        <Play className="w-6 h-6" />
         Start Experience
-      </Button>
+      </button>
     </div>
   );
 }

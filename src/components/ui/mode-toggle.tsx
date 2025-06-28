@@ -1,6 +1,4 @@
-import { Button } from "./button";
 import { useAppStore } from "../../store";
-import { Moon, Sun } from "lucide-react";
 
 export function ModeToggle() {
   const mode = useAppStore((state) => state.mode);
@@ -8,16 +6,8 @@ export function ModeToggle() {
   const setNight = useAppStore((state) => state.setNight);
 
   if (mode === "day") {
-    return (
-      <Button size="icon" onClick={setNight}>
-        <Sun />
-      </Button>
-    );
+    return <button onClick={setNight}>Night</button>;
   }
 
-  return (
-    <Button size="icon" onClick={setDay}>
-      <Moon />
-    </Button>
-  );
+  return <button onClick={setDay}>Day</button>;
 }

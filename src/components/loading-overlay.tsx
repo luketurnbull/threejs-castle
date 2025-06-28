@@ -22,8 +22,14 @@ export default function LoadingOverlay() {
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 pointer-events-none"
       style={{
+        position: "fixed",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        zIndex: 50,
+        pointerEvents: "none",
         opacity: 1,
         background:
           "linear-gradient(to bottom, #B3BDB9 0%, #A99391 50%, #918A8C 100%)",
