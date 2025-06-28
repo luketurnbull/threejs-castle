@@ -4,7 +4,14 @@ import LoadingOverlay from "./components/loading-overlay";
 
 function App() {
   return (
-    <div className="h-screen w-screen relative overflow-hidden">
+    <div
+      style={{
+        height: "100vh",
+        width: "100vw",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
       <Castle />
       <ControlPanel />
       <LoadingOverlay />

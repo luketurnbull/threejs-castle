@@ -627,7 +627,12 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Audio
   toggleAudio: () => {
-    const { audioEnabled, currentBackgroundAudio, started } = get();
+    const {
+      audioEnabled,
+      currentBackgroundAudio,
+      fireCracklingAudio,
+      started,
+    } = get();
     const newAudioEnabled = !audioEnabled;
 
     set({ audioEnabled: newAudioEnabled });
@@ -637,6 +642,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     } else {
       if (currentBackgroundAudio) {
         currentBackgroundAudio.pause();
+      }
+      // Also pause fire audio when audio is toggled off
+      if (fireCracklingAudio && !fireCracklingAudio.paused) {
+        fireCracklingAudio.pause();
       }
     }
   },
