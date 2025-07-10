@@ -24,7 +24,7 @@ export default function Experience() {
     if (gl && loadingState === "idle") {
       void init(gl);
     }
-  }, [gl]);
+  }, [gl, init]);
 
   return (
     <>

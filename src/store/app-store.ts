@@ -35,7 +35,6 @@ export type LoadingState =
 interface AppState {
   // Loading state
   loadingState: LoadingState;
-  isLoading: boolean;
   started: boolean;
 
   // Audio state
@@ -109,7 +108,6 @@ interface AppState {
 export const useAppStore = create<AppState>((set, get) => ({
   // Loading
   loadingState: "idle",
-  isLoading: false,
   started: false,
 
   // Audio
@@ -185,18 +183,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Loading sequence
   startLoadingSequence: async () => {
-    const { loadingState, isLoading } = get();
-
-    // Prevent multiple loading sequences
-    if (isLoading || loadingState !== "idle") {
-      console.log("Loading sequence already in progress, skipping");
-      return;
-    }
-
     set({ loadingState: "initialised" });
-
-    // Set loading flag
-    set({ isLoading: true });
 
     try {
       // Step 1: Load model and day textures simultaneously
@@ -218,8 +205,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       get().setComplete();
     } catch (error) {
       console.error("Loading sequence failed:", error);
-      // Don't reset to idle, just set loading to false
-      set({ isLoading: false });
+      set({ loadingState: "idle" });
     }
   },
 
@@ -800,24 +786,22 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Mode
   setDay: () => {
-    const { mode, fireCracklingAudio } = get();
-    if (mode !== "day") {
-      // Stop fire audio when switching to day mode
-      if (fireCracklingAudio && !fireCracklingAudio.paused) {
-        fireCracklingAudio.pause();
-      }
+    const { fireCracklingAudio } = get();
 
-      set({ mode: "day" });
-      get().transitionToDayAudio();
+    // Stop fire audio when switching to day mode
+    if (fireCracklingAudio && !fireCracklingAudio.paused) {
+      fireCracklingAudio.pause();
     }
+
+    set({ mode: "day" });
   },
 
   setNight: () => {
     const { mode } = get();
+
     if (mode !== "night") {
       set({ mode: "night" });
       get().transitionToNightAudio();
-      // Fire audio will start automatically when updateFireAudioVolume is called
     }
   },
 
@@ -829,6 +813,6 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Set complete
   setComplete: () => {
-    set({ loadingState: "complete", isLoading: false });
+    set({ loadingState: "complete" });
   },
 }));
